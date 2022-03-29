@@ -7,5 +7,340 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_CONNECTION_URL")
+}
+
+model User {
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  email               String               @unique
+  password            String
+  role                Role                 @default(STUDENT)
+  firstName           String               @map("first_name")
+  lastName            String               @map("last_name")
+  middleName          String               @map("middle_name")
+  birthDate           DateTime             @map("birth_date")
+  about               String?
+  phone               String?
+  gender              Gender
+  confirmed           Boolean              @default(false)
+  avatar              Avatar?
+  studentInfo         Student?
+  teacherInfo         Teacher?
+  articles            Article[]
+  courseReviews       CourseReview[]
+  olympiadReviews     OlympiadReview[]
+  passwordResetTokens PasswordResetToken[]
+  registrationTokens  RegistrationToken[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model PasswordResetToken {
+  id      Int         @id @default(autoincrement())
+  token   String      @unique
+  userId  Int         @map("user_id")
+  ip      String
+  browser String
+  status  TokenStatus @default(PENDING)
+  user    User        @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("password_reset_tokens")
+}
+
+model RegistrationToken {
+  id      Int         @id @default(autoincrement())
+  token   String      @unique
+  userId  Int         @map("user_id")
+  ip      String
+  browser String
+  status  TokenStatus @default(PENDING)
+  user    User        @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("registration_tokens")
+}
+
+model Olympiad {
+  id                Int                       @id @default(autoincrement())
+  name              String
+  format            String
+  startDate         DateTime
+  participationType OlympiadParticipationType
+  grade             Int
+  rating            Float                     @default(0)
+  taskExamples      OlympiadExampleTask[]
+  steps             OlympiadStep[]
+  reviews           OlympiadReview[]
+  rewards           String[]
+  applications      OlympiadApplication[]
+
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+
+  @@map("olympiads")
+}
+
+model OlympiadStep {
+  id           Int      @id @default(autoincrement())
+  name         String
+  step         Int
+  date         DateTime
+  timeDuration Int      @map("time_duration")
+  description  String
+
+  olympiadId Int      @map("olympiad_id")
+  olympiad   Olympiad @relation(fields: [olympiadId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("olympiad_steps")
+}
+
+model Course {
+  id            Int                   @id @default(autoincrement())
+  name          String
+  teacherId     Int                   @map("teacher_id")
+  teacher       Teacher               @relation(fields: [teacherId], references: [id])
+  capacity      Int
+  students      Student[]
+  rating        Float                 @default(0)
+  grade         Int
+  toWhom        String[]              @map("to_whom")
+  possibilities String[]
+  steps         CourseEducationStep[]
+  reviews       CourseReview[]
+  startDate     DateTime              @map("start_date")
+  price         Float
+  eripNumber    String                @map("erip_number")
+  length        String
+  applications  CourseApplication[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+
+  @@map("courses")
+}
+
+model CourseEducationStep {
+  id       Int    @id @default(autoincrement())
+  courseId Int    @map("course_id")
+  course   Course @relation(fields: [courseId], references: [id])
+  step     Int
+  title    String
+  text     String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("course_education_steps")
+}
+
+model CourseApplication {
+  id              Int               @id @default(autoincrement())
+  courseId        Int               @map("course_id")
+  appliciantName  String            @map("appliciant_name")
+  appliciantPhone String            @map("appliciant_phone")
+  course          Course            @relation(fields: [courseId], references: [id])
+  studentId       Int               @map("student_id")
+  student         Student           @relation(fields: [studentId], references: [id])
+  status          ApplicationStatus @default(CREATED)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("course_applications")
+}
+
+model OlympiadApplication {
+  id         Int               @id @default(autoincrement())
+  olympiadId Int               @map("course_id")
+  olympiad   Olympiad          @relation(fields: [olympiadId], references: [id])
+  studentId  Int               @map("student_id")
+  student    Student           @relation(fields: [studentId], references: [id])
+  steps      Int[]
+  status     ApplicationStatus @default(CREATED)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("olympiad_applications")
+}
+
+model CourseReview {
+  id       Int    @id @default(autoincrement())
+  courseId Int    @map("course_id")
+  course   Course @relation(fields: [courseId], references: [id])
+  authorId Int    @map("author_id")
+  author   User   @relation(fields: [authorId], references: [id])
+  rating   Float
+  text     String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("course_reviews")
+}
+
+model OlympiadReview {
+  id         Int      @id @default(autoincrement())
+  olympiadId Int      @map("olympiad_id")
+  course     Olympiad @relation(fields: [olympiadId], references: [id])
+  authorId   Int      @map("author_id")
+  author     User     @relation(fields: [authorId], references: [id])
+  rating     Float
+  text       String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("olympiad_reviews")
+}
+
+model Student {
+  id                     Int                   @id @default(autoincrement())
+  userId                 Int                   @unique @map("user_id")
+  user                   User                  @relation(fields: [userId], references: [id])
+  educationalInstitution String?               @map("educational_institution")
+  grade                  Int?
+  teachers               String?
+  courses                Course[]
+  courseApplications     CourseApplication[]
+  olympiadApplications   OlympiadApplication[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("students")
+}
+
+model Teacher {
+  id                   Int      @id @default(autoincrement())
+  userId               Int      @unique @map("user_id")
+  user                 User     @relation(fields: [userId], references: [id])
+  courses              Course[]
+  rating               Float    @default(0)
+  specialisations      String[] @map("specialisation")
+  studentsTeachedCount Int      @default(0) @map("students_teached_count")
+  telegramLink         String?  @map("telegram_link")
+  whatsappLink         String?  @map("whatsapp_link")
+  viberLink            String?  @map("viber_link")
+  vkLink               String?  @map("vk_link")
+  skypeLink            String?  @map("skype_link")
+
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("teachers")
+}
+
+model Article {
+  id       Int          @id @default(autoincrement())
+  title    String
+  content  String
+  authorId Int          @map("author_id")
+  author   User         @relation(fields: [authorId], references: [id])
+  tags     ArticleTag[]
+  views    Int          @default(0)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("articles")
+}
+
+model ArticleTag {
+  id        Int     @id @default(autoincrement())
+  articleId Int     @map("article_id")
+  article   Article @relation(fields: [articleId], references: [id])
+  name      String  @unique
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("article_tags")
+}
+
+model Avatar {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+
+  fileId Int  @unique @map("file_id")
+  file   File @relation(fields: [fileId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("avatars")
+}
+
+model OlympiadExampleTask {
+  id     Int  @id @default(autoincrement())
+  fileId Int  @map("task_id")
+  file   File @relation(fields: [fileId], references: [id])
+
+  olympiadId Int      @map("olympiad_id")
+  olympiad   Olympiad @relation(fields: [olympiadId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("olympiad_example_tasks")
+}
+
+model File {
+  id                   Int                   @id @default(autoincrement())
+  name                 String
+  path                 String
+  size                 Int
+  format               String
+  avatar               Avatar?
+  olympiadExampleTasks OlympiadExampleTask[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("files")
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+  TEACHER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum ApplicationStatus {
+  CREATED
+  FULFILLED
+  REJECTED
+  PENDING
+}
+
+enum OlympiadParticipationType {
+  FREE
+  PAID
+}
+
+enum TokenStatus {
+  PENDING
+  FULFILLED
+  EXPIRED
 }
