@@ -20,7 +20,6 @@ model User {
   lastName            String               @map("last_name")
   middleName          String               @map("middle_name")
   birthDate           DateTime             @map("birth_date")
-  about               String?
   phone               String?
   gender              Gender
   confirmed           Boolean              @default(false)
@@ -122,6 +121,7 @@ model Course {
   steps         CourseEducationStep[]
   reviews       CourseReview[]
   startDate     DateTime              @map("start_date")
+  materialsLink String?               @map("materials_link")
   price         Float
   eripNumber    String                @map("erip_number")
   length        String
@@ -232,6 +232,7 @@ model Teacher {
   user                 User     @relation(fields: [userId], references: [id])
   courses              Course[]
   rating               Float    @default(0)
+  about                String?
   specialisations      String[] @map("specialisation")
   studentsTeachedCount Int      @default(0) @map("students_teached_count")
   telegramLink         String?  @map("telegram_link")
