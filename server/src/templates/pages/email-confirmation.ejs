@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body>
+    <header><%- include('../partials/header'); %></header>
+
+    <main class="container">
+      <%- include('../partials/title'); %>
+      <span>Для завершения регистрации перейдите по ссылке:</span>
+      <a href="<%- locals.confirmationUrl %>" class="confirmation-url"
+        ><%- locals.confirmationUrl %></a
+      >
+      <span> Ссылка действительна в течении 24 часов. </span>
+    </main>
+
+    <footer>
+      <p>
+        Если Вы получили это письмо по ошибке, просто проигнорируйте и удалите
+        его. Ваши данные не будут зарегистрированы в нашей системе, если не
+        перейдете по ссылке для подтверждения.
+      </p>
+      <p>
+        Вы получили это письмо, потому что являетесь пользователями
+        <span>ШТН</span>
+      </p>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .container {
+    max-width: 550px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  main > span {
+    color: black;
+    font-size: 17px;
+    font-weight: 500;
+    text-align: center;
+    display: block;
+  }
+  .confirmation-url {
+    color: #4579de;
+    font-size: 17px;
+    text-align: center;
+    display: block;
+    font-weight: 600;
+    margin-top: 20px;
+  }
+
+  .confirmation-url + span {
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  footer p:last-child {
+    margin-top: 10px;
+  }
+  footer p:last-child span {
+    color: #4579de;
+  }
+</style>

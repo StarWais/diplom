@@ -12,14 +12,13 @@ datasource db {
 
 model User {
   id                  Int                  @id @default(autoincrement())
-  name                String
   email               String               @unique
   password            String
   role                Role                 @default(STUDENT)
   firstName           String               @map("first_name")
   lastName            String               @map("last_name")
   middleName          String               @map("middle_name")
-  birthDate           DateTime             @map("birth_date")
+  birthDate           DateTime?            @map("birth_date")
   phone               String?
   gender              Gender
   confirmed           Boolean              @default(false)
@@ -39,13 +38,14 @@ model User {
 }
 
 model PasswordResetToken {
-  id      Int         @id @default(autoincrement())
-  token   String      @unique
-  userId  Int         @map("user_id")
-  ip      String
-  browser String
-  status  TokenStatus @default(PENDING)
-  user    User        @relation(fields: [userId], references: [id])
+  id        Int         @id @default(autoincrement())
+  token     String      @unique
+  userId    Int         @map("user_id")
+  ip        String
+  browser   String
+  status    TokenStatus @default(PENDING)
+  user      User        @relation(fields: [userId], references: [id])
+  expiresIn DateTime    @map("expires_in")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -54,13 +54,14 @@ model PasswordResetToken {
 }
 
 model RegistrationToken {
-  id      Int         @id @default(autoincrement())
-  token   String      @unique
-  userId  Int         @map("user_id")
-  ip      String
-  browser String
-  status  TokenStatus @default(PENDING)
-  user    User        @relation(fields: [userId], references: [id])
+  id        Int         @id @default(autoincrement())
+  token     String      @unique
+  userId    Int         @map("user_id")
+  ip        String
+  browser   String
+  status    TokenStatus @default(PENDING)
+  user      User        @relation(fields: [userId], references: [id])
+  expiresIn DateTime    @map("expires_in")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -343,5 +344,4 @@ enum OlympiadParticipationType {
 enum TokenStatus {
   PENDING
   FULFILLED
-  EXPIRED
 }
