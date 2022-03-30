@@ -1,0 +1,11 @@
+**/node_modules/
+**/dist/
+**/.next/
+*.env
+**/yarn-error.log
+**/yarn-debug.log
+**/production.env
+**/.env.test
+**/development.env
+**/.vscode
+.DS_Store
