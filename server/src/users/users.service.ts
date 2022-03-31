@@ -6,10 +6,18 @@ import { Injectable } from '@nestjs/common';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findUnique(details: Prisma.UserWhereUniqueInput): Promise<User> {
+  async findUnique(details: Prisma.UserWhereUniqueInput): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: details,
-      rejectOnNotFound: true,
+    });
+  }
+
+  async confirmUser(details: Prisma.UserWhereUniqueInput): Promise<User> {
+    return this.prisma.user.update({
+      where: details,
+      data: {
+        confirmed: true,
+      },
     });
   }
 
@@ -18,11 +26,6 @@ export class UsersService {
   }
 
   async userExists(details: Prisma.UserWhereUniqueInput): Promise<boolean> {
-    try {
-      await this.findUnique(details);
-      return true;
-    } catch (error: any) {
-      return false;
-    }
+    return !!(await this.findUnique(details));
   }
 }

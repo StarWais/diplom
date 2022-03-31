@@ -1,4 +1,4 @@
-import { UserEntity } from './../users/models/user.entity';
+import { BrowserInfo } from './../decorators/browser-info.decorator';
 import { SignupDto } from './dto/signup.dto';
 import {
   Controller,
@@ -8,17 +8,16 @@ import {
   Body,
   UseGuards,
   Request,
-  Ip,
 } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import * as parseUserAgent from 'ua-parser-js';
+
 import { AuthService } from './auth.service';
 
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { SigninDto } from './dto/signin.dto';
 import { AuthToken } from './models/auth-token.entity';
 import { User } from '@prisma/client';
-import { Request as RequestType } from 'express';
+import { CurrentBrowserInfo } from 'src/decorators/browser-info.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -29,23 +28,16 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async signup(
     @Body() details: SignupDto,
-    @Ip() ip: string,
-    @Request() request: RequestType,
-  ): Promise<UserEntity> {
-    const parsedUserAgent = parseUserAgent(request.headers['user-agent']);
-    return new UserEntity(
-      await this.authService.signup(
-        details,
-        ip.replace('::ffff:', ''),
-        parsedUserAgent.browser.name,
-      ),
-    );
+    @CurrentBrowserInfo() browserInfo: BrowserInfo,
+  ): Promise<AuthToken> {
+    return this.authService.signup(details, browserInfo);
   }
 
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: SigninDto })
+  @HttpCode(HttpStatus.OK)
   @Post('signin')
-  async signin(@Request() req): Promise<AuthToken> {
+  async signin(@Request() req: any): Promise<AuthToken> {
     return this.authService.signin(req.user as User);
   }
 }

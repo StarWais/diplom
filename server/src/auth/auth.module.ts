@@ -9,6 +9,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { UsersModule } from './../users/users.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+import { AuthConfirmationService } from './auth-confirmation.service';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { AuthController } from './auth.controller';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, AuthConfirmationService],
   controllers: [AuthController],
 })
 export class AuthModule {}
