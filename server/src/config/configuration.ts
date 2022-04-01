@@ -34,7 +34,10 @@ export interface EmailOptions {
       pass: string;
     };
   };
-  author: string;
+  author: {
+    name: string;
+    email: string;
+  };
 }
 
 export interface DomainOptions {
@@ -96,7 +99,10 @@ export default (): GlobalConfig => ({
         pass: process.env.EMAIL_PASSWORD,
       },
     },
-    author: 'Diplom Backend',
+    author: {
+      name: 'Школа точных наук',
+      email: 'fathermkv@gmail.com',
+    },
   },
   domainOptions: {
     backend: process.env.BACKEND_DOMAIN,

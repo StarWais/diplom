@@ -12,7 +12,7 @@ export class MailerConfigService implements MailerOptionsFactory {
     return {
       transport: emailConfig.transport,
       defaults: {
-        from: emailConfig.author,
+        from: `${emailConfig.author.name} <${emailConfig.author.email}>`,
       },
       template: {
         dir: 'src/templates/pages',
