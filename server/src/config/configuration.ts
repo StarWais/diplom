@@ -19,7 +19,8 @@ export interface AuthOptions {
     secret: string;
     expiresIn: string;
   };
-  emailConfirmationTokenExpiresIn: number;
+  registrationTokenOptions: ConfirmationTokenOptions;
+  passwordResetTokenOptions: ConfirmationTokenOptions;
   ignoreExpiration: boolean;
 }
 
@@ -51,6 +52,11 @@ export interface GlobalConfig {
   domainOptions: DomainOptions;
 }
 
+export interface ConfirmationTokenOptions {
+  length: number;
+  expiresIn: number;
+}
+
 export default (): GlobalConfig => ({
   port: parseInt(process.env.PORT, 10) || 5000,
   development: process.env.NODE_ENV === 'development',
@@ -65,7 +71,14 @@ export default (): GlobalConfig => ({
       expiresIn: process.env.JWT_EXPIRES_IN,
     },
     ignoreExpiration: process.env.NODE_ENV === 'development',
-    emailConfirmationTokenExpiresIn: 86400000,
+    registrationTokenOptions: {
+      length: 12,
+      expiresIn: 60 * 60 * 24 * 7,
+    },
+    passwordResetTokenOptions: {
+      length: 12,
+      expiresIn: 60 * 60 * 24 * 7,
+    },
   },
   swaggerOptions: {
     title: 'Школа точных наук',

@@ -15,7 +15,7 @@ import {
   PasswordValidationRequirement,
 } from 'class-validator-password-check';
 
-const passwordRequirement: PasswordValidationRequirement = {
+export const passwordRequirement: PasswordValidationRequirement = {
   mustContainLowerLetter: true,
   mustContainNumber: true,
   mustContainSpecialCharacter: true,
@@ -23,6 +23,9 @@ const passwordRequirement: PasswordValidationRequirement = {
 };
 
 export class SignupDto {
+  @ApiProperty({
+    example: 'example@example.com',
+  })
   @IsNotEmpty()
   @IsEmail()
   @Length(6, 100)
@@ -31,26 +34,41 @@ export class SignupDto {
   })
   readonly email: string;
 
+  @ApiProperty({
+    example: '12345678aA!',
+  })
   @IsNotEmpty()
   @Length(8, 16)
   @Validate(PasswordValidation, [passwordRequirement])
   readonly password: string;
 
+  @ApiProperty({
+    example: Gender.MALE,
+  })
   @IsNotEmpty()
   @IsEnum(Gender)
   @ApiProperty({ enum: Gender })
   readonly gender: Gender;
 
+  @ApiProperty({
+    example: 'Иван',
+  })
   @IsNotEmpty()
   @MaxLength(50)
   @IsAlpha('ru-RU')
   readonly firstName: string;
 
+  @ApiProperty({
+    example: 'Иванов',
+  })
   @IsNotEmpty()
   @MaxLength(50)
   @IsAlpha('ru-RU')
   readonly lastName: string;
 
+  @ApiProperty({
+    example: 'Иванович',
+  })
   @IsNotEmpty()
   @MaxLength(50)
   @IsAlpha('ru-RU')

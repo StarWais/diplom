@@ -12,9 +12,21 @@ export class UsersService {
     });
   }
 
-  async confirmUser(details: Prisma.UserWhereUniqueInput): Promise<User> {
+  async updatePassword(
+    searchDetails: Prisma.UserWhereUniqueInput,
+    newPassword: string,
+  ): Promise<User> {
     return this.prisma.user.update({
-      where: details,
+      where: searchDetails,
+      data: {
+        password: newPassword,
+      },
+    });
+  }
+
+  async confirmUser(searchDetails: Prisma.UserWhereUniqueInput): Promise<User> {
+    return this.prisma.user.update({
+      where: searchDetails,
       data: {
         confirmed: true,
       },

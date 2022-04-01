@@ -3,21 +3,61 @@ import { Gender, Role, User } from '@prisma/client';
 import { Exclude, Expose } from 'class-transformer';
 
 export class UserEntity implements User {
+  @ApiProperty({
+    example: 1,
+    type: 'integer',
+  })
   id: number;
+  @ApiProperty({
+    example: 'example@example.com',
+  })
   email: string;
-  @ApiProperty({ enum: Role })
+  @ApiProperty({ enum: Role, example: Role.STUDENT })
   role: Role;
+  @ApiProperty({
+    example: 'Иван',
+  })
   firstName: string;
+  @ApiProperty({
+    example: 'Иванов',
+  })
   lastName: string;
+  @ApiProperty({
+    example: 'Иванович',
+  })
   middleName: string;
+  @ApiProperty({
+    example: Date.now(),
+    type: 'date-time',
+    nullable: true,
+  })
   birthDate: Date | null;
+  @ApiProperty({
+    example: '+3756666666',
+    type: 'string',
+    nullable: true,
+  })
   phone: string | null;
 
-  @ApiProperty({ enum: Gender })
+  @ApiProperty({ enum: Gender, example: Gender.MALE })
   gender: Gender;
 
+  @ApiProperty({
+    example: true,
+    type: 'boolean',
+  })
   confirmed: boolean;
+  @ApiProperty({
+    example: Date.now(),
+    type: 'date-time',
+    nullable: true,
+  })
   createdAt: Date;
+  @ApiProperty({
+    example: Date.now(),
+    type: 'date-time',
+    nullable: true,
+  })
   updatedAt: Date;
 
   @ApiHideProperty()
@@ -25,7 +65,9 @@ export class UserEntity implements User {
   password: string;
 
   @Expose()
-  @ApiProperty()
+  @ApiProperty({
+    example: 'Иванов Иван Иванович',
+  })
   get fullName(): string {
     return `${this.lastName} ${this.firstName} ${this.middleName} `;
   }

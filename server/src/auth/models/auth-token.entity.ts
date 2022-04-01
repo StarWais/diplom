@@ -1,3 +1,10 @@
+import { ApiProperty } from '@nestjs/swagger';
 export class AuthToken {
-  constructor(public accessToken: string) {}
+  @ApiProperty({
+    example: 'nhbgy789ikojnihuh73i',
+  })
+  readonly accessToken: string;
+  constructor(accessToken: string) {
+    this.accessToken = accessToken;
+  }
 }
