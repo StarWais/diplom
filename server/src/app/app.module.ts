@@ -4,10 +4,14 @@ import { APP_FILTER } from '@nestjs/core';
 import { PrismaClientExceptionFilter, PrismaModule } from 'nestjs-prisma';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { ThrottlerModule } from '@nestjs/throttler';
 
-import { MailerConfigService } from './../config/mailer-config.service';
 import configuration from '../config/configuration';
-import { PrismaConfigService } from '../config/prisma-config.service';
+import {
+  PrismaConfigService,
+  MailerConfigService,
+  ThrottlerConfigService,
+} from './../config/services';
 import { validationSchema } from '../config/env/env-validation';
 import { AuthModule } from './../auth/auth.module';
 import { UsersModule } from './../users/users.module';
@@ -29,6 +33,9 @@ import { UsersModule } from './../users/users.module';
     }),
     MailerModule.forRootAsync({
       useClass: MailerConfigService,
+    }),
+    ThrottlerModule.forRootAsync({
+      useClass: ThrottlerConfigService,
     }),
     UsersModule,
     AuthModule,

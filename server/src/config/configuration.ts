@@ -24,6 +24,11 @@ export interface AuthOptions {
   ignoreExpiration: boolean;
 }
 
+export interface ThrottlerOptions {
+  ttl: number;
+  limit: number;
+}
+
 export interface EmailOptions {
   transport: {
     host: string;
@@ -53,6 +58,7 @@ export interface GlobalConfig {
   swaggerOptions: SwaggerOptions;
   emailOptions: EmailOptions;
   domainOptions: DomainOptions;
+  throttlerOptions: ThrottlerOptions;
 }
 
 export interface ConfirmationTokenOptions {
@@ -107,5 +113,9 @@ export default (): GlobalConfig => ({
   domainOptions: {
     backend: process.env.BACKEND_DOMAIN,
     frontend: process.env.FRONTEND_DOMAIN,
+  },
+  throttlerOptions: {
+    ttl: 60 * 60,
+    limit: process.env.NODE_ENV === 'development' ? 0 : 200,
   },
 });
