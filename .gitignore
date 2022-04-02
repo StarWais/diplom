@@ -8,4 +8,5 @@
 **/.env.test
 **/development.env
 **/.vscode
+**/.idea
 .DS_Store
