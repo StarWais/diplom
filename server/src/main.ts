@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
 import { PrismaClientExceptionFilter, PrismaService } from 'nestjs-prisma';
 import * as csurf from 'csurf';
+import helmet from 'helmet';
 import { AppModule } from './app/app.module';
 import { SwaggerOptions, ValidationPipeOptions } from './config/configuration';
 
@@ -43,6 +44,9 @@ async function bootstrap() {
 
   // enable csurf
   app.use(csurf());
+
+  //enable helmet
+  app.use(helmet());
 
   await app.listen(port);
 }
