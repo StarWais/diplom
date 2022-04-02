@@ -19,14 +19,14 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
-import { UserEntity } from './../users/models/user.entity';
+import { UserEntity } from '../users/models/user.entity';
 
 import {
   DomainOptions,
   ConfirmationTokenOptions,
-} from './../config/configuration';
-import { BrowserInfo } from './../decorators/browser-info.decorator';
-import { UsersService } from './../users/users.service';
+} from '../config/configuration';
+import { BrowserInfo } from '../decorators/browser-info.decorator';
+import { UsersService } from '../users/users.service';
 import { AuthToken } from './models/auth-token.entity';
 import { JWTPayload } from './strategies/jwt.strategy';
 import {
@@ -252,14 +252,14 @@ export class AuthService {
         'authOptions.passwordResetTokenOptions',
       );
     const tokenValue = crypto.randomBytes(tokenLength).toString('hex');
-    const token = await this.prisma.passwordResetToken.create({
+    return this.prisma.passwordResetToken.create({
       data: {
         token: tokenValue,
         expiresIn: new Date(tokenExpiresIn + Date.now()),
         ...details,
       },
     });
-    return token;
+
   }
   private async createRegistrationToken(
     details: Omit<Prisma.RegistrationTokenCreateInput, 'token' | 'expiresIn'>,
@@ -269,14 +269,13 @@ export class AuthService {
         'authOptions.registrationTokenOptions',
       );
     const tokenValue = crypto.randomBytes(tokenLength).toString('hex');
-    const token = await this.prisma.registrationToken.create({
+    return this.prisma.registrationToken.create({
       data: {
         token: tokenValue,
         expiresIn: new Date(tokenExpiresIn + Date.now()),
         ...details,
       },
     });
-    return token;
   }
   async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.usersService.findUnique({ email });

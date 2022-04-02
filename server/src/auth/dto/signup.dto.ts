@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmailUserAlreadyExist } from './../../users/validators/users.validator';
 import { Gender } from '@prisma/client';
 import {
   IsAlpha,
@@ -14,6 +13,8 @@ import {
   PasswordValidation,
   PasswordValidationRequirement,
 } from 'class-validator-password-check';
+
+import { IsEmailUserAlreadyExist } from '../../users/validators/users.validator';
 
 export const passwordRequirement: PasswordValidationRequirement = {
   mustContainLowerLetter: true,

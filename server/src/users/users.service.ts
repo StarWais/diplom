@@ -24,9 +24,9 @@ export class UsersService {
     });
   }
 
-  async confirmUser(searchDetails: Prisma.UserWhereUniqueInput): Promise<User> {
+  async confirmUser(details: Prisma.UserWhereUniqueInput): Promise<User> {
     return this.prisma.user.update({
-      where: searchDetails,
+      where: details,
       data: {
         confirmed: true,
       },

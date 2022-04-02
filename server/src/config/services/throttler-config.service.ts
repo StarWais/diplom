@@ -12,7 +12,6 @@ export class ThrottlerConfigService implements ThrottlerOptionsFactory {
   createThrottlerOptions():
     | ThrottlerModuleOptions
     | Promise<ThrottlerModuleOptions> {
-    const config = this.configService.get<ThrottlerOptions>('throttlerOptions');
-    return config;
+    return this.configService.get<ThrottlerOptions>('throttlerOptions');
   }
 }

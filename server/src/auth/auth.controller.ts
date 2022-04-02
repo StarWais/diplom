@@ -11,11 +11,11 @@ import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
 import { AuthService } from './auth.service';
-import { CurrentUser } from './../decorators/current-user.decorator';
+import { CurrentUser } from '../decorators/current-user.decorator';
 import {
   BrowserInfo,
   CurrentBrowserInfo,
-} from './../decorators/browser-info.decorator';
+} from '../decorators/browser-info.decorator';
 import { AuthToken } from './models/auth-token.entity';
 import {
   ConfirmEmailDto,
@@ -63,7 +63,7 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('confirm/resend')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.ACCEPTED)
   async resendRegistrationConfirmation(
     @CurrentUser() user: User,
     @CurrentBrowserInfo() browserInfo: BrowserInfo,
@@ -75,9 +75,9 @@ export class AuthController {
   @HttpCode(HttpStatus.ACCEPTED)
   async resetPassword(
     @Body() details: PasswordResetDto,
-    @CurrentBrowserInfo() broswerInfo: BrowserInfo,
+    @CurrentBrowserInfo() browserInfo: BrowserInfo,
   ): Promise<void> {
-    return this.authService.resetPassword(details, broswerInfo);
+    return this.authService.resetPassword(details, browserInfo);
   }
 
   @Post('confirm-password-reset')

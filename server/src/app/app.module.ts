@@ -11,10 +11,10 @@ import {
   PrismaConfigService,
   MailerConfigService,
   ThrottlerConfigService,
-} from './../config/services';
+} from '../config/services';
 import { validationSchema } from '../config/env/env-validation';
-import { AuthModule } from './../auth/auth.module';
-import { UsersModule } from './../users/users.module';
+import { AuthModule } from '../auth/auth.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [

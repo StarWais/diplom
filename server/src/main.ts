@@ -6,6 +6,7 @@ import { useContainer } from 'class-validator';
 import { PrismaClientExceptionFilter, PrismaService } from 'nestjs-prisma';
 import * as csurf from 'csurf';
 import helmet from 'helmet';
+
 import { AppModule } from './app/app.module';
 import { SwaggerOptions, ValidationPipeOptions } from './config/configuration';
 
@@ -24,7 +25,7 @@ async function bootstrap() {
 
   // enable shutdown hook
   const prismaService: PrismaService = app.get(PrismaService);
-  prismaService.enableShutdownHooks(app);
+  await prismaService.enableShutdownHooks(app);
 
   // enable prisma exception filter
   const { httpAdapter } = app.get(HttpAdapterHost);
@@ -50,4 +51,5 @@ async function bootstrap() {
 
   await app.listen(port);
 }
+
 bootstrap();
