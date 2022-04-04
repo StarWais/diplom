@@ -19,7 +19,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
-import { UserEntity } from '../users/models/user.entity';
+import { UserEntity } from '../users/entities/user.entity';
 
 import {
   DomainOptions,
@@ -27,7 +27,7 @@ import {
 } from '../config/configuration';
 import { BrowserInfo } from '../decorators/browser-info.decorator';
 import { UsersService } from '../users/users.service';
-import { AuthToken } from './models/auth-token.entity';
+import { AuthTokenEntity } from './entities/auth-token.entity';
 import { JWTPayload } from './strategies/jwt.strategy';
 import {
   ConfirmEmailDto,
@@ -57,12 +57,14 @@ export class AuthService {
   ): Promise<boolean> {
     return bcrypt.compare(password, hash);
   }
-  private async generateJWTToken(user: User): Promise<AuthToken> {
+  private async generateJWTToken(user: User): Promise<AuthTokenEntity> {
     const payload: JWTPayload = {
       sub: user.id,
       email: user.email,
     };
-    return new AuthToken(this.jwtService.sign(payload));
+    return new AuthTokenEntity({
+      accessToken: this.jwtService.sign(payload),
+    });
   }
   async resetPassword(
     details: PasswordResetDto,
@@ -259,7 +261,6 @@ export class AuthService {
         ...details,
       },
     });
-
   }
   private async createRegistrationToken(
     details: Omit<Prisma.RegistrationTokenCreateInput, 'token' | 'expiresIn'>,
@@ -291,7 +292,7 @@ export class AuthService {
   async signup(
     details: SignupDto,
     browserInfo: BrowserInfo,
-  ): Promise<AuthToken> {
+  ): Promise<AuthTokenEntity> {
     const { password, ...restUserDetails } = details;
     const hashedPassword = await this.hashPassword(password);
     const user = await this.usersService.create({
@@ -301,7 +302,7 @@ export class AuthService {
     await this.onUserSignedUp(user, browserInfo);
     return this.generateJWTToken(user);
   }
-  async signin(user: User): Promise<AuthToken> {
+  async signin(user: User): Promise<AuthTokenEntity> {
     return this.generateJWTToken(user);
   }
 }

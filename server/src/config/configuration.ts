@@ -5,6 +5,9 @@ export interface ValidationPipeOptions extends ValidatorOptions {
   transform?: boolean;
   disableErrorMessages?: boolean;
   exceptionFactory?: (errors: ValidationError[]) => any;
+  transformOptions: {
+    enableImplicitConversion: boolean;
+  };
 }
 
 export interface SwaggerOptions {
@@ -73,6 +76,9 @@ export default (): GlobalConfig => ({
     transform: true,
     whitelist: true,
     enableDebugMessages: process.env.NODE_ENV === 'development',
+    transformOptions: {
+      enableImplicitConversion: true,
+    },
   },
   authOptions: {
     jwt: {

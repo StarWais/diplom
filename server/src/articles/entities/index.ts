@@ -1,0 +1,2 @@
+export { ArticleTagEntity } from './article-tag.entity';
+export { ArticleEntity } from './article.entity';

@@ -60,6 +60,12 @@ export class UserEntity implements User {
   })
   updatedAt: Date;
 
+  @ApiProperty({
+    example: false,
+    type: 'boolean',
+  })
+  canPublish: boolean;
+
   @ApiHideProperty()
   @Exclude()
   password: string;

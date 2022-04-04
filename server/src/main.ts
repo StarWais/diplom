@@ -4,7 +4,6 @@ import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
 import { PrismaClientExceptionFilter, PrismaService } from 'nestjs-prisma';
-import * as csurf from 'csurf';
 import helmet from 'helmet';
 
 import { AppModule } from './app/app.module';
@@ -19,6 +18,7 @@ async function bootstrap() {
   // enable validation
   const validatorOptions =
     config.get<ValidationPipeOptions>('validatorOptions');
+
   app.useGlobalPipes(new ValidationPipe(validatorOptions));
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
@@ -42,9 +42,6 @@ async function bootstrap() {
   SwaggerModule.setup(swaggerConfigOptions.swaggerPath, app, document);
 
   const port = config.get<number>('port');
-
-  // enable csurf
-  app.use(csurf());
 
   //enable helmet
   app.use(helmet());

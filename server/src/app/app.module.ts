@@ -15,6 +15,7 @@ import {
 import { validationSchema } from '../config/env/env-validation';
 import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/users.module';
+import { ArticlesModule } from 'src/articles/articles.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { UsersModule } from '../users/users.module';
     }),
     UsersModule,
     AuthModule,
+    ArticlesModule,
   ],
   controllers: [],
   providers: [
