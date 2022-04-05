@@ -4,6 +4,7 @@ import { applyDecorators, Type } from '@nestjs/common';
 
 import { PaginationQuery } from './pagination-query';
 import { PrismaService } from 'nestjs-prisma';
+import { Prisma } from '@prisma/client';
 
 export class Paginated<T> {
   nodes: T[];
@@ -57,22 +58,26 @@ export async function Paginate<T, U>(
   paginationQuery: PaginationQuery,
   prismaClient: PrismaService,
   entityName: string,
-  args: U,
+  args: Omit<U, 'skip' | 'take' | 'cursor'>,
   convertor: (item: T) => any = (item: T) => item,
 ): Promise<Paginated<T> | null> {
   const take = paginationQuery.limit || 20;
-  const skip = (paginationQuery.page ? paginationQuery.page - 1 : 1) * take;
+  const page = paginationQuery.page || 1;
+
+  const skip = (page - 1) * take;
 
   const results = await prismaClient[entityName].findMany({
     skip,
     take,
-    where: args,
+    ...args,
   });
 
   const convertedResults: T[] = results.map(convertor);
 
   const totalCount = await prismaClient[entityName].count({
-    where: args,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    where: args.where,
   });
 
   const totalPages = Math.ceil(totalCount / take);

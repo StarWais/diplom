@@ -1,10 +1,8 @@
-import { IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { isLowercase, MaxLength } from 'class-validator';
 
 export class ArticleTagDto {
-  @IsOptional()
-  @IsNumber()
-  id?: number;
-
   @MaxLength(50)
-  name: string;
+  @Transform(({ value }) => value.toLowerCase())
+  readonly name: string;
 }

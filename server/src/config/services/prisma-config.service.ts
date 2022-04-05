@@ -8,9 +8,9 @@ export class PrismaConfigService implements PrismaOptionsFactory {
 
   createPrismaOptions(): PrismaServiceOptions | Promise<PrismaServiceOptions> {
     return {
-      prismaOptions: {
-        log: ['info', 'query'],
-      },
+      // prismaOptions: {
+      //   log: ['info', 'query'],
+      // },
       explicitConnect: true,
     };
   }

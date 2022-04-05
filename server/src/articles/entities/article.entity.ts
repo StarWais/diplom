@@ -59,7 +59,7 @@ export class ArticleEntity implements Article {
       },
     ],
   })
-  readonly tags: ArticleTagEntity[];
+  readonly tags: Pick<ArticleTagEntity, 'id' | 'name'>[];
 
   constructor(partial: Partial<ArticleEntity>) {
     Object.assign(this, partial);

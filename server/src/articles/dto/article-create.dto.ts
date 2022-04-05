@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
@@ -26,7 +26,6 @@ export class ArticleCreateDto {
     isArray: true,
     example: [
       {
-        id: 1,
         name: 'Математика',
       },
       {

@@ -1,6 +1,8 @@
+import { FindOneParams } from './../common/params/find-one-params';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -17,6 +19,7 @@ import {
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiBearerAuth,
+  ApiNoContentResponse,
 } from '@nestjs/swagger';
 import { User, Role } from '@prisma/client';
 
@@ -39,7 +42,7 @@ export class ArticlesController {
   @ApiOkResponse({ type: ArticleEntity, description: 'Статья' })
   @Get(':slug')
   async findOne(@Param('slug') slug: string): Promise<ArticleEntity> {
-    return this.articlesService.get({ slug });
+    return this.articlesService.findOne({ slug });
   }
 
   @Get()
@@ -75,7 +78,7 @@ export class ArticlesController {
   })
   @ApiForbiddenResponse({ description: 'Нет прав на публикацию статьи' })
   @Post('/:id/publish')
-  async publish(@Param('id') id: number): Promise<ArticleEntity> {
+  async publish(@Param() { id }: FindOneParams): Promise<ArticleEntity> {
     return this.articlesService.publish({ id });
   }
 
@@ -91,10 +94,22 @@ export class ArticlesController {
   @ApiForbiddenResponse({ description: 'Нет прав на публикацию статьи' })
   @Patch('/:id')
   async update(
-    @Param('id') id: number,
+    @Param() { id }: FindOneParams,
     @Body() details: ArticleUpdateDto,
   ): Promise<ArticleEntity> {
-    return this.articlesService.update(id, details);
+    return this.articlesService.update({ id }, details);
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Удалить статью' })
+  @ApiNoContentResponse({ description: 'Статья успешно удалена' })
+  @ApiForbiddenResponse({ description: 'Нет прав на удаление статьи' })
+  @Delete('/:id')
+  async delete(@Param() { id }: FindOneParams): Promise<void> {
+    await this.articlesService.delete({ id });
   }
 
   @ApiOperation({ summary: 'Получить список тегов статей' })
