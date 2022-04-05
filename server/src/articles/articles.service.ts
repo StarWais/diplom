@@ -56,19 +56,23 @@ export class ArticlesService {
   async findOne(
     details: Prisma.ArticleWhereUniqueInput,
   ): Promise<ArticleEntity> {
-    return new ArticleEntity(
-      await this.prisma.article.findUnique({
-        where: details,
-        include: {
-          tags: {
-            select: {
-              name: true,
-              id: true,
-            },
+    const article = await this.prisma.article.findUnique({
+      where: details,
+      include: {
+        tags: {
+          select: {
+            name: true,
+            id: true,
           },
         },
-      }),
-    );
+      },
+    });
+
+    if (!article) {
+      throw new NotFoundException('Статья не найдена');
+    }
+
+    return new ArticleEntity(article);
   }
   async publish(
     details: Prisma.ArticleWhereUniqueInput,

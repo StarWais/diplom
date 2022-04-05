@@ -24,6 +24,7 @@
     "migrate:deploy": "dotenv -e src/config/env/development.env -- npx prisma migrate deploy",
     "prisma:generate": "dotenv -e src/config/env/development.env -- npx prisma generate",
     "prisma:studio": "dotenv -e src/config/env/development.env -- npx prisma studio",
+    "prisma:reset": "dotenv -e src/config/env/development.env -- npx prisma migrate reset",
     "prisma:seed": "npx prisma db seed"
   },
   "dependencies": {

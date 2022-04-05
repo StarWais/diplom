@@ -20,6 +20,7 @@ import {
   ApiForbiddenResponse,
   ApiBearerAuth,
   ApiNoContentResponse,
+  ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { User, Role } from '@prisma/client';
 
@@ -39,6 +40,7 @@ export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
   @ApiOperation({ summary: 'Получить статью по slug' })
+  @ApiNotFoundResponse({ description: 'Статья не найдена' })
   @ApiOkResponse({ type: ArticleEntity, description: 'Статья' })
   @Get(':slug')
   async findOne(@Param('slug') slug: string): Promise<ArticleEntity> {
@@ -77,6 +79,7 @@ export class ArticlesController {
     description: 'Статья',
   })
   @ApiForbiddenResponse({ description: 'Нет прав на публикацию статьи' })
+  @ApiNotFoundResponse({ description: 'Статья не найдена' })
   @Post('/:id/publish')
   async publish(@Param() { id }: FindOneParams): Promise<ArticleEntity> {
     return this.articlesService.publish({ id });
@@ -91,6 +94,7 @@ export class ArticlesController {
     type: ArticleEntity,
     description: 'Статья',
   })
+  @ApiNotFoundResponse({ description: 'Статья не найдена' })
   @ApiForbiddenResponse({ description: 'Нет прав на публикацию статьи' })
   @Patch('/:id')
   async update(
@@ -105,6 +109,7 @@ export class ArticlesController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Удалить статью' })
+  @ApiNotFoundResponse({ description: 'Статья не найдена' })
   @ApiNoContentResponse({ description: 'Статья успешно удалена' })
   @ApiForbiddenResponse({ description: 'Нет прав на удаление статьи' })
   @Delete('/:id')
