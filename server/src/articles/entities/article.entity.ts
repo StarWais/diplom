@@ -1,7 +1,7 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Article, ArticleStatus } from '@prisma/client';
 import { CreatedUpdatedEntity } from 'src/common/entities';
-import { ArticleLikeEntity } from './article-like-entity';
+import { ArticleLikeEntity } from './article-like.entity';
 import { ArticleTagEntity } from './article-tag.entity';
 
 export class ArticleEntity extends CreatedUpdatedEntity implements Article {
