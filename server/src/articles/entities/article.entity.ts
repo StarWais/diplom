@@ -1,8 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Article, ArticleStatus } from '@prisma/client';
+import { CreatedUpdatedEntity } from 'src/common/entities';
+import { ArticleLikeEntity } from './article-like-entity';
 import { ArticleTagEntity } from './article-tag.entity';
 
-export class ArticleEntity implements Article {
+export class ArticleEntity extends CreatedUpdatedEntity implements Article {
   @ApiProperty({
     example: 1,
     type: 'integer',
@@ -36,32 +38,23 @@ export class ArticleEntity implements Article {
   })
   readonly views: number;
   @ApiProperty({
-    example: Date.now(),
-    type: 'date-time',
-  })
-  readonly createdAt: Date;
-  @ApiProperty({
-    example: Date.now(),
-    type: 'date-time',
-  })
-  readonly updatedAt: Date;
-  @ApiProperty({
-    type: ArticleTagEntity,
+    type: PickType(ArticleTagEntity, ['name'] as const),
     isArray: true,
-    example: [
-      {
-        id: 1,
-        name: 'Математика',
-      },
-      {
-        id: 2,
-        name: 'Физика',
-      },
-    ],
   })
-  readonly tags: Pick<ArticleTagEntity, 'id' | 'name'>[];
+  readonly tags: Pick<ArticleTagEntity, 'name'>[];
+  @ApiProperty({
+    type: ArticleLikeEntity,
+    isArray: true,
+  })
+  readonly likes: ArticleLikeEntity[];
+  @ApiProperty({
+    type: ArticleLikeEntity,
+    isArray: true,
+  })
+  readonly dislikes: ArticleLikeEntity[];
 
   constructor(partial: Partial<ArticleEntity>) {
+    super(partial);
     Object.assign(this, partial);
   }
 }

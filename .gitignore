@@ -7,6 +7,7 @@
 **/production.env
 **/.env.test
 **/development.env
-**/.vscode
 **/.idea
 .DS_Store
+/**/.idea/*
+/**/.vscode/*

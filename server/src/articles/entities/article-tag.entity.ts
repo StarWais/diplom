@@ -1,7 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ArticleTag } from '@prisma/client';
+import { CreatedUpdatedEntity } from '../../common/entities/created-updated-entity';
 
-export class ArticleTagEntity implements ArticleTag {
+export class ArticleTagEntity
+  extends CreatedUpdatedEntity
+  implements ArticleTag
+{
   @ApiProperty({
     example: 1,
     type: 'integer',
@@ -11,14 +15,9 @@ export class ArticleTagEntity implements ArticleTag {
     example: 'Математика',
   })
   readonly name: string;
-  @ApiProperty({
-    example: Date.now(),
-    type: 'date-time',
-  })
-  readonly createdAt: Date;
-  @ApiProperty({
-    example: Date.now(),
-    type: 'date-time',
-  })
-  readonly updatedAt: Date;
+
+  constructor(data: Partial<ArticleTagEntity>) {
+    super(data);
+    Object.assign(this, data);
+  }
 }

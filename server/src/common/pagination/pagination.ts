@@ -4,7 +4,6 @@ import { applyDecorators, Type } from '@nestjs/common';
 
 import { PaginationQuery } from './pagination-query';
 import { PrismaService } from 'nestjs-prisma';
-import { Prisma } from '@prisma/client';
 
 export class Paginated<T> {
   nodes: T[];
@@ -23,7 +22,6 @@ export const ApiPaginatedDto = <TModel extends Type<any>>(
       schema: {
         description,
         allOf: [
-          { $ref: getSchemaPath(Paginated) },
           {
             properties: {
               nodes: {

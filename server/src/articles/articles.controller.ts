@@ -1,4 +1,5 @@
-import { FindOneParams } from './../common/params/find-one-params';
+import { PaginationQuery } from './../common/pagination/pagination-query';
+import { FindOneParams } from '../common/params/find-one-params';
 import {
   Body,
   Controller,
@@ -24,20 +25,38 @@ import {
 } from '@nestjs/swagger';
 import { User, Role } from '@prisma/client';
 
-import { ApiPaginatedDto, Paginated } from './../common/pagination/pagination';
-import { RolesGuard } from './../auth/guards/roles.guard';
-import { JwtAuthGuard } from './../auth/guards/jwt-auth.guard';
-import { CurrentUser } from './../decorators/current-user.decorator';
+import { ApiPaginatedDto, Paginated } from '../common/pagination/pagination';
+import { RolesGuard, JwtAuthGuard } from './../auth/guards';
+import { CurrentUser } from '../decorators/current-user.decorator';
 import { ArticlesService } from './articles.service';
-import { ArticleCreateDto, ArticleUpdateDto } from './dto';
-import { ArticleEntity, ArticleTagEntity } from './entities';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { ArticlesGetFilter } from './filters/articles-get-filter';
+import {
+  ArticleCommentCreateDto,
+  ArticleCreateDto,
+  ArticleUpdateDto,
+} from './dto';
+import {
+  ArticleCommentEntity,
+  ArticleEntity,
+  ArticleTagEntity,
+} from './entities';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { ArticlesGetFilter } from './filters';
 
 @ApiTags('Статьи')
 @Controller('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
+  @ApiOperation({ summary: 'Получить список тегов статей' })
+  @ApiOkResponse({
+    type: ArticleTagEntity,
+    isArray: true,
+    description: 'Статья',
+  })
+  @HttpCode(HttpStatus.OK)
+  @Get('tags')
+  async tags(): Promise<ArticleTagEntity[]> {
+    return this.articlesService.tags();
+  }
 
   @ApiOperation({ summary: 'Получить статью по slug' })
   @ApiNotFoundResponse({ description: 'Статья не найдена' })
@@ -60,7 +79,6 @@ export class ArticlesController {
   @ApiOperation({ summary: 'Создать статью' })
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: ArticleEntity, description: 'Статья' })
-  @ApiForbiddenResponse({ description: 'Нет прав на публикацию' })
   @Post()
   async create(
     @Body() details: ArticleCreateDto,
@@ -117,15 +135,67 @@ export class ArticlesController {
     await this.articlesService.delete({ id });
   }
 
-  @ApiOperation({ summary: 'Получить список тегов статей' })
-  @ApiOkResponse({
-    type: ArticleTagEntity,
-    isArray: true,
-    description: 'Статья',
-  })
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Добавить коментарий к статье' })
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ type: ArticleCommentEntity, description: 'Коментарий' })
+  @Post(':id/comments')
+  async createComment(
+    @Param() { id }: FindOneParams,
+    @Body() details: ArticleCommentCreateDto,
+    @CurrentUser() currentUser: User,
+  ): Promise<ArticleCommentEntity> {
+    return this.articlesService.createComment({ id }, details, currentUser);
+  }
+
+  @ApiOperation({ summary: 'Получить коментарии к статье' })
+  @ApiPaginatedDto(ArticleCommentEntity, 'Коментарии к статье')
+  @Get(':id/comments')
+  async findComments(
+    @Param() { id }: FindOneParams,
+    @Query() paginationDetails: PaginationQuery,
+  ): Promise<Paginated<ArticleCommentEntity>> {
+    return this.articlesService.findComments({ id }, paginationDetails);
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Удалить коментарий к статье' })
+  @ApiNotFoundResponse({ description: 'Коментарий не найден' })
+  @ApiNoContentResponse({ description: 'Коментарий успешно удален' })
+  @ApiForbiddenResponse({ description: 'Нет прав на удаление коментария' })
+  @Delete('/comments/:id')
+  async deleteComment(@Param() { id }: FindOneParams): Promise<void> {
+    await this.articlesService.deleteComment({ id });
+  }
+
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  @Get('tags')
-  async tags(): Promise<ArticleTagEntity[]> {
-    return this.articlesService.tags();
+  @ApiOkResponse({ description: 'Лайк поставлен', type: ArticleEntity })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Добавить лайк к статье' })
+  @ApiNotFoundResponse({ description: 'Статья не найдена' })
+  @Post(':id/like')
+  async like(
+    @Param() { id }: FindOneParams,
+    @CurrentUser() currentUser: User,
+  ): Promise<ArticleEntity> {
+    return this.articlesService.like({ id }, currentUser);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Добавить дизлайк к статье' })
+  @ApiNotFoundResponse({ description: 'Статья не найдена' })
+  @ApiOkResponse({ description: 'Дизлайк поставлен', type: ArticleEntity })
+  @Post(':id/dislike')
+  async dislike(
+    @Param() { id }: FindOneParams,
+    @CurrentUser() currentUser: User,
+  ): Promise<ArticleEntity> {
+    return this.articlesService.dislike({ id }, currentUser);
   }
 }

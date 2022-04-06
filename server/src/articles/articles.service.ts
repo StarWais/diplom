@@ -1,17 +1,47 @@
-import { Paginated } from './../common/pagination/pagination';
+import { PaginationQuery } from './../common/pagination/pagination-query';
+import { Paginated } from '../common/pagination/pagination';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ArticleStatus, Prisma, User } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import slugify from 'slugify';
-import { Paginate } from 'src/common/pagination/pagination';
-import { ArticleCreateDto, ArticleUpdateDto } from './dto';
-import { ArticleEntity, ArticleTagEntity } from './entities';
-import { ArticlesGetFilter } from './filters/articles-get-filter';
+import { Paginate } from '../common/pagination/pagination';
+import {
+  ArticleCommentCreateDto,
+  ArticleCreateDto,
+  ArticleUpdateDto,
+} from './dto';
+import {
+  ArticleEntity,
+  ArticleTagEntity,
+  ArticleCommentEntity,
+} from './entities';
+import { ArticlesGetFilter } from './filters';
 
 @Injectable()
 export class ArticlesService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private prismaArticleParams: Pick<Prisma.ArticleFindFirstArgs, 'include'> = {
+    include: {
+      tags: {
+        select: {
+          name: true,
+        },
+      },
+      likes: {
+        select: {
+          userId: true,
+          id: true,
+        },
+      },
+      dislikes: {
+        select: {
+          userId: true,
+          id: true,
+        },
+      },
+    },
+  };
   async create(
     details: ArticleCreateDto,
     currentUser: User,
@@ -46,7 +76,6 @@ export class ArticlesService {
           tags: {
             select: {
               name: true,
-              id: true,
             },
           },
         },
@@ -58,14 +87,7 @@ export class ArticlesService {
   ): Promise<ArticleEntity> {
     const article = await this.prisma.article.findUnique({
       where: details,
-      include: {
-        tags: {
-          select: {
-            name: true,
-            id: true,
-          },
-        },
-      },
+      ...this.prismaArticleParams,
     });
 
     if (!article) {
@@ -77,21 +99,14 @@ export class ArticlesService {
   async publish(
     details: Prisma.ArticleWhereUniqueInput,
   ): Promise<ArticleEntity> {
-    await this.checkExistance(details);
+    await this.findOne(details);
     return new ArticleEntity(
       await this.prisma.article.update({
         where: details,
         data: {
           status: ArticleStatus.PUBLISHED,
         },
-        include: {
-          tags: {
-            select: {
-              name: true,
-              id: true,
-            },
-          },
-        },
+        ...this.prismaArticleParams,
       }),
     );
   }
@@ -113,7 +128,7 @@ export class ArticlesService {
           status: ArticleStatus.PUBLISHED,
           authorId: details.authorId,
           tags: {
-            every: {
+            some: {
               name: {
                 in: details.tags,
               },
@@ -135,14 +150,7 @@ export class ArticlesService {
         orderBy: {
           createdAt: 'desc',
         },
-        include: {
-          tags: {
-            select: {
-              name: true,
-              id: true,
-            },
-          },
-        },
+        ...this.prismaArticleParams,
       },
       (article) => new ArticleEntity(article),
     );
@@ -165,19 +173,21 @@ export class ArticlesService {
     }
     return slug;
   }
-  private async checkExistance(details: Prisma.ArticleWhereUniqueInput) {
-    const article = await this.prisma.article.findUnique({
+  private async checkCommentExistance(
+    details: Prisma.ArticleCommentWhereUniqueInput,
+  ) {
+    const comment = await this.prisma.articleComment.findUnique({
       where: details,
     });
-    if (!article) {
-      throw new NotFoundException('Статья не найдена');
+    if (!comment) {
+      throw new NotFoundException('Коментарий не найден');
     }
   }
   async update(
     searchDetails: Prisma.ArticleWhereUniqueInput,
     details: ArticleUpdateDto,
   ) {
-    await this.checkExistance(searchDetails);
+    await this.findOne(searchDetails);
     const { title } = details;
     return new ArticleEntity(
       await this.prisma.article.update({
@@ -199,36 +209,175 @@ export class ArticlesService {
               }
             : undefined,
         },
+        ...this.prismaArticleParams,
+      }),
+    );
+  }
+  async delete(details: Prisma.ArticleWhereUniqueInput): Promise<void> {
+    await this.findOne(details);
+    await this.prisma.article.delete({
+      where: details,
+    });
+  }
+  async createComment(
+    searchCommentDetails: Prisma.ArticleWhereUniqueInput,
+    details: ArticleCommentCreateDto,
+    user: User,
+  ): Promise<ArticleCommentEntity> {
+    await this.findOne(searchCommentDetails);
+    return new ArticleCommentEntity(
+      await this.prisma.articleComment.create({
+        data: {
+          ...details,
+          article: {
+            connect: {
+              id: searchCommentDetails.id,
+            },
+          },
+          author: {
+            connect: {
+              id: user.id,
+            },
+          },
+        },
         include: {
-          tags: {
+          author: {
             select: {
-              name: true,
               id: true,
+              firstName: true,
+              lastName: true,
+              middleName: true,
+              avatar: {
+                include: {
+                  file: true,
+                },
+              },
             },
           },
         },
       }),
     );
   }
-  async delete(
+  async findComments(
+    searchDetails: Prisma.ArticleWhereUniqueInput,
+    paginationDetails: PaginationQuery,
+  ): Promise<Paginated<ArticleCommentEntity>> {
+    await this.findOne(searchDetails);
+    return Paginate<ArticleCommentEntity, Prisma.ArticleCommentFindManyArgs>(
+      paginationDetails,
+      this.prisma,
+      'articleComment',
+      {
+        where: {
+          articleId: searchDetails.id,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        include: {
+          author: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              middleName: true,
+              avatar: {
+                include: {
+                  file: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      (comment) => new ArticleCommentEntity(comment),
+    );
+  }
+  async deleteComment(
+    details: Prisma.ArticleCommentWhereUniqueInput,
+  ): Promise<void> {
+    await this.checkCommentExistance(details);
+    await this.prisma.articleComment.delete({
+      where: details,
+    });
+  }
+  async like(
     details: Prisma.ArticleWhereUniqueInput,
+    user: User,
   ): Promise<ArticleEntity> {
-    await this.checkExistance(details);
+    const article = await this.findOne(details);
+    const userLike = article.likes.find((like) => like.userId === user.id);
+    const userDislike = article.dislikes.find(
+      (dislike) => dislike.userId === user.id,
+    );
     return new ArticleEntity(
-      await this.prisma.article.delete({
+      await this.prisma.article.update({
         where: details,
-        include: {
-          tags: {
-            select: {
-              name: true,
-              id: true,
-            },
-          },
+        data: {
+          dislikes: userDislike
+            ? {
+                delete: {
+                  id: userDislike.id,
+                },
+              }
+            : undefined,
+          likes: userLike
+            ? {
+                delete: {
+                  id: userLike.id,
+                },
+              }
+            : {
+                create: {
+                  user: {
+                    connect: {
+                      id: user.id,
+                    },
+                  },
+                },
+              },
         },
+
+        ...this.prismaArticleParams,
       }),
     );
   }
-  async addComment() {}
-  async removeComment() {}
-  async like() {}
+  async dislike(details: Prisma.ArticleWhereUniqueInput, user: User) {
+    const article = await this.findOne(details);
+    const userLike = article.likes.find((like) => like.userId === user.id);
+    const userDislike = article.dislikes.find(
+      (dislike) => dislike.userId === user.id,
+    );
+
+    return new ArticleEntity(
+      await this.prisma.article.update({
+        where: details,
+        data: {
+          likes: userLike
+            ? {
+                delete: {
+                  id: userLike.id,
+                },
+              }
+            : undefined,
+          dislikes: !userDislike
+            ? {
+                create: {
+                  user: {
+                    connect: {
+                      id: user.id,
+                    },
+                  },
+                },
+              }
+            : {
+                delete: {
+                  id: userDislike.id,
+                },
+              },
+        },
+        ...this.prismaArticleParams,
+      }),
+    );
+  }
 }

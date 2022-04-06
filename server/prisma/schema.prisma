@@ -31,6 +31,9 @@ model User {
   olympiadReviews     OlympiadReview[]
   passwordResetTokens PasswordResetToken[]
   registrationTokens  RegistrationToken[]
+  articleComments     ArticleComment[]
+  articleLikes        ArticleLike[]
+  articleDislikes     ArticleDislike[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -251,20 +254,63 @@ model Teacher {
 }
 
 model Article {
-  id       Int           @id @default(autoincrement())
+  id       Int              @id @default(autoincrement())
   title    String
-  slug     String        @unique
+  slug     String           @unique
   content  String
-  authorId Int           @map("author_id")
-  author   User          @relation(fields: [authorId], references: [id])
+  authorId Int              @map("author_id")
+  author   User             @relation(fields: [authorId], references: [id])
   tags     ArticleTag[]
-  views    Int           @default(0)
+  views    Int              @default(0)
   status   ArticleStatus
+  comments ArticleComment[]
+  likes    ArticleLike[]
+  dislikes ArticleDislike[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+
   @@map("articles")
+}
+
+model ArticleLike {
+  id        Int     @id @default(autoincrement())
+  articleId Int     @map("article_id")
+  article   Article @relation(fields: [articleId], references: [id])
+  userId    Int     @map("user_id")
+  user      User    @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("article_likes")
+}
+
+model ArticleDislike {
+  id        Int     @id @default(autoincrement())
+  articleId Int     @map("article_id")
+  article   Article @relation(fields: [articleId], references: [id])
+  userId    Int     @map("user_id")
+  user      User    @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("article_dislikes")
+}
+
+model ArticleComment {
+  id        Int      @id @default(autoincrement())
+  articleId Int      @map("article_id")
+  article   Article  @relation(fields: [articleId], references: [id])
+  authorId  Int      @map("author_id")
+  author    User     @relation(fields: [authorId], references: [id])
+  text      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("article_comments")
 }
 
 model ArticleTag {

@@ -1,4 +1,3 @@
-import { LocalAuthGuard } from './local-auth.guard';
-import { JwtAuthGuard } from './jwt-auth.guard';
-
-export { LocalAuthGuard, JwtAuthGuard };
+export { LocalAuthGuard } from './local-auth.guard';
+export { JwtAuthGuard } from './jwt-auth.guard';
+export { RolesGuard } from './roles.guard';

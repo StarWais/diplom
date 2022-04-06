@@ -75,7 +75,7 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   async confirm(@Body() details: ConfirmEmailDto): Promise<void> {
-    return this.authService.confirmRegistration(details);
+    await this.authService.confirmRegistration(details);
   }
 
   @ApiBearerAuth()
@@ -88,7 +88,7 @@ export class AuthController {
     @CurrentUser() user: User,
     @CurrentBrowserInfo() browserInfo: BrowserInfo,
   ): Promise<void> {
-    return this.authService.sendAnotherRegistrationToken(user, browserInfo);
+    await this.authService.sendAnotherRegistrationToken(user, browserInfo);
   }
 
   @Post('reset-password')
@@ -100,7 +100,7 @@ export class AuthController {
     @Body() details: PasswordResetDto,
     @CurrentBrowserInfo() browserInfo: BrowserInfo,
   ): Promise<void> {
-    return this.authService.resetPassword(details, browserInfo);
+    await this.authService.resetPassword(details, browserInfo);
   }
 
   @Post('confirm-password-reset')
@@ -111,6 +111,6 @@ export class AuthController {
   async confirmPasswordReset(
     @Body() details: ConfirmPasswordResetDto,
   ): Promise<void> {
-    return this.authService.confirmPasswordReset(details);
+    await this.authService.confirmPasswordReset(details);
   }
 }

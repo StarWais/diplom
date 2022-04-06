@@ -1,6 +1,7 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Gender, Role, User } from '@prisma/client';
 import { Exclude, Expose } from 'class-transformer';
+import { UserAvatarEntity } from '.';
 
 export class UserEntity implements User {
   @ApiProperty({
@@ -69,6 +70,11 @@ export class UserEntity implements User {
   @ApiHideProperty()
   @Exclude()
   password: string;
+
+  @ApiProperty({
+    type: UserAvatarEntity,
+  })
+  avatar: UserAvatarEntity;
 
   @Expose()
   @ApiProperty({
