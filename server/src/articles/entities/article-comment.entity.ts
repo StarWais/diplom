@@ -1,7 +1,8 @@
-import { UserEntity } from './../../users/entities';
 import { ApiProperty, PickType, PartialType } from '@nestjs/swagger';
 import { ArticleComment } from '@prisma/client';
-import { CreatedUpdatedEntity } from 'src/common/entities';
+
+import { UserEntity } from '../../users/entities';
+import { CreatedUpdatedEntity } from '../../common/entities';
 
 export class ArticleCommentEntity
   extends CreatedUpdatedEntity

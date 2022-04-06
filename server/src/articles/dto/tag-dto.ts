@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { isLowercase, MaxLength } from 'class-validator';
+import { MaxLength } from 'class-validator';
 
 export class ArticleTagDto {
   @MaxLength(50)

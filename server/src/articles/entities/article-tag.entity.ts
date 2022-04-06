@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ArticleTag } from '@prisma/client';
-import { CreatedUpdatedEntity } from '../../common/entities/created-updated-entity';
+import { CreatedUpdatedEntity } from '../../common/entities';
 
 export class ArticleTagEntity
   extends CreatedUpdatedEntity

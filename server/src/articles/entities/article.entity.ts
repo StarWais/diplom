@@ -1,8 +1,8 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Article, ArticleStatus } from '@prisma/client';
-import { CreatedUpdatedEntity } from 'src/common/entities';
 import { ArticleLikeEntity } from './article-like.entity';
 import { ArticleTagEntity } from './article-tag.entity';
+import { CreatedUpdatedEntity } from '../../common/entities';
 
 export class ArticleEntity extends CreatedUpdatedEntity implements Article {
   @ApiProperty({
@@ -42,11 +42,13 @@ export class ArticleEntity extends CreatedUpdatedEntity implements Article {
     isArray: true,
   })
   readonly tags: Pick<ArticleTagEntity, 'name'>[];
+
   @ApiProperty({
     type: ArticleLikeEntity,
     isArray: true,
   })
   readonly likes: ArticleLikeEntity[];
+
   @ApiProperty({
     type: ArticleLikeEntity,
     isArray: true,

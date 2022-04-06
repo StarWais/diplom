@@ -1,5 +1,3 @@
-import { PaginationQuery } from './../common/pagination/pagination-query';
-import { FindOneParams } from '../common/params/find-one-params';
 import {
   Body,
   Controller,
@@ -25,8 +23,10 @@ import {
 } from '@nestjs/swagger';
 import { User, Role } from '@prisma/client';
 
+import { PaginationQuery } from '../common/pagination/pagination-query';
+import { FindOneParams } from '../common/params/find-one-params';
 import { ApiPaginatedDto, Paginated } from '../common/pagination/pagination';
-import { RolesGuard, JwtAuthGuard } from './../auth/guards';
+import { RolesGuard, JwtAuthGuard } from '../auth/guards';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { ArticlesService } from './articles.service';
 import {
