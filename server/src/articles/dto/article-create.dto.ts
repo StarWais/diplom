@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type, Transform } from 'class-transformer';
+import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   ArrayMinSize,
   IsArray,
   IsNotEmpty,
@@ -20,6 +21,7 @@ export class ArticleCreateDto {
   @IsArray()
   @ValidateNested({ each: true })
   @ArrayMinSize(1)
+  @ArrayMaxSize(10)
   @Type(() => ArticleTagDto)
   @ApiProperty({
     type: ArticleTagDto,
@@ -27,9 +29,6 @@ export class ArticleCreateDto {
     example: [
       {
         name: 'Математика',
-      },
-      {
-        name: 'Новый тэг',
       },
     ],
   })

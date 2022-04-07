@@ -126,11 +126,13 @@ model Course {
   steps         CourseEducationStep[]
   reviews       CourseReview[]
   startDate     DateTime              @map("start_date")
-  materialsLink String?               @map("materials_link")
+  materials     String[]
   price         Float
   eripNumber    String                @map("erip_number")
   length        String
   applications  CourseApplication[]
+  modules       CourseModule[]
+  tags          CourseTag[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -139,10 +141,34 @@ model Course {
   @@map("courses")
 }
 
+model CourseModule {
+ id             Int @id @default(autoincrement())
+ name           String
+ description    String
+ courseId       Int @map("course_id")
+ course         Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+
+ createdAt DateTime @default(now()) @map("created_at")
+ updatedAt DateTime @updatedAt @map("updated_at")
+
+}
+
+model CourseTag {
+  id       Int       @id @default(autoincrement())
+  courses  Course[]
+  name     String    @unique
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("courses_tags")
+}
+
 model CourseEducationStep {
   id       Int    @id @default(autoincrement())
   courseId Int    @map("course_id")
-  course   Course @relation(fields: [courseId], references: [id])
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   step     Int
   title    String
   text     String
@@ -158,7 +184,7 @@ model CourseApplication {
   courseId        Int               @map("course_id")
   appliciantName  String            @map("appliciant_name")
   appliciantPhone String            @map("appliciant_phone")
-  course          Course            @relation(fields: [courseId], references: [id])
+  course          Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
   studentId       Int               @map("student_id")
   student         Student           @relation(fields: [studentId], references: [id])
   status          ApplicationStatus @default(CREATED)
@@ -172,7 +198,7 @@ model CourseApplication {
 model OlympiadApplication {
   id         Int               @id @default(autoincrement())
   olympiadId Int               @map("course_id")
-  olympiad   Olympiad          @relation(fields: [olympiadId], references: [id])
+  olympiad   Olympiad          @relation(fields: [olympiadId], references: [id], onDelete: Cascade)
   studentId  Int               @map("student_id")
   student    Student           @relation(fields: [studentId], references: [id])
   steps      Int[]
@@ -187,10 +213,9 @@ model OlympiadApplication {
 model CourseReview {
   id       Int    @id @default(autoincrement())
   courseId Int    @map("course_id")
-  course   Course @relation(fields: [courseId], references: [id])
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   authorId Int    @map("author_id")
   author   User   @relation(fields: [authorId], references: [id])
-  rating   Float
   text     String
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -202,7 +227,7 @@ model CourseReview {
 model OlympiadReview {
   id         Int      @id @default(autoincrement())
   olympiadId Int      @map("olympiad_id")
-  course     Olympiad @relation(fields: [olympiadId], references: [id])
+  olympiad     Olympiad @relation(fields: [olympiadId], references: [id], onDelete: Cascade)
   authorId   Int      @map("author_id")
   author     User     @relation(fields: [authorId], references: [id])
   rating     Float
@@ -239,7 +264,7 @@ model Teacher {
   rating               Float    @default(0)
   about                String?
   specialisations      String[] @map("specialisation")
-  studentsTeachedCount Int      @default(0) @map("students_teached_count")
+  studentsTaughtCount  Int      @default(0) @map("students_teached_count")
   telegramLink         String?  @map("telegram_link")
   whatsappLink         String?  @map("whatsapp_link")
   viberLink            String?  @map("viber_link")
@@ -277,7 +302,7 @@ model Article {
 model ArticleLike {
   id        Int     @id @default(autoincrement())
   articleId Int     @map("article_id")
-  article   Article @relation(fields: [articleId], references: [id])
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
   userId    Int     @map("user_id")
   user      User    @relation(fields: [userId], references: [id])
 
@@ -290,7 +315,7 @@ model ArticleLike {
 model ArticleDislike {
   id        Int     @id @default(autoincrement())
   articleId Int     @map("article_id")
-  article   Article @relation(fields: [articleId], references: [id])
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
   userId    Int     @map("user_id")
   user      User    @relation(fields: [userId], references: [id])
 
@@ -303,7 +328,7 @@ model ArticleDislike {
 model ArticleComment {
   id        Int      @id @default(autoincrement())
   articleId Int      @map("article_id")
-  article   Article  @relation(fields: [articleId], references: [id])
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
   authorId  Int      @map("author_id")
   author    User     @relation(fields: [authorId], references: [id])
   text      String

@@ -7,14 +7,7 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
 import { AuthService } from './auth.service';
@@ -23,7 +16,6 @@ import {
   BrowserInfo,
   CurrentBrowserInfo,
 } from '../decorators/browser-info.decorator';
-import { AuthTokenEntity } from './entities/auth-token.entity';
 import {
   ConfirmEmailDto,
   ConfirmPasswordResetDto,
@@ -43,14 +35,10 @@ export class AuthController {
     summary: 'Зарегистрироваться',
   })
   @HttpCode(HttpStatus.CREATED)
-  @ApiCreatedResponse({
-    type: AuthTokenEntity,
-    description: 'Токен авторизации',
-  })
   async signup(
     @Body() details: SignupDto,
     @CurrentBrowserInfo() browserInfo: BrowserInfo,
-  ): Promise<AuthTokenEntity> {
+  ) {
     return this.authService.signup(details, browserInfo);
   }
 
@@ -59,13 +47,9 @@ export class AuthController {
   @ApiOperation({
     summary: 'Войти',
   })
-  @ApiOkResponse({
-    type: AuthTokenEntity,
-    description: 'Токен авторизации',
-  })
   @HttpCode(HttpStatus.OK)
   @Post('signin')
-  async signin(@Request() req: any): Promise<AuthTokenEntity> {
+  async signin(@Request() req: any) {
     return this.authService.signin(req.user as User);
   }
 
@@ -74,7 +58,7 @@ export class AuthController {
     summary: 'Подтвердить регистрацию',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  async confirm(@Body() details: ConfirmEmailDto): Promise<void> {
+  async confirm(@Body() details: ConfirmEmailDto) {
     await this.authService.confirmRegistration(details);
   }
 
@@ -87,7 +71,7 @@ export class AuthController {
   async resendRegistrationConfirmation(
     @CurrentUser() user: User,
     @CurrentBrowserInfo() browserInfo: BrowserInfo,
-  ): Promise<void> {
+  ) {
     await this.authService.sendAnotherRegistrationToken(user, browserInfo);
   }
 
@@ -99,7 +83,7 @@ export class AuthController {
   async resetPassword(
     @Body() details: PasswordResetDto,
     @CurrentBrowserInfo() browserInfo: BrowserInfo,
-  ): Promise<void> {
+  ) {
     await this.authService.resetPassword(details, browserInfo);
   }
 
@@ -108,9 +92,7 @@ export class AuthController {
     summary: 'Подтвердить изменение пароля',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  async confirmPasswordReset(
-    @Body() details: ConfirmPasswordResetDto,
-  ): Promise<void> {
+  async confirmPasswordReset(@Body() details: ConfirmPasswordResetDto) {
     await this.authService.confirmPasswordReset(details);
   }
 }

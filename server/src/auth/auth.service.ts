@@ -19,15 +19,12 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
-import { UserEntity } from '../users/entities/user.entity';
-
 import {
   DomainOptions,
   ConfirmationTokenOptions,
 } from '../config/configuration';
 import { BrowserInfo } from '../decorators/browser-info.decorator';
 import { UsersService } from '../users/users.service';
-import { AuthTokenEntity } from './entities/auth-token.entity';
 import { JWTPayload } from './strategies/jwt.strategy';
 import {
   ConfirmEmailDto,
@@ -45,31 +42,25 @@ export class AuthService {
     private readonly config: ConfigService,
     private readonly mailerService: MailerService,
   ) {}
-  private async hashPassword(
-    password: string,
-    saltRounds = 10,
-  ): Promise<string> {
+  private static async hashPassword(password: string, saltRounds = 10) {
     return bcrypt.hash(password, saltRounds);
   }
-  private async comparePassword(
-    password: string,
-    hash: string,
-  ): Promise<boolean> {
+
+  private static async comparePassword(password: string, hash: string) {
     return bcrypt.compare(password, hash);
   }
-  private async generateJWTToken(user: User): Promise<AuthTokenEntity> {
+
+  private async generateJWTToken(user: User) {
     const payload: JWTPayload = {
       sub: user.id,
       email: user.email,
     };
-    return new AuthTokenEntity({
+    return {
       accessToken: this.jwtService.sign(payload),
-    });
+    };
   }
-  async resetPassword(
-    details: PasswordResetDto,
-    browserInfo: BrowserInfo,
-  ): Promise<void> {
+
+  async resetPassword(details: PasswordResetDto, browserInfo: BrowserInfo) {
     const user = await this.usersService.findUnique({ email: details.email });
     if (!user) {
       throw new BadRequestException(
@@ -87,6 +78,7 @@ export class AuthService {
     });
     return this.sendPasswordResetEmail(user, token);
   }
+
   private checkToken<T extends PasswordResetToken | RegistrationToken>(
     token: T,
   ): T {
@@ -101,14 +93,15 @@ export class AuthService {
     }
     return token;
   }
-  async confirmPasswordReset(details: ConfirmPasswordResetDto): Promise<void> {
+
+  async confirmPasswordReset(details: ConfirmPasswordResetDto) {
     const { token: tokenValue, newPassword } = details;
     const token = await this.validatePasswordResetToken(tokenValue);
     const user = await this.usersService.findUnique({
       id: token.userId,
     });
 
-    const compareNewPassword = await this.comparePassword(
+    const compareNewPassword = await AuthService.comparePassword(
       newPassword,
       user.password,
     );
@@ -122,7 +115,7 @@ export class AuthService {
       where: { id: token.id },
       data: { status: TokenStatus.FULFILLED },
     });
-    const hashedNewPassword = await this.hashPassword(newPassword);
+    const hashedNewPassword = await AuthService.hashPassword(newPassword);
     await this.usersService.updatePassword(
       {
         id: user.id,
@@ -130,6 +123,7 @@ export class AuthService {
       hashedNewPassword,
     );
   }
+
   private async validatePasswordResetToken(
     tokenValue: string,
   ): Promise<PasswordResetToken> {
@@ -138,6 +132,7 @@ export class AuthService {
     });
     return this.checkToken(tokenInfo);
   }
+
   private async validateRegistrationToken(
     tokenValue: string,
   ): Promise<RegistrationToken> {
@@ -146,6 +141,7 @@ export class AuthService {
     });
     return this.checkToken(tokenInfo);
   }
+
   private async sendRegistrationConfirmationEmail(
     email: string,
     token: string,
@@ -162,11 +158,12 @@ export class AuthService {
       },
     });
   }
+
   private async sendPasswordResetEmail(
     user: User,
     token: PasswordResetToken,
   ): Promise<void> {
-    const { email, fullName } = new UserEntity(user);
+    const { email, firstName, middleName, lastName } = user;
     const { ip, browser, createdAt } = token;
     return this.mailerService.sendMail({
       to: email,
@@ -175,7 +172,7 @@ export class AuthService {
       context: {
         title: 'Восстановление пароля',
         linkButtonText: 'Восстановить пароль',
-        fullName,
+        fullName: `${lastName} ${firstName} ${middleName}`,
         ip,
         browser,
         date: format(createdAt, 'dd MMMM yyyy', { locale: ru }),
@@ -186,6 +183,7 @@ export class AuthService {
       },
     });
   }
+
   async confirmRegistration(details: ConfirmEmailDto): Promise<void> {
     const token = await this.validateRegistrationToken(details.token);
     await this.prisma.registrationToken.update({
@@ -196,6 +194,7 @@ export class AuthService {
       id: token.userId,
     });
   }
+
   private async disableOtherRegistrationTokens(userId: number): Promise<void> {
     await this.prisma.registrationToken.updateMany({
       where: {
@@ -208,6 +207,7 @@ export class AuthService {
       },
     });
   }
+
   private async disableOtherPasswordResetTokens(userId: number): Promise<void> {
     await this.prisma.passwordResetToken.updateMany({
       where: {
@@ -219,6 +219,7 @@ export class AuthService {
       },
     });
   }
+
   private async createSendRegistrationToken(
     user: User,
     browserInfo: BrowserInfo,
@@ -243,9 +244,11 @@ export class AuthService {
     await this.disableOtherRegistrationTokens(user.id);
     return this.createSendRegistrationToken(user, browserInfo);
   }
+
   async onUserSignedUp(user: User, browserInfo: BrowserInfo): Promise<void> {
     return this.createSendRegistrationToken(user, browserInfo);
   }
+
   private async createPasswordResetToken(
     details: Omit<Prisma.PasswordResetTokenCreateInput, 'token' | 'expiresIn'>,
   ): Promise<PasswordResetToken> {
@@ -262,6 +265,7 @@ export class AuthService {
       },
     });
   }
+
   private async createRegistrationToken(
     details: Omit<Prisma.RegistrationTokenCreateInput, 'token' | 'expiresIn'>,
   ): Promise<RegistrationToken> {
@@ -278,23 +282,25 @@ export class AuthService {
       },
     });
   }
+
   async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.usersService.findUnique({ email });
     if (!user) {
       return null;
     }
-    const isPasswordValid = await this.comparePassword(password, user.password);
+    const isPasswordValid = await AuthService.comparePassword(
+      password,
+      user.password,
+    );
     if (!isPasswordValid) {
       return null;
     }
     return user;
   }
-  async signup(
-    details: SignupDto,
-    browserInfo: BrowserInfo,
-  ): Promise<AuthTokenEntity> {
+
+  async signup(details: SignupDto, browserInfo: BrowserInfo) {
     const { password, ...restUserDetails } = details;
-    const hashedPassword = await this.hashPassword(password);
+    const hashedPassword = await AuthService.hashPassword(password);
     const user = await this.usersService.create({
       password: hashedPassword,
       ...restUserDetails,
@@ -302,7 +308,8 @@ export class AuthService {
     await this.onUserSignedUp(user, browserInfo);
     return this.generateJWTToken(user);
   }
-  async signin(user: User): Promise<AuthTokenEntity> {
+
+  async signin(user: User) {
     return this.generateJWTToken(user);
   }
 }
