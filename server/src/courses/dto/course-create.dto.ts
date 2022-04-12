@@ -4,12 +4,20 @@ import {
   ArrayMinSize,
   IsArray,
   IsInt,
+  IsDate,
   IsNotEmpty,
   IsPositive,
   MaxLength,
+  ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CourseStepCreateDto, CourseModuleCreateDto, CourseTagDto } from '.';
+import {
+  FileSystemStoredFile,
+  HasMimeType,
+  IsFile,
+  MaxFileSize,
+} from 'nestjs-form-data';
 
 export class CourseCreateDto {
   @ApiProperty({
@@ -18,13 +26,6 @@ export class CourseCreateDto {
   @IsNotEmpty()
   @MaxLength(100)
   readonly name: string;
-
-  @ApiProperty({
-    example: '4 недели',
-  })
-  @IsNotEmpty()
-  @MaxLength(100)
-  readonly length: string;
 
   @ApiProperty({
     example: 5,
@@ -79,24 +80,37 @@ export class CourseCreateDto {
   readonly possibilities: string[];
 
   @ApiProperty({
-    isArray: true,
-    type: 'string',
-    example: ['ссылка на материал 1', 'ссылка на материал 2'],
+    example: 'http://example.com/materials.zip',
   })
-  @IsArray()
-  @ArrayMinSize(1)
-  @Type(() => String)
-  readonly materials: string[];
+  @IsNotEmpty()
+  readonly materialsLink: string;
+
+  @ApiProperty({
+    example: 12,
+  })
+  @IsInt()
+  @IsPositive()
+  readonly materialsCount: number;
 
   @ApiProperty({
     example: Date.now(),
     type: 'date-time',
   })
+  @IsNotEmpty()
+  @IsDate()
   readonly startDate: Date;
 
   @ApiProperty({
+    example: Date.now(),
+    type: 'date-time',
+  })
+  @IsNotEmpty()
+  @IsDate()
+  readonly finishDate: Date;
+
+  @ApiProperty({
     isArray: true,
-    type: CourseStepCreateDto,
+    type: () => CourseStepCreateDto,
     example: [
       {
         step: 1,
@@ -105,7 +119,8 @@ export class CourseCreateDto {
       },
     ],
   })
-  @IsArray({ each: true })
+  @IsArray()
+  @ValidateNested({ each: true })
   @Type(() => CourseStepCreateDto)
   @ArrayMaxSize(5)
   @ArrayMinSize(1)
@@ -113,7 +128,7 @@ export class CourseCreateDto {
 
   @ApiProperty({
     isArray: true,
-    type: CourseModuleCreateDto,
+    type: () => CourseModuleCreateDto,
     example: [
       {
         name: 'Модуль 1',
@@ -121,7 +136,8 @@ export class CourseCreateDto {
       },
     ],
   })
-  @IsArray({ each: true })
+  @IsArray()
+  @ValidateNested({ each: true })
   @Type(() => CourseModuleCreateDto)
   @ArrayMaxSize(5)
   @ArrayMinSize(1)
@@ -129,14 +145,15 @@ export class CourseCreateDto {
 
   @ApiProperty({
     isArray: true,
-    type: CourseTagDto,
+    type: () => CourseTagDto,
     example: [
       {
         name: 'Математика',
       },
     ],
   })
-  @IsArray({ each: true })
+  @IsArray()
+  @ValidateNested({ each: true })
   @Type(() => CourseTagDto)
   @ArrayMaxSize(10)
   @ArrayMinSize(1)
@@ -148,4 +165,16 @@ export class CourseCreateDto {
   @IsNotEmpty()
   @MaxLength(100)
   readonly eripNumber: string;
+
+  @IsFile()
+  @MaxFileSize(1e6)
+  @HasMimeType([
+    'image/jpeg',
+    'image/png',
+    'image/jpg',
+    'image/gif',
+    'image/svg+xml',
+    'image/webp',
+  ])
+  image: FileSystemStoredFile;
 }

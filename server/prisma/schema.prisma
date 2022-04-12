@@ -23,7 +23,7 @@ model User {
   canPublish          Boolean              @default(false)
   gender              Gender
   confirmed           Boolean              @default(false)
-  avatar              Avatar?
+  avatarLink          String?              @map("avatar_link")
   studentInfo         Student?
   teacherInfo         Teacher?
   articles            Article[]
@@ -113,26 +113,28 @@ model OlympiadStep {
 }
 
 model Course {
-  id            Int                   @id @default(autoincrement())
-  name          String
-  teacherId     Int                   @map("teacher_id")
-  teacher       Teacher               @relation(fields: [teacherId], references: [id])
-  capacity      Int
-  students      Student[]
-  rating        Float                 @default(0)
-  grade         Int
-  toWhom        String[]              @map("to_whom")
-  possibilities String[]
-  steps         CourseEducationStep[]
-  reviews       CourseReview[]
-  startDate     DateTime              @map("start_date")
-  materials     String[]
-  price         Float
-  eripNumber    String                @map("erip_number")
-  length        String
-  applications  CourseApplication[]
-  modules       CourseModule[]
-  tags          CourseTag[]
+  id             Int                   @id @default(autoincrement())
+  name           String
+  teacherId      Int                   @map("teacher_id")
+  teacher        Teacher               @relation(fields: [teacherId], references: [id])
+  capacity       Int
+  students       Student[]
+  rating         Float                 @default(0)
+  grade          Int
+  toWhom         String[]              @map("to_whom")
+  possibilities  String[]
+  steps          CourseEducationStep[]
+  reviews        CourseReview[]
+  startDate      DateTime              @map("start_date")
+  materialsLink  String                @map("materials_link")
+  materialsCount Int                   @map("materials_count")
+  price          Float
+  imageLink      String                @map("image_link")
+  eripNumber     String                @map("erip_number")
+  finishDate     DateTime              @map("finish_date")
+  applications   CourseApplication[]
+  modules        CourseModule[]
+  tags           CourseTag[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -142,22 +144,22 @@ model Course {
 }
 
 model CourseModule {
- id             Int @id @default(autoincrement())
- name           String
- description    String
- courseId       Int @map("course_id")
- course         Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  courseId    Int    @map("course_id")
+  course      Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
 
- createdAt DateTime @default(now()) @map("created_at")
- updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
 }
 
 model CourseTag {
-  id       Int       @id @default(autoincrement())
-  courses  Course[]
-  name     String    @unique
+  id      Int      @id @default(autoincrement())
+  courses Course[]
+  name    String   @unique
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -185,8 +187,8 @@ model CourseApplication {
   appliciantName  String            @map("appliciant_name")
   appliciantPhone String            @map("appliciant_phone")
   course          Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  studentId       Int               @map("student_id")
-  student         Student           @relation(fields: [studentId], references: [id])
+  studentId       Int?              @map("student_id")
+  student         Student?          @relation(fields: [studentId], references: [id])
   status          ApplicationStatus @default(CREATED)
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -211,12 +213,13 @@ model OlympiadApplication {
 }
 
 model CourseReview {
-  id       Int    @id @default(autoincrement())
-  courseId Int    @map("course_id")
-  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  authorId Int    @map("author_id")
-  author   User   @relation(fields: [authorId], references: [id])
-  text     String
+  id        Int     @id @default(autoincrement())
+  courseId  Int     @map("course_id")
+  course    Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  authorId  Int     @map("author_id")
+  published Boolean @default(false)
+  author    User    @relation(fields: [authorId], references: [id])
+  text      String
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -227,8 +230,9 @@ model CourseReview {
 model OlympiadReview {
   id         Int      @id @default(autoincrement())
   olympiadId Int      @map("olympiad_id")
-  olympiad     Olympiad @relation(fields: [olympiadId], references: [id], onDelete: Cascade)
+  olympiad   Olympiad @relation(fields: [olympiadId], references: [id], onDelete: Cascade)
   authorId   Int      @map("author_id")
+  published  Boolean  @default(false)
   author     User     @relation(fields: [authorId], references: [id])
   rating     Float
   text       String
@@ -257,19 +261,19 @@ model Student {
 }
 
 model Teacher {
-  id                   Int      @id @default(autoincrement())
-  userId               Int      @unique @map("user_id")
-  user                 User     @relation(fields: [userId], references: [id])
-  courses              Course[]
-  rating               Float    @default(0)
-  about                String?
-  specialisations      String[] @map("specialisation")
-  studentsTaughtCount  Int      @default(0) @map("students_teached_count")
-  telegramLink         String?  @map("telegram_link")
-  whatsappLink         String?  @map("whatsapp_link")
-  viberLink            String?  @map("viber_link")
-  vkLink               String?  @map("vk_link")
-  skypeLink            String?  @map("skype_link")
+  id                  Int      @id @default(autoincrement())
+  userId              Int      @unique @map("user_id")
+  user                User     @relation(fields: [userId], references: [id])
+  courses             Course[]
+  rating              Float    @default(0)
+  about               String?
+  specialisations     String[] @map("specialisation")
+  studentsTaughtCount Int      @default(0) @map("students_teached_count")
+  telegramLink        String?  @map("telegram_link")
+  whatsappLink        String?  @map("whatsapp_link")
+  viberLink           String?  @map("viber_link")
+  vkLink              String?  @map("vk_link")
+  skypeLink           String?  @map("skype_link")
 
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -349,24 +353,9 @@ model ArticleTag {
   @@map("article_tags")
 }
 
-model Avatar {
-  id     Int  @id @default(autoincrement())
-  userId Int  @unique @map("user_id")
-  user   User @relation(fields: [userId], references: [id])
-
-  fileId Int  @unique @map("file_id")
-  file   File @relation(fields: [fileId], references: [id])
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("avatars")
-}
-
 model OlympiadExampleTask {
-  id     Int  @id @default(autoincrement())
-  fileId Int  @map("task_id")
-  file   File @relation(fields: [fileId], references: [id])
+  id     Int      @id @default(autoincrement())
+  images String[]
 
   olympiadId Int      @map("olympiad_id")
   olympiad   Olympiad @relation(fields: [olympiadId], references: [id])
@@ -375,20 +364,6 @@ model OlympiadExampleTask {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("olympiad_example_tasks")
-}
-
-model File {
-  id                   Int                   @id @default(autoincrement())
-  name                 String
-  path                 String
-  size                 Int
-  format               String
-  avatar               Avatar?
-  olympiadExampleTasks OlympiadExampleTask[]
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  @@map("files")
 }
 
 enum Role {

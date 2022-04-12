@@ -309,15 +309,7 @@ export class ArticlesService {
             firstName: true,
             lastName: true,
             middleName: true,
-            avatar: {
-              include: {
-                file: {
-                  select: {
-                    path: true,
-                  },
-                },
-              },
-            },
+            avatarLink: true,
           },
         },
       },
@@ -347,15 +339,7 @@ export class ArticlesService {
               firstName: true,
               lastName: true,
               middleName: true,
-              avatar: {
-                include: {
-                  file: {
-                    select: {
-                      path: true,
-                    },
-                  },
-                },
-              },
+              avatarLink: true,
             },
           },
         },

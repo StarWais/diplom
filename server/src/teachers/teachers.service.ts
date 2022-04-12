@@ -1,10 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { UsersService } from './../users/users.service';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
+import { CreateTeacherDto } from './dto';
 
 @Injectable()
 export class TeachersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly usersService: UsersService,
+  ) {}
 
   async findTeacherOrThrowError(details: Prisma.TeacherWhereUniqueInput) {
     const teacher = await this.prisma.teacher.findUnique({
@@ -14,5 +23,26 @@ export class TeachersService {
       throw new NotFoundException('Учитель не найден');
     }
     return teacher;
+  }
+
+  async create(details: CreateTeacherDto) {
+    const dbUser = await this.usersService.findUnique({
+      id: details.userId,
+    });
+    if (!dbUser) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+    if (dbUser.role === Role.TEACHER) {
+      throw new BadRequestException('Пользователь уже является учителем');
+    }
+    return this.prisma.teacher.create({
+      data: {
+        user: {
+          connect: {
+            id: dbUser.id,
+          },
+        },
+      },
+    });
   }
 }

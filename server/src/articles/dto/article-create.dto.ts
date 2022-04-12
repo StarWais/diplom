@@ -8,6 +8,7 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
+
 import { ArticleTagDto } from '.';
 
 export class ArticleCreateDto {
@@ -24,7 +25,7 @@ export class ArticleCreateDto {
   @ArrayMaxSize(10)
   @Type(() => ArticleTagDto)
   @ApiProperty({
-    type: ArticleTagDto,
+    type: () => ArticleTagDto,
     isArray: true,
     example: [
       {

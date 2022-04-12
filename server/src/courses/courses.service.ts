@@ -1,29 +1,80 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { application } from 'express';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Course, CourseReview, Prisma, User } from '@prisma/client';
-import { CourseCreateDto } from './dto';
+import {
+  ApplicationStatus,
+  Course,
+  CourseApplication,
+  CourseReview,
+  Prisma,
+  User,
+} from '@prisma/client';
+import { FileSystemStoredFile } from 'nestjs-form-data';
+import { ConfigService } from '@nestjs/config';
+import * as Sharp from 'sharp';
+import { v4 } from 'uuid';
+
+import {
+  CourseCreateDto,
+  CourseUpdateDto,
+  CreateCourseReviewDto,
+  CourseApplicationCreateDto,
+  CourseApplicationUpdateDto,
+} from './dto';
 import { CoursesGetFilter } from './filters';
 import { Paginate } from '../common/pagination/pagination';
-import { CourseUpdateDto } from './dto/course-update.dto';
 import { TeachersService } from '../teachers/teachers.service';
+import { StudentsService } from './../students/students.service';
 import { PaginationQuery } from '../common/pagination/pagination-query';
-import { CreateCourseReviewDto } from './dto/create-course-review.dto';
+import { FormDataOptions } from '../config/configuration';
 
 @Injectable()
 export class CoursesService {
   constructor(
-    readonly prisma: PrismaService,
-    readonly teachersService: TeachersService,
+    private readonly prisma: PrismaService,
+    private readonly teachersService: TeachersService,
+    private readonly studentsService: StudentsService,
+    private readonly config: ConfigService,
   ) {}
+
+  private async saveImage(image: FileSystemStoredFile) {
+    const fileName = `${v4()}.avif`;
+    const path = `${
+      this.config.get<FormDataOptions>('formDataOptions').uploadsDir
+    }/${fileName}`;
+    await Sharp(image.path)
+      .resize(300, 300)
+      .avif({ quality: 100 })
+      .toFile(path);
+    return fileName;
+  }
+
+  private async findApplicationOrThrowError(
+    details: Prisma.CourseApplicationWhereUniqueInput,
+  ) {
+    const application = await this.prisma.courseApplication.findUnique({
+      where: details,
+    });
+    if (!application) {
+      throw new NotFoundException('Заявка не найдена');
+    }
+    return application;
+  }
 
   async create(details: CourseCreateDto) {
     await this.teachersService.findTeacherOrThrowError({
       id: details.teacherId,
     });
-    const { teacherId, modules, steps, tags, ...rest } = details;
+    const { teacherId, modules, steps, tags, image, ...rest } = details;
+    const savedImagePath = await this.saveImage(image);
     return this.prisma.course.create({
       data: {
         ...rest,
+        imageLink: savedImagePath,
         teacher: {
           connect: {
             id: teacherId,
@@ -85,12 +136,25 @@ export class CoursesService {
         tags: true,
         modules: true,
         steps: true,
+        _count: {
+          select: {
+            students: true,
+          },
+        },
       },
     });
     if (!course) {
       throw new NotFoundException('Курс не найден');
     }
     return course;
+  }
+  private async findCourseWithStudents(details: Prisma.CourseWhereUniqueInput) {
+    return this.prisma.course.findUnique({
+      where: details,
+      include: {
+        students: true,
+      },
+    });
   }
 
   async findAll(details: CoursesGetFilter) {
@@ -254,6 +318,20 @@ export class CoursesService {
     });
   }
 
+  async publishReview(reviewId: number) {
+    await this.findReviewOrThrowError({
+      id: reviewId,
+    });
+    return this.prisma.courseReview.update({
+      where: {
+        id: reviewId,
+      },
+      data: {
+        published: true,
+      },
+    });
+  }
+
   async findReviews(
     courseDetails: Prisma.CourseWhereUniqueInput,
     paginationDetails: PaginationQuery,
@@ -271,6 +349,7 @@ export class CoursesService {
           course: {
             id: course.id,
           },
+          published: true,
         },
         orderBy: {
           createdAt: 'desc',
@@ -282,15 +361,7 @@ export class CoursesService {
               middleName: true,
               firstName: true,
               lastName: true,
-              avatar: {
-                include: {
-                  file: {
-                    select: {
-                      path: true,
-                    },
-                  },
-                },
-              },
+              avatarLink: true,
             },
           },
         },
@@ -304,6 +375,10 @@ export class CoursesService {
     currentUser: User,
   ) {
     const course = await this.findCourseOrThrowError(courseDetails);
+    await this.studentsService.checkIfStudentFinishedCourse(
+      currentUser,
+      course,
+    );
     return this.prisma.courseReview.create({
       data: {
         ...details,
@@ -325,17 +400,117 @@ export class CoursesService {
             middleName: true,
             firstName: true,
             lastName: true,
-            avatar: {
-              include: {
-                file: {
-                  select: {
-                    path: true,
-                  },
+            avatarLink: true,
+          },
+        },
+      },
+    });
+  }
+  async applyToCourse(courseId: number, details: CourseApplicationCreateDto) {
+    const course = await this.findCourseOrThrowError({
+      id: courseId,
+    });
+    await this.checkIfCourseHasFreePlaces(course.id);
+    const application = await this.prisma.courseApplication.create({
+      data: {
+        ...details,
+        course: {
+          connect: {
+            id: course.id,
+          },
+        },
+      },
+    });
+    return application;
+  }
+  async findApplications(
+    courseDetails: Prisma.CourseWhereUniqueInput,
+    paginationDetails: PaginationQuery,
+  ) {
+    const course = await this.findCourseOrThrowError(courseDetails);
+    return Paginate<CourseApplication, Prisma.CourseApplicationFindManyArgs>(
+      {
+        limit: paginationDetails.limit,
+        page: paginationDetails.page,
+      },
+      this.prisma,
+      'courseApplication',
+      {
+        where: {
+          course: {
+            id: course.id,
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        include: {
+          student: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  id: true,
+                  lastName: true,
+                  middleName: true,
                 },
               },
             },
           },
         },
+      },
+    );
+  }
+  private async checkIfCourseHasFreePlaces(courseId: number) {
+    const course = await this.findCourseWithStudents({ id: courseId });
+    if (course.capacity < course.students.length) {
+      throw new BadRequestException('Нет свободных мест');
+    }
+  }
+  async updateApplication(
+    applicationId: number,
+    details: CourseApplicationUpdateDto,
+  ) {
+    const application = await this.findApplicationOrThrowError({
+      id: applicationId,
+    });
+    const { studentId, ...rest } = details;
+    if (studentId) {
+      if (application.studentId) {
+        throw new BadRequestException('Заявка уже обратотана');
+      }
+      await this.studentsService.checkIfStudentIsAttendingCourse(
+        studentId,
+        application.courseId,
+      );
+    }
+    if (rest.status === ApplicationStatus.FULFILLED) {
+      await this.checkIfCourseHasFreePlaces(application.courseId);
+    }
+    return this.prisma.courseApplication.update({
+      where: {
+        id: applicationId,
+      },
+      data: {
+        ...rest,
+        student: studentId
+          ? {
+              connect: {
+                id: studentId,
+              },
+            }
+          : undefined,
+        course: studentId
+          ? {
+              update: {
+                students: {
+                  connect: {
+                    id: studentId,
+                  },
+                },
+              },
+            }
+          : undefined,
       },
     });
   }

@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -11,16 +13,26 @@ import {
 } from '@nestjs/common';
 import { FindOneParams } from '../common/params/find-one-params';
 import { CoursesService } from './courses.service';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CoursesGetFilter } from './filters';
-import { CourseCreateDto } from './dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role, User } from '@prisma/client';
 import { JwtAuthGuard, RolesGuard } from '../auth/guards';
-import { CourseUpdateDto } from './dto/course-update.dto';
-import { CreateCourseReviewDto } from './dto/create-course-review.dto';
+import {
+  CourseUpdateDto,
+  CourseApplicationCreateDto,
+  CourseApplicationUpdateDto,
+  CourseCreateDto,
+  CreateCourseReviewDto,
+} from './dto';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { PaginationQuery } from '../common/pagination/pagination-query';
+import { FormDataRequest } from 'nestjs-form-data';
 
 @ApiTags('Курсы')
 @Controller('courses')
@@ -31,7 +43,7 @@ export class CoursesController {
     summary: 'Получить список всех курсов',
   })
   @Get()
-  findAll(@Query() filter: CoursesGetFilter) {
+  async findAll(@Query() filter: CoursesGetFilter) {
     return this.coursesService.findAll(filter);
   }
 
@@ -39,7 +51,7 @@ export class CoursesController {
     summary: 'Получить список тегов курсов',
   })
   @Get('tags')
-  tags() {
+  async tags() {
     return this.coursesService.tags();
   }
 
@@ -47,29 +59,33 @@ export class CoursesController {
     summary: 'Получить курс по id',
   })
   @Get(':id')
-  findOne(@Param() searchParams: FindOneParams) {
+  async findOne(@Param() searchParams: FindOneParams) {
     return this.coursesService.findCourseOrThrowError(searchParams);
   }
 
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Создать курс',
   })
+  @FormDataRequest()
   @Post()
-  create(@Body() details: CourseCreateDto) {
+  async create(@Body() details: CourseCreateDto) {
     return this.coursesService.create(details);
   }
 
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Обновить курс',
   })
+  @FormDataRequest()
   @Patch(':id')
-  update(
+  async update(
     @Param() searchParams: FindOneParams,
     @Body() details: CourseUpdateDto,
   ) {
@@ -79,11 +95,12 @@ export class CoursesController {
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Удалить курс',
   })
   @Delete(':id')
-  delete(@Param() searchParams: FindOneParams) {
+  async delete(@Param() searchParams: FindOneParams) {
     return this.coursesService.delete(searchParams);
   }
 
@@ -91,7 +108,7 @@ export class CoursesController {
     summary: 'Получить отзывы к курсу',
   })
   @Get(':id/reviews')
-  reviews(
+  async reviews(
     @Param() searchParams: FindOneParams,
     @Query() filter: PaginationQuery,
   ) {
@@ -104,7 +121,7 @@ export class CoursesController {
     summary: 'Оставить отзыв',
   })
   @Post(':id/reviews')
-  createReview(
+  async createReview(
     @Param() searchParams: FindOneParams,
     @Body() details: CreateCourseReviewDto,
     @CurrentUser() currentUser: User,
@@ -116,10 +133,62 @@ export class CoursesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({
+    summary: 'Опубликовать отзыв',
+  })
+  @Post('reviews/:id/publish')
+  async publishReview(@Param() searchParams: FindOneParams) {
+    return this.coursesService.publishReview(searchParams.id);
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
     summary: 'Удалить отзыв',
   })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('reviews/:id')
-  deleteReview(@Param() searchParams: FindOneParams) {
-    return this.coursesService.deleteReview(searchParams);
+  async deleteReview(@Param() searchParams: FindOneParams) {
+    await this.coursesService.deleteReview(searchParams);
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Получить список заявок на курс',
+  })
+  @Get('/:id/applications')
+  async findApplications(
+    @Param() findDetails: FindOneParams,
+    @Query() filter: PaginationQuery,
+  ) {
+    return this.coursesService.findApplications(findDetails, filter);
+  }
+
+  @ApiOperation({
+    summary: 'Записаться на курс',
+  })
+  @Post('/:id/applications')
+  @HttpCode(HttpStatus.CREATED)
+  async apply(
+    @Param() { id }: FindOneParams,
+    @Body() details: CourseApplicationCreateDto,
+  ) {
+    return this.coursesService.applyToCourse(id, details);
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Обновить заявку на курс',
+  })
+  @Patch('/:id/applications')
+  async updateApplication(
+    @Param() { id }: FindOneParams,
+    @Body() details: CourseApplicationUpdateDto,
+  ) {
+    return this.coursesService.updateApplication(id, details);
   }
 }

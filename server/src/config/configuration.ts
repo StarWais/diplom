@@ -1,5 +1,6 @@
 import { ValidationError } from '@nestjs/common';
 import { ValidatorOptions } from 'class-validator';
+import { join } from 'path';
 
 export interface ValidationPipeOptions extends ValidatorOptions {
   transform?: boolean;
@@ -15,6 +16,11 @@ export interface SwaggerOptions {
   description: string;
   version: string;
   swaggerPath: string;
+}
+
+export interface FormDataOptions {
+  tempStorageDir: string;
+  uploadsDir: string;
 }
 
 export interface AuthOptions {
@@ -62,6 +68,7 @@ export interface GlobalConfig {
   emailOptions: EmailOptions;
   domainOptions: DomainOptions;
   throttlerOptions: ThrottlerOptions;
+  formDataOptions: FormDataOptions;
 }
 
 export interface ConfirmationTokenOptions {
@@ -123,5 +130,9 @@ export default (): GlobalConfig => ({
   throttlerOptions: {
     ttl: 60 * 60,
     limit: process.env.NODE_ENV === 'development' ? 0 : 200,
+  },
+  formDataOptions: {
+    tempStorageDir: join(process.cwd(), '/tmp/uploads'),
+    uploadsDir: join(process.cwd(), '/public/uploads'),
   },
 });
