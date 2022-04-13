@@ -11,7 +11,6 @@ import {
   PrismaConfigService,
   MailerConfigService,
   ThrottlerConfigService,
-  FormdataConfigService,
 } from '../config/services';
 import { validationSchema } from '../config/env/env-validation';
 import { AuthModule } from '../auth/auth.module';
@@ -20,7 +19,6 @@ import { ArticlesModule } from 'src/articles/articles.module';
 import { CoursesModule } from '../courses/courses.module';
 import { StudentsModule } from '../students/students.module';
 import { TeachersModule } from '../teachers/teachers.module';
-import { NestjsFormDataModule } from 'nestjs-form-data';
 
 @Module({
   imports: [

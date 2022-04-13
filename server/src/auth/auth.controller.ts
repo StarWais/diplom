@@ -23,7 +23,7 @@ import {
   SigninDto,
   SignupDto,
 } from './dto';
-import { LocalAuthGuard } from './guards';
+import { JwtAuthGuard, LocalAuthGuard } from './guards';
 
 @ApiTags('Авторизация')
 @Controller('auth')
@@ -62,6 +62,7 @@ export class AuthController {
     await this.authService.confirmRegistration(details);
   }
 
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post('confirm/resend')
   @ApiOperation({

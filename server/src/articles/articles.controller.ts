@@ -41,7 +41,7 @@ export class ArticlesController {
   @ApiOperation({ summary: 'Получить статью по slug' })
   @Get(':slug')
   async findOne(@Param('slug') slug: string) {
-    return this.articlesService.findOne({ slug });
+    return this.articlesService.findOneOrThrowError({ slug });
   }
 
   @Get()
@@ -126,7 +126,6 @@ export class ArticlesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Добавить лайк к статье' })
   @Post(':id/like')
   async like(@Param() { id }: FindOneParams, @CurrentUser() currentUser: User) {
@@ -134,7 +133,6 @@ export class ArticlesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Добавить дизлайк к статье' })
   @Post(':id/dislike')

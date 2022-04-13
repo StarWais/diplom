@@ -1,4 +1,4 @@
-<a class="link-button" href="<%= locals.linkButtonLink %>">
+<a class="link-button" href="<%= locals.linkButtonLink || process.env.FRONTEND_DOMAIN %>">
   <%= locals.linkButtonText %>
 </a>
 

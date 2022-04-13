@@ -132,6 +132,7 @@ export class CoursesController {
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Опубликовать отзыв',
   })
@@ -184,7 +185,7 @@ export class CoursesController {
   @ApiOperation({
     summary: 'Обновить заявку на курс',
   })
-  @Patch('/:id/applications')
+  @Patch('applications/:id/')
   async updateApplication(
     @Param() { id }: FindOneParams,
     @Body() details: CourseApplicationUpdateDto,

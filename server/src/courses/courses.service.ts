@@ -1,4 +1,3 @@
-import { application } from 'express';
 import {
   BadRequestException,
   Injectable,
@@ -28,9 +27,11 @@ import {
 import { CoursesGetFilter } from './filters';
 import { Paginate } from '../common/pagination/pagination';
 import { TeachersService } from '../teachers/teachers.service';
-import { StudentsService } from './../students/students.service';
+import { StudentsService } from '../students/students.service';
 import { PaginationQuery } from '../common/pagination/pagination-query';
 import { FormDataOptions } from '../config/configuration';
+import { UsersService } from '../users/users.service';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class CoursesService {
@@ -38,6 +39,8 @@ export class CoursesService {
     private readonly prisma: PrismaService,
     private readonly teachersService: TeachersService,
     private readonly studentsService: StudentsService,
+    private readonly usersService: UsersService,
+    private readonly mailerService: MailerService,
     private readonly config: ConfigService,
   ) {}
 
@@ -148,6 +151,7 @@ export class CoursesService {
     }
     return course;
   }
+
   private async findCourseWithStudents(details: Prisma.CourseWhereUniqueInput) {
     return this.prisma.course.findUnique({
       where: details,
@@ -379,7 +383,7 @@ export class CoursesService {
       currentUser,
       course,
     );
-    return this.prisma.courseReview.create({
+    const review = await this.prisma.courseReview.create({
       data: {
         ...details,
         course: {
@@ -405,7 +409,21 @@ export class CoursesService {
         },
       },
     });
+    const adminMails = await this.usersService.getAdminMails();
+    await this.mailerService.sendMail({
+      to: adminMails,
+      subject: 'Новый отзыв к курсу',
+      template: 'new-course-review',
+      context: {
+        reviewText: review.text,
+        authorFullName: `${review.author.lastName} ${review.author.firstName} ${review.author.middleName} `,
+        courseName: course.name,
+        courseGrade: course.grade,
+      },
+    });
+    return review;
   }
+
   async applyToCourse(courseId: number, details: CourseApplicationCreateDto) {
     const course = await this.findCourseOrThrowError({
       id: courseId,
@@ -421,8 +439,21 @@ export class CoursesService {
         },
       },
     });
+    const adminMails = await this.usersService.getAdminMails();
+    await this.mailerService.sendMail({
+      to: adminMails,
+      subject: 'Новая зяявка на курc',
+      template: 'new-course-application',
+      context: {
+        appliciantName: application.appliciantName,
+        appliciantPhone: application.appliciantPhone,
+        courseName: course.name,
+        courseGrade: course.grade,
+      },
+    });
     return application;
   }
+
   async findApplications(
     courseDetails: Prisma.CourseWhereUniqueInput,
     paginationDetails: PaginationQuery,
@@ -461,12 +492,14 @@ export class CoursesService {
       },
     );
   }
+
   private async checkIfCourseHasFreePlaces(courseId: number) {
     const course = await this.findCourseWithStudents({ id: courseId });
     if (course.capacity < course.students.length) {
       throw new BadRequestException('Нет свободных мест');
     }
   }
+
   async updateApplication(
     applicationId: number,
     details: CourseApplicationUpdateDto,
@@ -475,16 +508,17 @@ export class CoursesService {
       id: applicationId,
     });
     const { studentId, ...rest } = details;
+    const isFulfilling = rest.status === ApplicationStatus.FULFILLED;
     if (studentId) {
       if (application.studentId) {
-        throw new BadRequestException('Заявка уже обратотана');
+        throw new BadRequestException('Студент уже назначен');
       }
       await this.studentsService.checkIfStudentIsAttendingCourse(
         studentId,
         application.courseId,
       );
     }
-    if (rest.status === ApplicationStatus.FULFILLED) {
+    if (isFulfilling) {
       await this.checkIfCourseHasFreePlaces(application.courseId);
     }
     return this.prisma.courseApplication.update({
@@ -500,17 +534,18 @@ export class CoursesService {
               },
             }
           : undefined,
-        course: studentId
-          ? {
-              update: {
-                students: {
-                  connect: {
-                    id: studentId,
+        course:
+          studentId && isFulfilling
+            ? {
+                update: {
+                  students: {
+                    connect: {
+                      id: studentId,
+                    },
                   },
                 },
-              },
-            }
-          : undefined,
+              }
+            : undefined,
       },
     });
   }

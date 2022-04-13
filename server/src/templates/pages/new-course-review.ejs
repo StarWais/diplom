@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body>
+    <header><%- include('../partials/header'); %></header>
+
+    <main class="container">
+      <p>
+        Пользователь <b><%= locals.authorFullName %> </b> оставил отзыв на курс <b><%= locals.courseName %></b>, для <b><%= locals.courseGrade %></b> класса.
+      </p>
+      <p>
+        <%= locals.reviewText %>.
+      </p>
+      <%- include('../partials/go-to-website-button'); %>
+    </main>
+
+  </body>
+</html>
+
+<style>
+	main p {
+		font-weight: 500;
+		color: black;
+		font-size: 17px;
+	}
+	p:last-child {
+		margin-top: 30px;
+	}
+</style>

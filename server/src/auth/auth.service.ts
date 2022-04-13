@@ -159,6 +159,14 @@ export class AuthService {
     });
   }
 
+  private async sendWelcomeEmail(user: User): Promise<void> {
+    return this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Добро пожаловать на сайт',
+      template: 'welcome',
+    });
+  }
+
   private async sendPasswordResetEmail(
     user: User,
     token: PasswordResetToken,
@@ -190,9 +198,10 @@ export class AuthService {
       where: { id: token.id },
       data: { status: TokenStatus.FULFILLED },
     });
-    await this.usersService.confirmUser({
+    const user = await this.usersService.confirmUser({
       id: token.userId,
     });
+    await this.sendWelcomeEmail(user);
   }
 
   private async disableOtherRegistrationTokens(userId: number): Promise<void> {
@@ -234,6 +243,7 @@ export class AuthService {
     });
     await this.sendRegistrationConfirmationEmail(user.email, token.token);
   }
+
   async sendAnotherRegistrationToken(
     user: User,
     browserInfo: BrowserInfo,

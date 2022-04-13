@@ -19,15 +19,21 @@ import {
   ArticleUpdateDto,
 } from './dto';
 import { ArticlesGetFilter } from './filters';
+import { MailerService } from '@nestjs-modules/mailer';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ArticlesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailerService: MailerService,
+    private readonly usersService: UsersService,
+  ) {}
 
-  async create(details: ArticleCreateDto, currentUser: User): Promise<Article> {
+  async create(details: ArticleCreateDto, currentUser: User) {
     const slug = await this.generateSlug(details.title);
 
-    return this.prisma.article.create({
+    const article = await this.prisma.article.create({
       data: {
         title: details.title,
         content: details.content,
@@ -57,6 +63,13 @@ export class ArticlesService {
             name: true,
           },
         },
+        author: {
+          select: {
+            firstName: true,
+            lastName: true,
+            middleName: true,
+          },
+        },
         likes: {
           select: {
             userId: true,
@@ -71,9 +84,24 @@ export class ArticlesService {
         },
       },
     });
+
+    if (article.status === ArticleStatus.DRAFT) {
+      const adminMails = await this.usersService.getAdminMails();
+      await this.mailerService.sendMail({
+        to: adminMails,
+        subject: 'Новая заявка на публикацию статьи',
+        template: 'article-publish-request',
+        context: {
+          fullName: `${article.author.lastName} ${article.author.firstName} ${article.author.middleName}`,
+          articleTitle: article.title,
+          articleTag: article.tags.map((tag) => tag.name).join(', '),
+        },
+      });
+    }
+    return article;
   }
 
-  async findOne(details: Prisma.ArticleWhereUniqueInput) {
+  async findOneOrThrowError(details: Prisma.ArticleWhereUniqueInput) {
     const article = await this.prisma.article.findUnique({
       where: details,
       include: {
@@ -105,7 +133,7 @@ export class ArticlesService {
   }
 
   async publish(details: Prisma.ArticleWhereUniqueInput): Promise<Article> {
-    await this.findOne(details);
+    await this.findOneOrThrowError(details);
 
     return this.prisma.article.update({
       where: details,
@@ -230,7 +258,7 @@ export class ArticlesService {
     searchDetails: Prisma.ArticleWhereUniqueInput,
     details: ArticleUpdateDto,
   ): Promise<Article> {
-    await this.findOne(searchDetails);
+    await this.findOneOrThrowError(searchDetails);
     const { title } = details;
 
     return this.prisma.article.update({
@@ -275,7 +303,7 @@ export class ArticlesService {
   }
 
   async delete(details: Prisma.ArticleWhereUniqueInput): Promise<void> {
-    await this.findOne(details);
+    await this.findOneOrThrowError(details);
     await this.prisma.article.delete({
       where: details,
     });
@@ -285,8 +313,8 @@ export class ArticlesService {
     searchCommentDetails: Prisma.ArticleWhereUniqueInput,
     details: ArticleCommentCreateDto,
     user: User,
-  ): Promise<ArticleComment> {
-    await this.findOne(searchCommentDetails);
+  ) {
+    await this.findOneOrThrowError(searchCommentDetails);
 
     return this.prisma.articleComment.create({
       data: {
@@ -320,7 +348,7 @@ export class ArticlesService {
     searchDetails: Prisma.ArticleWhereUniqueInput,
     paginationDetails: PaginationQuery,
   ): Promise<Paginated<ArticleComment>> {
-    await this.findOne(searchDetails);
+    await this.findOneOrThrowError(searchDetails);
     return Paginate<ArticleComment, Prisma.ArticleCommentFindManyArgs>(
       paginationDetails,
       this.prisma,
@@ -360,7 +388,7 @@ export class ArticlesService {
     details: Prisma.ArticleWhereUniqueInput,
     user: User,
   ): Promise<Article> {
-    const article = await this.findOne(details);
+    const article = await this.findOneOrThrowError(details);
     const userLike = article.likes.find((like) => like.userId === user.id);
     const userDislike = article.dislikes.find(
       (dislike) => dislike.userId === user.id,
@@ -415,7 +443,7 @@ export class ArticlesService {
   }
 
   async dislike(details: Prisma.ArticleWhereUniqueInput, user: User) {
-    const article = await this.findOne(details);
+    const article = await this.findOneOrThrowError(details);
     const userLike = article.likes.find((like) => like.userId === user.id);
     const userDislike = article.dislikes.find(
       (dislike) => dislike.userId === user.id,
