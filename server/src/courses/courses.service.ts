@@ -18,11 +18,11 @@ import * as Sharp from 'sharp';
 import { v4 } from 'uuid';
 
 import {
+  CourseApplicationCreateDto,
+  CourseApplicationUpdateDto,
   CourseCreateDto,
   CourseUpdateDto,
   CreateCourseReviewDto,
-  CourseApplicationCreateDto,
-  CourseApplicationUpdateDto,
 } from './dto';
 import { CoursesGetFilter } from './filters';
 import { Paginate } from '../common/pagination/pagination';
@@ -409,6 +409,14 @@ export class CoursesService {
         },
       },
     });
+    await this.notifyAdminsOnReviewCreate(review, course);
+    return review;
+  }
+
+  async notifyAdminsOnReviewCreate(
+    review: CourseReview & { author: Partial<User> },
+    course: Course,
+  ) {
     const adminMails = await this.usersService.getAdminMails();
     await this.mailerService.sendMail({
       to: adminMails,
@@ -421,7 +429,24 @@ export class CoursesService {
         courseGrade: course.grade,
       },
     });
-    return review;
+  }
+
+  async notifyAdminsOnCourseApply(
+    application: CourseApplication,
+    course: Course,
+  ) {
+    const adminMails = await this.usersService.getAdminMails();
+    await this.mailerService.sendMail({
+      to: adminMails,
+      subject: 'Новая зяявка на курc',
+      template: 'new-course-application',
+      context: {
+        appliciantName: application.appliciantName,
+        appliciantPhone: application.appliciantPhone,
+        courseName: course.name,
+        courseGrade: course.grade,
+      },
+    });
   }
 
   async applyToCourse(courseId: number, details: CourseApplicationCreateDto) {
@@ -439,18 +464,7 @@ export class CoursesService {
         },
       },
     });
-    const adminMails = await this.usersService.getAdminMails();
-    await this.mailerService.sendMail({
-      to: adminMails,
-      subject: 'Новая зяявка на курc',
-      template: 'new-course-application',
-      context: {
-        appliciantName: application.appliciantName,
-        appliciantPhone: application.appliciantPhone,
-        courseName: course.name,
-        courseGrade: course.grade,
-      },
-    });
+    await this.notifyAdminsOnCourseApply(application, course);
     return application;
   }
 

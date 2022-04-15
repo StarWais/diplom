@@ -1,20 +1,18 @@
 import { PrismaService } from 'nestjs-prisma';
-import { Prisma, Role, User } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findUnique(details: Prisma.UserWhereUniqueInput): Promise<User | null> {
+  async findUnique(details: Prisma.UserWhereUniqueInput) {
     return this.prisma.user.findUnique({
       where: details,
     });
   }
 
-  async findUniqueOrThrowError(
-    details: Prisma.UserWhereUniqueInput,
-  ): Promise<User> {
+  async findUniqueOrThrowError(details: Prisma.UserWhereUniqueInput) {
     const user = await this.findUnique(details);
     if (!user) {
       throw new NotFoundException('Пользователь не найден');
@@ -25,7 +23,7 @@ export class UsersService {
   async updatePassword(
     searchDetails: Prisma.UserWhereUniqueInput,
     newPassword: string,
-  ): Promise<User> {
+  ) {
     return this.prisma.user.update({
       where: searchDetails,
       data: {
@@ -34,7 +32,7 @@ export class UsersService {
     });
   }
 
-  async confirmUser(details: Prisma.UserWhereUniqueInput): Promise<User> {
+  async confirmUser(details: Prisma.UserWhereUniqueInput) {
     return this.prisma.user.update({
       where: details,
       data: {
@@ -43,12 +41,12 @@ export class UsersService {
     });
   }
 
-  async getAdminMails(): Promise<string[]> {
+  async getAdminMails() {
     const admins = await this.findAdmins();
     return admins.map((admin) => admin.email);
   }
 
-  async create(details: Prisma.UserCreateInput): Promise<User> {
+  async create(details: Prisma.UserCreateInput) {
     return this.prisma.user.create({
       data: {
         ...details,
@@ -59,7 +57,7 @@ export class UsersService {
     });
   }
 
-  async findAdmins(): Promise<User[]> {
+  async findAdmins() {
     return this.prisma.user.findMany({
       where: {
         role: Role.ADMIN,
@@ -67,7 +65,7 @@ export class UsersService {
     });
   }
 
-  async userExists(details: Prisma.UserWhereUniqueInput): Promise<boolean> {
+  async userExists(details: Prisma.UserWhereUniqueInput) {
     return !!(await this.findUnique(details));
   }
 }
