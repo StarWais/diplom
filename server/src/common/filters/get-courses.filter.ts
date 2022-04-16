@@ -1,9 +1,9 @@
+import { IsInt, IsOptional, IsPositive } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsPositive, IsOptional, IsInt } from 'class-validator';
-import { PaginationQuery } from '../../common/pagination/pagination-query';
+import { PaginationQuery } from '../pagination/pagination-query';
 
-export class CoursesGetFilter extends PaginationQuery {
+export class GetCoursesFilter extends PaginationQuery {
   @IsOptional()
   @IsInt()
   @IsPositive()

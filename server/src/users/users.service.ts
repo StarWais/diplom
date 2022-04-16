@@ -1,5 +1,5 @@
 import { PrismaService } from 'nestjs-prisma';
-import { Prisma, Role } from '@prisma/client';
+import { Prisma, Role, User } from '@prisma/client';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
@@ -18,6 +18,13 @@ export class UsersService {
       throw new NotFoundException('Пользователь не найден');
     }
     return user;
+  }
+
+  async makeTeacher(user: User) {
+    return this.prisma.user.update({
+      where: { id: user.id },
+      data: { role: user.role !== Role.ADMIN ? Role.TEACHER : undefined },
+    });
   }
 
   async updatePassword(

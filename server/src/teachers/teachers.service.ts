@@ -1,4 +1,4 @@
-import { UsersService } from './../users/users.service';
+import { UsersService } from '../users/users.service';
 import {
   BadRequestException,
   Injectable,
@@ -26,15 +26,13 @@ export class TeachersService {
   }
 
   async create(details: CreateTeacherDto) {
-    const dbUser = await this.usersService.findUnique({
+    const dbUser = await this.usersService.findUniqueOrThrowError({
       id: details.userId,
     });
-    if (!dbUser) {
-      throw new NotFoundException('Пользователь не найден');
-    }
     if (dbUser.role === Role.TEACHER) {
       throw new BadRequestException('Пользователь уже является учителем');
     }
+    await this.usersService.makeTeacher(dbUser);
     return this.prisma.teacher.create({
       data: {
         user: {

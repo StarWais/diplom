@@ -24,14 +24,15 @@ import {
   CourseUpdateDto,
   CreateCourseReviewDto,
 } from './dto';
-import { CoursesGetFilter } from './filters';
 import { Paginate } from '../common/pagination/pagination';
 import { TeachersService } from '../teachers/teachers.service';
 import { StudentsService } from '../students/students.service';
 import { PaginationQuery } from '../common/pagination/pagination-query';
-import { FormDataOptions } from '../config/configuration';
+import { DomainOptions, FormDataOptions } from '../config/configuration';
 import { UsersService } from '../users/users.service';
 import { MailerService } from '@nestjs-modules/mailer';
+import { GetCoursesFilter } from '../common/filters/get-courses.filter';
+import { isBefore } from 'date-fns';
 
 @Injectable()
 export class CoursesService {
@@ -49,11 +50,12 @@ export class CoursesService {
     const path = `${
       this.config.get<FormDataOptions>('formDataOptions').uploadsDir
     }/${fileName}`;
+    const domain = this.config.get<DomainOptions>('domainOptions').backend;
     await Sharp(image.path)
       .resize(300, 300)
       .avif({ quality: 100 })
       .toFile(path);
-    return fileName;
+    return `${domain}/uploads/${fileName}`;
   }
 
   private async findApplicationOrThrowError(
@@ -161,7 +163,23 @@ export class CoursesService {
     });
   }
 
-  async findAll(details: CoursesGetFilter) {
+  async findMyCourses(currentUser: User) {
+    const courses = await this.prisma.course.findMany({
+      where: {
+        students: {
+          some: {
+            id: currentUser.id,
+          },
+        },
+      },
+    });
+    return courses.map((course) => ({
+      ...course,
+      finished: isBefore(course.finishDate, new Date()),
+    }));
+  }
+
+  async findAll(details: GetCoursesFilter) {
     return Paginate<Course, Prisma.CourseFindManyArgs>(
       {
         page: details.page,
@@ -373,6 +391,18 @@ export class CoursesService {
     );
   }
 
+  private async checkIfUserAlreadyReviewedCourse(user: User, course: Course) {
+    const review = await this.prisma.courseReview.findFirst({
+      where: {
+        authorId: user.id,
+        courseId: course.id,
+      },
+    });
+    if (review) {
+      throw new BadRequestException('Вы уже оставляли отзыв на этот курс');
+    }
+  }
+
   async createReview(
     courseDetails: Prisma.CourseWhereUniqueInput,
     details: CreateCourseReviewDto,
@@ -383,6 +413,7 @@ export class CoursesService {
       currentUser,
       course,
     );
+    await this.checkIfUserAlreadyReviewedCourse(currentUser, course);
     const review = await this.prisma.courseReview.create({
       data: {
         ...details,

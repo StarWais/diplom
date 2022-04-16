@@ -1,7 +1,14 @@
-import { JwtAuthGuard } from './../auth/guards/jwt-auth.guard';
-import { RolesGuard } from './../auth/guards/roles.guard';
+import { JwtAuthGuard } from '../auth/guards';
+import { RolesGuard } from '../auth/guards';
 import { TeachersService } from './teachers.service';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateTeacherDto } from './dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
@@ -15,11 +22,12 @@ export class TeachersController {
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Сделать пользователя учителем',
   })
   @Post()
   async create(@Body() details: CreateTeacherDto) {
-    return this.teachersService.create(details);
+    await this.teachersService.create(details);
   }
 }

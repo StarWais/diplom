@@ -19,7 +19,6 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { CoursesGetFilter } from './filters';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role, User } from '@prisma/client';
 import { JwtAuthGuard, RolesGuard } from '../auth/guards';
@@ -33,6 +32,7 @@ import {
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { PaginationQuery } from '../common/pagination/pagination-query';
 import { FormDataRequest } from 'nestjs-form-data';
+import { GetCoursesFilter } from '../common/filters/get-courses.filter';
 
 @ApiTags('Курсы')
 @Controller('courses')
@@ -43,8 +43,18 @@ export class CoursesController {
     summary: 'Получить список всех курсов',
   })
   @Get()
-  async findAll(@Query() filter: CoursesGetFilter) {
+  async findAll(@Query() filter: GetCoursesFilter) {
     return this.coursesService.findAll(filter);
+  }
+
+  @ApiOperation({
+    summary: 'Получить мои курсы',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('my')
+  async findMyCourses(@CurrentUser() currentUser: User) {
+    return this.coursesService.findMyCourses(currentUser);
   }
 
   @ApiOperation({
