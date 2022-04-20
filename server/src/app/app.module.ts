@@ -19,6 +19,8 @@ import { ArticlesModule } from 'src/articles/articles.module';
 import { CoursesModule } from '../courses/courses.module';
 import { StudentsModule } from '../students/students.module';
 import { TeachersModule } from '../teachers/teachers.module';
+import { ImagesModule } from '../common/images/images.module';
+import { InfoModule } from '../info/info.module';
 
 @Module({
   imports: [
@@ -41,13 +43,14 @@ import { TeachersModule } from '../teachers/teachers.module';
     ThrottlerModule.forRootAsync({
       useClass: ThrottlerConfigService,
     }),
-
+    ImagesModule,
     UsersModule,
     AuthModule,
     ArticlesModule,
     CoursesModule,
     StudentsModule,
     TeachersModule,
+    InfoModule,
   ],
   controllers: [],
   providers: [

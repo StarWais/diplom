@@ -217,6 +217,7 @@ model CourseReview {
   courseId  Int     @map("course_id")
   course    Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
   authorId  Int     @map("author_id")
+  rating    Float     @map("rating")
   published Boolean @default(false)
   author    User    @relation(fields: [authorId], references: [id])
   text      String

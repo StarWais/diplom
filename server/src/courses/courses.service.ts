@@ -12,10 +12,6 @@ import {
   Prisma,
   User,
 } from '@prisma/client';
-import { FileSystemStoredFile } from 'nestjs-form-data';
-import { ConfigService } from '@nestjs/config';
-import * as Sharp from 'sharp';
-import { v4 } from 'uuid';
 
 import {
   CourseApplicationCreateDto,
@@ -28,11 +24,11 @@ import { Paginate } from '../common/pagination/pagination';
 import { TeachersService } from '../teachers/teachers.service';
 import { StudentsService } from '../students/students.service';
 import { PaginationQuery } from '../common/pagination/pagination-query';
-import { DomainOptions, FormDataOptions } from '../config/configuration';
 import { UsersService } from '../users/users.service';
 import { MailerService } from '@nestjs-modules/mailer';
 import { GetCoursesFilter } from '../common/filters/get-courses.filter';
 import { isBefore } from 'date-fns';
+import { ImagesService } from '../common/images/images.service';
 
 @Injectable()
 export class CoursesService {
@@ -42,21 +38,8 @@ export class CoursesService {
     private readonly studentsService: StudentsService,
     private readonly usersService: UsersService,
     private readonly mailerService: MailerService,
-    private readonly config: ConfigService,
+    private readonly imageService: ImagesService,
   ) {}
-
-  private async saveImage(image: FileSystemStoredFile) {
-    const fileName = `${v4()}.avif`;
-    const path = `${
-      this.config.get<FormDataOptions>('formDataOptions').uploadsDir
-    }/${fileName}`;
-    const domain = this.config.get<DomainOptions>('domainOptions').backend;
-    await Sharp(image.path)
-      .resize(300, 300)
-      .avif({ quality: 100 })
-      .toFile(path);
-    return `${domain}/uploads/${fileName}`;
-  }
 
   private async findApplicationOrThrowError(
     details: Prisma.CourseApplicationWhereUniqueInput,
@@ -75,11 +58,11 @@ export class CoursesService {
       id: details.teacherId,
     });
     const { teacherId, modules, steps, tags, image, ...rest } = details;
-    const savedImagePath = await this.saveImage(image);
+    const imageLink = await this.imageService.saveImage(image);
     return this.prisma.course.create({
       data: {
         ...rest,
-        imageLink: savedImagePath,
+        imageLink,
         teacher: {
           connect: {
             id: teacherId,
@@ -163,7 +146,7 @@ export class CoursesService {
     });
   }
 
-  async findMyCourses(currentUser: User) {
+  async findMyStudentsCourses(currentUser: User) {
     const courses = await this.prisma.course.findMany({
       where: {
         students: {
@@ -173,9 +156,10 @@ export class CoursesService {
         },
       },
     });
-    return courses.map((course) => ({
+    return courses.map(async (course) => ({
       ...course,
       finished: isBefore(course.finishDate, new Date()),
+      rated: await this.checkIfUserAlreadyReviewedCourse(currentUser, course),
     }));
   }
 
@@ -225,6 +209,16 @@ export class CoursesService {
     );
   }
 
+  async findTopRated() {
+    return this.prisma.course.findMany({
+      where: {},
+      orderBy: {
+        rating: 'desc',
+      },
+      take: 6,
+    });
+  }
+
   async tags() {
     return this.prisma.courseTag.findMany();
   }
@@ -268,9 +262,11 @@ export class CoursesService {
 
   async deleteReview(details: Prisma.CourseReviewWhereUniqueInput) {
     await this.findReviewOrThrowError(details);
-    return this.prisma.courseReview.delete({
+    const review = await this.prisma.courseReview.delete({
       where: details,
     });
+    await this.updateCourseRating(review.courseId);
+    return review;
   }
 
   async update(
@@ -344,7 +340,7 @@ export class CoursesService {
     await this.findReviewOrThrowError({
       id: reviewId,
     });
-    return this.prisma.courseReview.update({
+    const review = await this.prisma.courseReview.update({
       where: {
         id: reviewId,
       },
@@ -352,6 +348,8 @@ export class CoursesService {
         published: true,
       },
     });
+    await this.updateCourseRating(review.courseId);
+    return review;
   }
 
   async findReviews(
@@ -391,7 +389,10 @@ export class CoursesService {
     );
   }
 
-  private async checkIfUserAlreadyReviewedCourse(user: User, course: Course) {
+  private async checkIfUserAlreadyReviewedCourseAndThrowError(
+    user: User,
+    course: Course,
+  ) {
     const review = await this.prisma.courseReview.findFirst({
       where: {
         authorId: user.id,
@@ -401,6 +402,36 @@ export class CoursesService {
     if (review) {
       throw new BadRequestException('Вы уже оставляли отзыв на этот курс');
     }
+  }
+
+  private async checkIfUserAlreadyReviewedCourse(user: User, course: Course) {
+    return !!(await this.prisma.courseReview.findFirst({
+      where: {
+        authorId: user.id,
+        courseId: course.id,
+      },
+    }));
+  }
+
+  private async updateCourseRating(courseId: number) {
+    const reviews = await this.prisma.courseReview.findMany({
+      where: {
+        courseId,
+        published: true,
+      },
+    });
+    if (reviews.length === 0) {
+      return;
+    }
+    const rating = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return this.prisma.course.update({
+      where: {
+        id: courseId,
+      },
+      data: {
+        rating: rating / reviews.length,
+      },
+    });
   }
 
   async createReview(
@@ -413,7 +444,10 @@ export class CoursesService {
       currentUser,
       course,
     );
-    await this.checkIfUserAlreadyReviewedCourse(currentUser, course);
+    await this.checkIfUserAlreadyReviewedCourseAndThrowError(
+      currentUser,
+      course,
+    );
     const review = await this.prisma.courseReview.create({
       data: {
         ...details,
@@ -440,6 +474,7 @@ export class CoursesService {
         },
       },
     });
+
     await this.notifyAdminsOnReviewCreate(review, course);
     return review;
   }

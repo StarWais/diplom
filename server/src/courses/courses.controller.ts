@@ -46,15 +46,23 @@ export class CoursesController {
   async findAll(@Query() filter: GetCoursesFilter) {
     return this.coursesService.findAll(filter);
   }
-
   @ApiOperation({
-    summary: 'Получить мои курсы',
+    summary: 'Получить 6 самых популярных курсов',
+  })
+  @Get('top-rated')
+  async findTopRated() {
+    return this.coursesService.findTopRated();
+  }
+
+  @Roles(Role.ADMIN, Role.STUDENT)
+  @ApiOperation({
+    summary: 'Получить мои курсы (студент)',
   })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get('my')
   async findMyCourses(@CurrentUser() currentUser: User) {
-    return this.coursesService.findMyCourses(currentUser);
+    return this.coursesService.findMyStudentsCourses(currentUser);
   }
 
   @ApiOperation({
@@ -125,7 +133,8 @@ export class CoursesController {
     return this.coursesService.findReviews(searchParams, filter);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN, Role.STUDENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Оставить отзыв',
