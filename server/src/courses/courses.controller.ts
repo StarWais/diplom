@@ -48,6 +48,7 @@ export class CoursesController {
   async findAll(@Query() filter: GetCoursesFilter) {
     return this.coursesService.findAll(filter);
   }
+
   @ApiOperation({
     summary: 'Получить 6 самых популярных курсов',
   })
@@ -107,7 +108,7 @@ export class CoursesController {
   })
   @ApiBearerAuth()
   @Roles(Role.ADMIN, Role.TEACHER)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post(':id/attendances')
   async createAttendance(
     @Param() searchParams: FindOneParams,
@@ -126,7 +127,7 @@ export class CoursesController {
   })
   @ApiBearerAuth()
   @Roles(Role.ADMIN, Role.TEACHER)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch('attendances/:id')
   async updateAttendance(
     @Param() searchParams: FindOneParams,
@@ -144,7 +145,7 @@ export class CoursesController {
   })
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete('attendances/:id')
   async deleteAttendance(@Param() searchParams: FindOneParams) {
     return this.coursesService.deleteCourseAttendance(searchParams);
