@@ -16,6 +16,8 @@ import {
 import {
   CourseApplicationCreateDto,
   CourseApplicationUpdateDto,
+  CourseAttendanceCreateDto,
+  CourseAttendanceUpdateDto,
   CourseCreateDto,
   CourseUpdateDto,
   CreateCourseReviewDto,
@@ -440,7 +442,7 @@ export class CoursesService {
     currentUser: User,
   ) {
     const course = await this.findCourseOrThrowError(courseDetails);
-    await this.studentsService.checkIfStudentFinishedCourse(
+    await this.studentsService.checkIfStudentFinishedCourseAndThrowError(
       currentUser,
       course,
     );
@@ -593,10 +595,14 @@ export class CoursesService {
       if (application.studentId) {
         throw new BadRequestException('Студент уже назначен');
       }
-      await this.studentsService.checkIfStudentIsAttendingCourse(
-        studentId,
-        application.courseId,
-      );
+      if (
+        await this.studentsService.checkIfStudentIsAttendingCourse(
+          studentId,
+          application.courseId,
+        )
+      ) {
+        throw new BadRequestException('Ученик уже записан на этот курс');
+      }
     }
     if (isFulfilling) {
       await this.checkIfCourseHasFreePlaces(application.courseId);
@@ -626,6 +632,153 @@ export class CoursesService {
                 },
               }
             : undefined,
+      },
+    });
+  }
+
+  private compareDatesWithoutTime(date1: Date, date2: Date) {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  }
+
+  private async checkIfStudentAttendanceExistsOnThisDayOrThrowError(
+    studentId: number,
+    courseId: number,
+    date: Date,
+  ) {
+    const attendances = await this.prisma.courseAttendance.findMany({
+      where: {
+        studentId,
+        courseId,
+      },
+    });
+    attendances.forEach((attendance) => {
+      if (this.compareDatesWithoutTime(attendance.date, date)) {
+        throw new BadRequestException('У ученика уже есть запись на этот день');
+      }
+    });
+  }
+
+  private async findCourseAttendanceOrThrowError(
+    details: Prisma.CourseAttendanceWhereUniqueInput,
+  ) {
+    const attendance = await this.prisma.courseAttendance.findUnique({
+      where: details,
+    });
+    if (!attendance) {
+      throw new NotFoundException('Запись посещаемости не найдена');
+    }
+    return attendance;
+  }
+
+  async updateCourseAttendance(
+    courseAttendanceDetails: Prisma.CourseAttendanceWhereUniqueInput,
+    details: CourseAttendanceUpdateDto,
+    currentUser: User,
+  ) {
+    const attendance = await this.findCourseAttendanceOrThrowError(
+      courseAttendanceDetails,
+    );
+    const course = await this.findCourseOrThrowError({
+      id: attendance.courseId,
+    });
+    await this.teachersService.checkIfTeacherIsCuratingCourseOrThrowError(
+      { userId: currentUser.id },
+      course,
+    );
+    return this.prisma.courseAttendance.update({
+      where: courseAttendanceDetails,
+      data: {
+        ...details,
+      },
+    });
+  }
+
+  async createCourseAttendance(
+    courseDetails: Prisma.CourseWhereUniqueInput,
+    details: CourseAttendanceCreateDto,
+    currentUser: User,
+  ) {
+    const course = await this.findCourseOrThrowError(courseDetails);
+    await this.teachersService.checkIfTeacherIsCuratingCourseOrThrowError(
+      { userId: currentUser.id },
+      course,
+    );
+    const { studentId, ...rest } = details;
+    await this.checkIfStudentAttendanceExistsOnThisDayOrThrowError(
+      studentId,
+      course.id,
+      details.date,
+    );
+    return this.prisma.courseAttendance.create({
+      data: {
+        ...rest,
+        course: {
+          connect: {
+            id: course.id,
+          },
+        },
+        student: {
+          connect: {
+            id: studentId,
+          },
+        },
+      },
+    });
+  }
+
+  async deleteCourseAttendance(
+    courseAttendanceDetails: Prisma.CourseAttendanceWhereUniqueInput,
+  ) {
+    await this.findCourseAttendanceOrThrowError(courseAttendanceDetails);
+    return this.prisma.courseAttendance.delete({
+      where: courseAttendanceDetails,
+    });
+  }
+
+  async getFullCourseAttendance(courseDetails: Prisma.CourseWhereUniqueInput) {
+    const course = await this.findCourseOrThrowError(courseDetails);
+    return this.prisma.courseAttendance.findMany({
+      where: {
+        courseId: course.id,
+      },
+      include: {
+        student: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                id: true,
+                lastName: true,
+                middleName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async getStudentCourseAttendance(
+    courseDetails: Prisma.CourseWhereUniqueInput,
+    currentUser: User,
+  ) {
+    const course = await this.findCourseOrThrowError(courseDetails);
+    if (
+      !(await this.studentsService.checkIfStudentIsAttendingCourse(
+        currentUser.id,
+        course.id,
+      ))
+    ) {
+      throw new BadRequestException('Ученик не записан на этот курс');
+    }
+    return this.prisma.courseAttendance.findMany({
+      where: {
+        courseId: course.id,
+        studentId: currentUser.id,
       },
     });
   }

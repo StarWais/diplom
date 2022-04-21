@@ -6,3 +6,5 @@ export { CourseTagDto } from './course-tag.dto';
 export { CourseStepCreateDto } from './course-step-create.dto';
 export { CourseUpdateDto } from './course-update.dto';
 export { CreateCourseReviewDto } from './create-course-review.dto';
+export { CourseAttendanceCreateDto } from './course-attendance-create.dto';
+export { CourseAttendanceUpdateDto } from './course-attendance-update.dto';

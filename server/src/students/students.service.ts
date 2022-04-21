@@ -36,7 +36,7 @@ export class StudentsService {
     return student;
   }
 
-  async checkIfStudentFinishedCourse(user: User, course: Course) {
+  async checkIfStudentFinishedCourseAndThrowError(user: User, course: Course) {
     if (user.role === Role.ADMIN) return;
     const student = await this.findStudentWithCoursesOrThrowError({
       userId: user.id,
@@ -55,8 +55,6 @@ export class StudentsService {
     const student = await this.findStudentWithCoursesOrThrowError({
       id: studentId,
     });
-    if (student.courses.some((c) => c.id === courseId)) {
-      throw new BadRequestException('Ученик уже записан на этот курс');
-    }
+    return !!student.courses.some((c) => c.id === courseId);
   }
 }

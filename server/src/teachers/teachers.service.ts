@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Prisma, Role } from '@prisma/client';
+import { Course, Prisma, Role } from '@prisma/client';
 import { CreateTeacherDto } from './dto';
 
 @Injectable()
@@ -23,6 +23,22 @@ export class TeachersService {
       throw new NotFoundException('Учитель не найден');
     }
     return teacher;
+  }
+
+  async checkIfTeacherIsCuratingCourseOrThrowError(
+    userDetails: Prisma.TeacherWhereUniqueInput,
+    course: Course,
+  ) {
+    const user = await this.usersService.findUnique({
+      id: userDetails.userId,
+    });
+    if (user.role === Role.ADMIN) {
+      return;
+    }
+    const teacher = await this.findTeacherOrThrowError(userDetails);
+    if (course.teacherId !== teacher.id) {
+      throw new BadRequestException('Учитель не ведет этот курс');
+    }
   }
 
   async create(details: CreateTeacherDto) {

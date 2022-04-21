@@ -118,6 +118,7 @@ model Course {
   teacherId      Int                   @map("teacher_id")
   teacher        Teacher               @relation(fields: [teacherId], references: [id])
   capacity       Int
+  attendances    CourseAttendance[]
   students       Student[]
   rating         Float                 @default(0)
   grade          Int
@@ -197,6 +198,22 @@ model CourseApplication {
   @@map("course_applications")
 }
 
+
+model CourseAttendance {
+  id              Int               @id @default(autoincrement())
+  courseId        Int               @map("course_id")
+  studentId       Int               @map("student_id")
+  course          Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  student         Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status          AttendanceStatus
+  date            DateTime
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("course_attendances")
+}
+
 model OlympiadApplication {
   id         Int               @id @default(autoincrement())
   olympiadId Int               @map("course_id")
@@ -217,7 +234,7 @@ model CourseReview {
   courseId  Int     @map("course_id")
   course    Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
   authorId  Int     @map("author_id")
-  rating    Float     @map("rating")
+  rating    Float   @map("rating")
   published Boolean @default(false)
   author    User    @relation(fields: [authorId], references: [id])
   text      String
@@ -254,6 +271,7 @@ model Student {
   courses                Course[]
   courseApplications     CourseApplication[]
   olympiadApplications   OlympiadApplication[]
+  attendances            CourseAttendance[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -398,4 +416,10 @@ enum OlympiadParticipationType {
 enum TokenStatus {
   PENDING
   FULFILLED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  ABSENT_WITH_REASON
 }

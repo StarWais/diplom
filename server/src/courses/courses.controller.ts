@@ -28,6 +28,8 @@ import {
   CourseApplicationUpdateDto,
   CourseCreateDto,
   CreateCourseReviewDto,
+  CourseAttendanceCreateDto,
+  CourseAttendanceUpdateDto,
 } from './dto';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { PaginationQuery } from '../common/pagination/pagination-query';
@@ -79,6 +81,73 @@ export class CoursesController {
   @Get(':id')
   async findOne(@Param() searchParams: FindOneParams) {
     return this.coursesService.findCourseOrThrowError(searchParams);
+  }
+
+  @ApiOperation({
+    summary: 'Получить посещаемость к курсу',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/attendances')
+  async getAttendances(
+    @Param() searchParams: FindOneParams,
+    @CurrentUser() currentUser: User,
+  ) {
+    if (currentUser.role === Role.STUDENT) {
+      return this.coursesService.getStudentCourseAttendance(
+        searchParams,
+        currentUser,
+      );
+    }
+    return this.coursesService.getFullCourseAttendance(searchParams);
+  }
+
+  @ApiOperation({
+    summary: 'Добавить посещаемость к курсу',
+  })
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN, Role.TEACHER)
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/attendances')
+  async createAttendance(
+    @Param() searchParams: FindOneParams,
+    @Body() details: CourseAttendanceCreateDto,
+    @CurrentUser() currentUser: User,
+  ) {
+    return this.coursesService.createCourseAttendance(
+      searchParams,
+      details,
+      currentUser,
+    );
+  }
+
+  @ApiOperation({
+    summary: 'Обновить посещаемость к курсу',
+  })
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN, Role.TEACHER)
+  @UseGuards(JwtAuthGuard)
+  @Patch('attendances/:id')
+  async updateAttendance(
+    @Param() searchParams: FindOneParams,
+    @Body() details: CourseAttendanceUpdateDto,
+    @CurrentUser() currentUser: User,
+  ) {
+    return this.coursesService.updateCourseAttendance(
+      searchParams,
+      details,
+      currentUser,
+    );
+  }
+  @ApiOperation({
+    summary: 'Удалить посещаемость к курсу',
+  })
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
+  @Delete('attendances/:id')
+  async deleteAttendance(@Param() searchParams: FindOneParams) {
+    return this.coursesService.deleteCourseAttendance(searchParams);
   }
 
   @Roles(Role.ADMIN)
