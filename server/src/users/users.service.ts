@@ -1,10 +1,20 @@
 import { PrismaService } from 'nestjs-prisma';
 import { Prisma, Role, User } from '@prisma/client';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ImagesService } from '../common/images/images.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly imageService: ImagesService,
+  ) {}
 
   async findUnique(details: Prisma.UserWhereUniqueInput) {
     return this.prisma.user.findUnique({
@@ -74,5 +84,57 @@ export class UsersService {
 
   async userExists(details: Prisma.UserWhereUniqueInput) {
     return !!(await this.findUnique(details));
+  }
+
+  async removeAvatar(details: Prisma.UserWhereUniqueInput) {
+    return this.prisma.user.update({
+      where: details,
+      data: {
+        avatarLink: null,
+      },
+    });
+  }
+
+  private async validateEmailChange(user: User, updateUserDto: UpdateUserDto) {
+    const userWithEmail = await this.findUnique({ email: updateUserDto.email });
+    if (userWithEmail && userWithEmail.id !== user.id) {
+      throw new BadRequestException(
+        'Пользователь с таким email уже существует',
+      );
+    }
+  }
+
+  private async checkUpdatePermission(
+    currentUser: User,
+    searchDetails: Prisma.UserWhereUniqueInput,
+  ) {
+    if (currentUser.role === Role.ADMIN) {
+      return;
+    }
+    if (currentUser.id !== searchDetails.id) {
+      throw new ForbiddenException();
+    }
+  }
+
+  async updateUserInfo(
+    searchDetails: Prisma.UserWhereUniqueInput,
+    details: UpdateUserDto,
+    currentUser: User,
+  ) {
+    await this.checkUpdatePermission(currentUser, searchDetails);
+    const updatedUser = await this.findUniqueOrThrowError(searchDetails);
+    await this.validateEmailChange(updatedUser, details);
+    const { avatar, ...rest } = details;
+    let newAvatarLink = undefined;
+    if (avatar) {
+      newAvatarLink = await this.imageService.saveImage(avatar);
+    }
+    return this.prisma.user.update({
+      where: searchDetails,
+      data: {
+        ...rest,
+        avatarLink: newAvatarLink,
+      },
+    });
   }
 }

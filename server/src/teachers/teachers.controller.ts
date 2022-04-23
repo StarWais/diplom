@@ -6,13 +6,17 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { CreateTeacherDto } from './dto';
+import { CreateTeacherDto, UpdateTeacherDto } from './dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from '../decorators/current-user.decorator';
+import { FindOneParams } from '../common/params/find-one-params';
 
 @ApiTags('Учителя')
 @Controller('teachers')
@@ -29,5 +33,20 @@ export class TeachersController {
   @Post()
   async create(@Body() details: CreateTeacherDto) {
     await this.teachersService.create(details);
+  }
+
+  @Roles(Role.ADMIN, Role.TEACHER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Обновить данные об учителе',
+  })
+  @Patch()
+  async update(
+    @Param() searchParams: FindOneParams,
+    @Body() details: UpdateTeacherDto,
+    @CurrentUser() currentUser,
+  ) {
+    await this.teachersService.update(searchParams, details, currentUser);
   }
 }

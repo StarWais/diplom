@@ -1,11 +1,12 @@
-import { isBefore } from 'date-fns';
-import { Prisma, Role, User, Course } from '@prisma/client';
+import { Prisma, Role, User, Course, Student } from '@prisma/client';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
+import { UpdateStudentDto } from './dto';
 
 @Injectable()
 export class StudentsService {
@@ -46,7 +47,7 @@ export class StudentsService {
       throw new BadRequestException('Вы не записаны на этот курс');
     }
 
-    if (isBefore(course.finishDate.getTime(), new Date().getTime())) {
+    if (!course.finished) {
       throw new BadRequestException('Курс еще не завершен');
     }
   }
@@ -56,5 +57,27 @@ export class StudentsService {
       id: studentId,
     });
     return !!student.courses.some((c) => c.id === courseId);
+  }
+
+  private async checkUpdatePermissions(user: User, student: Student) {
+    if (user.role === Role.ADMIN) return;
+    if (user.id !== student.userId) {
+      throw new ForbiddenException();
+    }
+  }
+
+  async update(
+    searchDetails: Prisma.StudentWhereUniqueInput,
+    details: UpdateStudentDto,
+    currentUser: User,
+  ) {
+    const student = await this.findStudentOrThrowError(searchDetails);
+    await this.checkUpdatePermissions(currentUser, student);
+    return this.prisma.student.update({
+      where: searchDetails,
+      data: {
+        ...details,
+      },
+    });
   }
 }

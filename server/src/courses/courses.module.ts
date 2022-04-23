@@ -6,6 +6,7 @@ import { CoursesService } from './courses.service';
 import { TeachersModule } from '../teachers/teachers.module';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 import { UsersModule } from '../users/users.module';
+import { CoursesJobs } from './courses.jobs';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { UsersModule } from '../users/users.module';
     }),
   ],
   controllers: [CoursesController],
-  providers: [CoursesService],
+  providers: [CoursesService, CoursesJobs],
 })
 export class CoursesModule {}

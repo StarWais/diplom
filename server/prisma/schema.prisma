@@ -133,6 +133,7 @@ model Course {
   imageLink      String                @map("image_link")
   eripNumber     String                @map("erip_number")
   finishDate     DateTime              @map("finish_date")
+  finished       Boolean               @default(false) @map("finished")
   applications   CourseApplication[]
   modules        CourseModule[]
   tags           CourseTag[]

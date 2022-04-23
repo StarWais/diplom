@@ -9,7 +9,7 @@ export class CourseModuleCreateDto {
   })
   readonly name: string;
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(255)
   @ApiProperty({
     example: 'Описание модуля 1',
   })

@@ -21,6 +21,7 @@ import { StudentsModule } from '../students/students.module';
 import { TeachersModule } from '../teachers/teachers.module';
 import { ImagesModule } from '../common/images/images.module';
 import { InfoModule } from '../info/info.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { InfoModule } from '../info/info.module';
     ThrottlerModule.forRootAsync({
       useClass: ThrottlerConfigService,
     }),
+    ScheduleModule.forRoot(),
     ImagesModule,
     UsersModule,
     AuthModule,

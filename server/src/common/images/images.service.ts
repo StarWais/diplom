@@ -18,6 +18,7 @@ export class ImagesService {
       .resize(300, 300)
       .avif({ quality: 100 })
       .toFile(path);
+
     return `${domain}/uploads/${fileName}`;
   }
 }

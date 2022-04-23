@@ -1,12 +1,13 @@
 import { UsersService } from '../users/users.service';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Course, Prisma, Role } from '@prisma/client';
-import { CreateTeacherDto } from './dto';
+import { Course, Prisma, Role, Teacher, User } from '@prisma/client';
+import { CreateTeacherDto, UpdateTeacherDto } from './dto';
 
 @Injectable()
 export class TeachersService {
@@ -39,6 +40,45 @@ export class TeachersService {
     if (course.teacherId !== teacher.id) {
       throw new BadRequestException('Учитель не ведет этот курс');
     }
+  }
+
+  async updateTeacherStudentsCount(teacherId: number, studentsCount: number) {
+    return this.prisma.teacher.update({
+      where: {
+        id: teacherId,
+      },
+      data: {
+        studentsTaughtCount: {
+          increment: studentsCount,
+        },
+      },
+    });
+  }
+
+  private async checkUpdatePermissions(user: User, teacher: Teacher) {
+    if (user.role === Role.ADMIN) {
+      return;
+    }
+    if (user.id !== teacher.userId) {
+      throw new ForbiddenException();
+    }
+  }
+
+  async update(
+    searchDetails: Prisma.TeacherWhereUniqueInput,
+    details: UpdateTeacherDto,
+    currentUser: User,
+  ) {
+    const teacher = await this.findTeacherOrThrowError(searchDetails);
+    await this.checkUpdatePermissions(currentUser, teacher);
+    return this.prisma.teacher.update({
+      where: {
+        id: teacher.id,
+      },
+      data: {
+        ...details,
+      },
+    });
   }
 
   async create(details: CreateTeacherDto) {

@@ -9,6 +9,7 @@ import {
   IsPositive,
   MaxLength,
   ValidateNested,
+  Length,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CourseStepCreateDto, CourseModuleCreateDto, CourseTagDto } from '.';
@@ -80,9 +81,10 @@ export class CourseCreateDto {
   readonly possibilities: string[];
 
   @ApiProperty({
-    example: 'http://example.com/materials.zip',
+    example: 'https://example.com/materials.zip',
   })
   @IsNotEmpty()
+  @Length(1, 255)
   readonly materialsLink: string;
 
   @ApiProperty({
