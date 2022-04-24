@@ -522,7 +522,7 @@ export class CoursesService {
     review: CourseReview & { author: Partial<User> },
     course: Course,
   ) {
-    const adminMails = await this.usersService.getAdminMails();
+    const adminMails = await this.usersService.getAdminConfirmedMails();
     await this.mailerService.sendMail({
       to: adminMails,
       subject: 'Новый отзыв к курсу',
@@ -540,7 +540,7 @@ export class CoursesService {
     application: CourseApplication,
     course: Course,
   ) {
-    const adminMails = await this.usersService.getAdminMails();
+    const adminMails = await this.usersService.getAdminConfirmedMails();
     await this.mailerService.sendMail({
       to: adminMails,
       subject: 'Новая зяявка на курc',

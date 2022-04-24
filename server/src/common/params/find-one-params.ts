@@ -6,6 +6,7 @@ export class FindOneParams {
     example: 1,
     required: true,
     type: 'number',
+    description: 'ID ресурса',
   })
   @IsNumber()
   id: number;

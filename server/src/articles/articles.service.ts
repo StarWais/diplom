@@ -86,7 +86,7 @@ export class ArticlesService {
     });
 
     if (article.status === ArticleStatus.DRAFT) {
-      const adminMails = await this.usersService.getAdminMails();
+      const adminMails = await this.usersService.getAdminConfirmedMails();
       await this.mailerService.sendMail({
         to: adminMails,
         subject: 'Новая заявка на публикацию статьи',

@@ -3,11 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { PrismaService } from 'nestjs-prisma';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   User,
   Prisma,
@@ -18,7 +14,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-
 import {
   DomainOptions,
   ConfirmationTokenOptions,
@@ -32,6 +27,7 @@ import {
   PasswordResetDto,
   SignupDto,
 } from './dto';
+import { HelpersMethods } from '../common/helpers/helpers.methods';
 
 @Injectable()
 export class AuthService {
@@ -79,21 +75,6 @@ export class AuthService {
     return this.sendPasswordResetEmail(user, token);
   }
 
-  private checkToken<T extends PasswordResetToken | RegistrationToken>(
-    token: T,
-  ): T {
-    if (!token) {
-      throw new NotFoundException('Токен не найден');
-    }
-    if (token.expiresIn.getTime() < Date.now()) {
-      throw new BadRequestException('Токен просрочен');
-    }
-    if (token.status === TokenStatus.FULFILLED) {
-      throw new BadRequestException('Токен уже использован');
-    }
-    return token;
-  }
-
   async confirmPasswordReset(details: ConfirmPasswordResetDto) {
     const { token: tokenValue, newPassword } = details;
     const token = await this.validatePasswordResetToken(tokenValue);
@@ -130,7 +111,7 @@ export class AuthService {
     const tokenInfo = await this.prisma.passwordResetToken.findUnique({
       where: { token: tokenValue },
     });
-    return this.checkToken(tokenInfo);
+    return HelpersMethods.checkToken(tokenInfo);
   }
 
   private async validateRegistrationToken(
@@ -139,7 +120,7 @@ export class AuthService {
     const tokenInfo = await this.prisma.registrationToken.findUnique({
       where: { token: tokenValue },
     });
-    return this.checkToken(tokenInfo);
+    return HelpersMethods.checkToken(tokenInfo);
   }
 
   private async sendRegistrationConfirmationEmail(

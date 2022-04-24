@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { IsEmailUserAlreadyExistConstraint } from './validators/users.validator';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 import { FormdataConfigService } from '../config/services';
+import { UsersController } from './users.controller';
 
 @Module({
   imports: [
@@ -12,5 +13,6 @@ import { FormdataConfigService } from '../config/services';
   ],
   providers: [UsersService, IsEmailUserAlreadyExistConstraint],
   exports: [UsersService],
+  controllers: [UsersController],
 })
 export class UsersModule {}

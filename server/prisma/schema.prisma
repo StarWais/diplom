@@ -24,12 +24,15 @@ model User {
   gender              Gender
   confirmed           Boolean              @default(false)
   avatarLink          String?              @map("avatar_link")
+  newEmail            String?              @map("new_email")
+  newEmailConfirmed   Boolean              @default(true)
   studentInfo         Student?
   teacherInfo         Teacher?
   articles            Article[]
   courseReviews       CourseReview[]
   olympiadReviews     OlympiadReview[]
   passwordResetTokens PasswordResetToken[]
+  emailChangeTokens   EmailChangeToken[]
   registrationTokens  RegistrationToken[]
   articleComments     ArticleComment[]
   articleLikes        ArticleLike[]
@@ -55,6 +58,22 @@ model PasswordResetToken {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("password_reset_tokens")
+}
+
+model EmailChangeToken {
+  id        Int         @id @default(autoincrement())
+  token     String      @unique
+  userId    Int         @map("user_id")
+  ip        String
+  browser   String
+  status    TokenStatus @default(PENDING)
+  user      User        @relation(fields: [userId], references: [id])
+  expiresIn DateTime    @map("expires_in")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("email_change_tokens")
 }
 
 model RegistrationToken {

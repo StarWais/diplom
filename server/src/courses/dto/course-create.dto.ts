@@ -168,6 +168,9 @@ export class CourseCreateDto {
   @MaxLength(100)
   readonly eripNumber: string;
 
+  @ApiProperty({
+    type: 'file',
+  })
   @IsFile()
   @MaxFileSize(1e6)
   @HasMimeType([

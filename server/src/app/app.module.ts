@@ -22,11 +22,12 @@ import { TeachersModule } from '../teachers/teachers.module';
 import { ImagesModule } from '../common/images/images.module';
 import { InfoModule } from '../info/info.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { join } from 'path';
 
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: 'public',
+      rootPath: join(__dirname, '..', '..', 'public'),
     }),
     ConfigModule.forRoot({
       isGlobal: true,

@@ -17,7 +17,7 @@ export class StudentsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({
-    description: 'Обновить данные студента',
+    summary: 'Обновить данные студента',
   })
   @Patch(':id')
   async update(

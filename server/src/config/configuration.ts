@@ -30,6 +30,7 @@ export interface AuthOptions {
   };
   registrationTokenOptions: ConfirmationTokenOptions;
   passwordResetTokenOptions: ConfirmationTokenOptions;
+  emailChangeTokenOptions: ConfirmationTokenOptions;
   ignoreExpiration: boolean;
 }
 
@@ -98,6 +99,10 @@ export default (): GlobalConfig => ({
       expiresIn: 60 * 60 * 24 * 7,
     },
     passwordResetTokenOptions: {
+      length: 12,
+      expiresIn: 60 * 60 * 24 * 7,
+    },
+    emailChangeTokenOptions: {
       length: 12,
       expiresIn: 60 * 60 * 24 * 7,
     },

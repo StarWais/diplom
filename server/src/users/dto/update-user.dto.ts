@@ -1,12 +1,6 @@
 import { ApiProperty, PartialType, PickType } from '@nestjs/swagger';
 import { SignupDto } from '../../auth/dto';
 import { IsDate, IsOptional, IsPhoneNumber } from 'class-validator';
-import {
-  FileSystemStoredFile,
-  HasMimeType,
-  IsFile,
-  MaxFileSize,
-} from 'nestjs-form-data';
 
 export class UpdateUserDto extends PartialType(
   PickType(SignupDto, [
@@ -33,17 +27,4 @@ export class UpdateUserDto extends PartialType(
   @IsOptional()
   @IsPhoneNumber('BY')
   readonly phone?: string;
-
-  @IsOptional()
-  @IsFile()
-  @MaxFileSize(1e6)
-  @HasMimeType([
-    'image/jpeg',
-    'image/png',
-    'image/jpg',
-    'image/gif',
-    'image/svg+xml',
-    'image/webp',
-  ])
-  readonly avatar?: FileSystemStoredFile;
 }
