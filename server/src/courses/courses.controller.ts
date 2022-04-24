@@ -11,16 +11,18 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { FindOneParams } from '../common/params/find-one-params';
-import { CoursesService } from './courses.service';
+import { Role, User } from '@prisma/client';
 import {
   ApiBearerAuth,
   ApiConsumes,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { FormDataRequest } from 'nestjs-form-data';
+
+import { FindOneParams } from '../common/params/find-one-params';
+import { CoursesService } from './courses.service';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Role, User } from '@prisma/client';
 import { JwtAuthGuard, RolesGuard } from '../auth/guards';
 import {
   CourseUpdateDto,
@@ -30,10 +32,9 @@ import {
   CreateCourseReviewDto,
   CourseAttendanceCreateDto,
   CourseAttendanceUpdateDto,
-} from './dto';
+} from './dto/request';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { PaginationQuery } from '../common/pagination/pagination-query';
-import { FormDataRequest } from 'nestjs-form-data';
 import { GetCoursesFilter } from '../common/filters/get-courses.filter';
 
 @ApiTags('Курсы')
@@ -85,21 +86,30 @@ export class CoursesController {
   }
 
   @ApiOperation({
-    summary: 'Получить посещаемость к курсу',
+    summary: 'Получить студенту свою посещаемость курса',
   })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Get(':id/attendances')
-  async getAttendances(
+  @Roles(Role.STUDENT, Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get(':id/my-attendance')
+  async getMyAttendanceToCourse(
     @Param() searchParams: FindOneParams,
     @CurrentUser() currentUser: User,
   ) {
-    if (currentUser.role === Role.STUDENT) {
-      return this.coursesService.getStudentCourseAttendance(
-        searchParams,
-        currentUser,
-      );
-    }
+    return this.coursesService.getStudentCourseAttendance(
+      searchParams,
+      currentUser,
+    );
+  }
+
+  @ApiOperation({
+    summary: 'Получить полную посещаесость курса',
+  })
+  @ApiBearerAuth()
+  @Roles(Role.TEACHER, Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get(':id/attendance')
+  async getAttendances(@Param() searchParams: FindOneParams) {
     return this.coursesService.getFullCourseAttendance(searchParams);
   }
 
@@ -109,7 +119,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Roles(Role.ADMIN, Role.TEACHER)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Post(':id/attendances')
+  @Post(':id/attendance')
   async createAttendance(
     @Param() searchParams: FindOneParams,
     @Body() details: CourseAttendanceCreateDto,
@@ -128,7 +138,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Roles(Role.ADMIN, Role.TEACHER)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Patch('attendances/:id')
+  @Patch('attendance/:id')
   async updateAttendance(
     @Param() searchParams: FindOneParams,
     @Body() details: CourseAttendanceUpdateDto,
@@ -146,7 +156,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Delete('attendances/:id')
+  @Delete('attendance/:id')
   async deleteAttendance(@Param() searchParams: FindOneParams) {
     return this.coursesService.deleteCourseAttendance(searchParams);
   }

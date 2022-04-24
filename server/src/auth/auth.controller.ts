@@ -22,7 +22,7 @@ import {
   PasswordResetDto,
   SigninDto,
   SignupDto,
-} from './dto';
+} from './dto/request';
 import { JwtAuthGuard, LocalAuthGuard } from './guards';
 
 @ApiTags('Авторизация')

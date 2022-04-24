@@ -9,7 +9,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-import { ArticleTagDto } from '.';
+import { ArticleTagDto } from './index';
 
 export class ArticleCreateDto {
   @IsNotEmpty()

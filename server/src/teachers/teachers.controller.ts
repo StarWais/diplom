@@ -11,7 +11,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { CreateTeacherDto, UpdateTeacherDto } from './dto';
+import { CreateTeacherDto, UpdateTeacherDto } from './dto/request';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';

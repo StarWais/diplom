@@ -20,7 +20,7 @@ import {
   ConfirmEmailChangeDto,
   UpdateUserAvatarDto,
   UpdateUserDto,
-} from './dto';
+} from './dto/request';
 import {
   ApiBearerAuth,
   ApiConsumes,

@@ -6,8 +6,8 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 export class CoursesJobs {
   constructor(private readonly coursesService: CoursesService) {}
 
-  @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_MIDNIGHT)
-  async handleCourseFinished() {
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  async handleCourseIsFinished() {
     await this.coursesService.updateFinishedCourses();
   }
 }

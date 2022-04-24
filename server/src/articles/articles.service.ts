@@ -17,7 +17,7 @@ import {
   ArticleCommentCreateDto,
   ArticleCreateDto,
   ArticleUpdateDto,
-} from './dto';
+} from './dto/request';
 import { ArticlesGetFilter } from './filters';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UsersService } from '../users/users.service';

@@ -26,7 +26,7 @@ import {
   ConfirmPasswordResetDto,
   PasswordResetDto,
   SignupDto,
-} from './dto';
+} from './dto/request';
 import { HelpersMethods } from '../common/helpers/helpers.methods';
 
 @Injectable()

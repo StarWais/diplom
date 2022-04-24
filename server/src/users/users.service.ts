@@ -10,7 +10,7 @@ import {
   UpdateUserDto,
   UpdateUserAvatarDto,
   ConfirmEmailChangeDto,
-} from './dto';
+} from './dto/request';
 import { ImagesService } from '../common/images/images.service';
 import {
   ConfirmationTokenOptions,

@@ -12,7 +12,11 @@ import {
   Length,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CourseStepCreateDto, CourseModuleCreateDto, CourseTagDto } from '.';
+import {
+  CourseStepCreateDto,
+  CourseModuleCreateDto,
+  CourseTagDto,
+} from './index';
 import {
   FileSystemStoredFile,
   HasMimeType,

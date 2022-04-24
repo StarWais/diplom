@@ -23,7 +23,7 @@ import {
   ArticleCommentCreateDto,
   ArticleCreateDto,
   ArticleUpdateDto,
-} from './dto';
+} from './dto/request';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { ArticlesGetFilter } from './filters';
 
@@ -31,6 +31,7 @@ import { ArticlesGetFilter } from './filters';
 @Controller('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
+
   @ApiOperation({ summary: 'Получить список тегов статей' })
   @HttpCode(HttpStatus.OK)
   @Get('tags')

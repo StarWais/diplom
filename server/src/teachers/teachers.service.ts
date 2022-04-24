@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Course, Prisma, Role, Teacher, User } from '@prisma/client';
-import { CreateTeacherDto, UpdateTeacherDto } from './dto';
+import { CreateTeacherDto, UpdateTeacherDto } from './dto/request';
 
 @Injectable()
 export class TeachersService {

@@ -21,7 +21,7 @@ import {
   CourseCreateDto,
   CourseUpdateDto,
   CreateCourseReviewDto,
-} from './dto';
+} from './dto/request';
 import { Paginate } from '../common/pagination/pagination';
 import { TeachersService } from '../teachers/teachers.service';
 import { StudentsService } from '../students/students.service';
