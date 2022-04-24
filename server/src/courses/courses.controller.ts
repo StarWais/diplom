@@ -25,14 +25,15 @@ import { CoursesService } from './courses.service';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard, RolesGuard } from '../auth/guards';
 import {
-  CourseUpdateDto,
   CourseApplicationCreateDto,
   CourseApplicationUpdateDto,
-  CourseCreateDto,
-  CreateCourseReviewDto,
   CourseAttendanceCreateDto,
   CourseAttendanceUpdateDto,
+  CourseCreateDto,
+  CourseUpdateDto,
+  CreateCourseReviewDto,
 } from './dto/request';
+
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { PaginationQuery } from '../common/pagination/pagination-query';
 import { GetCoursesFilter } from '../common/filters/get-courses.filter';
