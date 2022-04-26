@@ -5,18 +5,18 @@ import { ru } from 'date-fns/locale';
 import { PrismaService } from 'nestjs-prisma';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import {
-  User,
+  PasswordResetToken,
   Prisma,
   RegistrationToken,
   TokenStatus,
-  PasswordResetToken,
+  User,
 } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import {
-  DomainOptions,
   ConfirmationTokenOptions,
+  DomainOptions,
 } from '../config/configuration';
 import { BrowserInfo } from '../decorators/browser-info.decorator';
 import { UsersService } from '../users/users.service';
@@ -38,15 +38,15 @@ export class AuthService {
     private readonly config: ConfigService,
     private readonly mailerService: MailerService,
   ) {}
-  private static async hashPassword(password: string, saltRounds = 10) {
+  private async hashPassword(password: string, saltRounds = 10) {
     return bcrypt.hash(password, saltRounds);
   }
 
-  private static async comparePassword(password: string, hash: string) {
+  private async comparePassword(password: string, hash: string) {
     return bcrypt.compare(password, hash);
   }
 
-  private async generateJWTToken(user: User) {
+  private generateJWTToken(user: User) {
     const payload: JWTPayload = {
       sub: user.id,
       email: user.email,
@@ -82,7 +82,7 @@ export class AuthService {
       id: token.userId,
     });
 
-    const compareNewPassword = await AuthService.comparePassword(
+    const compareNewPassword = await this.comparePassword(
       newPassword,
       user.password,
     );
@@ -96,7 +96,7 @@ export class AuthService {
       where: { id: token.id },
       data: { status: TokenStatus.FULFILLED },
     });
-    const hashedNewPassword = await AuthService.hashPassword(newPassword);
+    const hashedNewPassword = await this.hashPassword(newPassword);
     await this.usersService.updatePassword(
       {
         id: user.id,
@@ -279,10 +279,7 @@ export class AuthService {
     if (!user) {
       return null;
     }
-    const isPasswordValid = await AuthService.comparePassword(
-      password,
-      user.password,
-    );
+    const isPasswordValid = await this.comparePassword(password, user.password);
     if (!isPasswordValid) {
       return null;
     }

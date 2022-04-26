@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsPositive, IsOptional } from 'class-validator';
+import { IsNumber, IsOptional, IsPositive } from 'class-validator';
 import { PaginationQuery } from '../../common/pagination/pagination-query';
+
 export class ArticlesGetFilter extends PaginationQuery {
   @IsOptional()
   @IsNumber()

@@ -1,18 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   Article,
+  ArticleComment,
   ArticleStatus,
+  ArticleTag,
   Prisma,
   User,
-  ArticleTag,
-  ArticleComment,
 } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import slugify from 'slugify';
 
 import { PaginationQuery } from '../common/pagination/pagination-query';
-import { Paginated } from '../common/pagination/pagination';
-import { Paginate } from '../common/pagination/pagination';
+import { Paginate, Paginated } from '../common/pagination/pagination';
 import {
   ArticleCommentCreateDto,
   ArticleCreateDto,

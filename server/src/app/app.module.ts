@@ -8,8 +8,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
 
 import configuration from '../config/configuration';
 import {
-  PrismaConfigService,
   MailerConfigService,
+  PrismaConfigService,
   ThrottlerConfigService,
 } from '../config/services';
 import { validationSchema } from '../config/env/env-validation';
@@ -39,6 +39,7 @@ import { join } from 'path';
       isGlobal: true,
       useClass: PrismaConfigService,
     }),
+
     MailerModule.forRootAsync({
       useClass: MailerConfigService,
     }),

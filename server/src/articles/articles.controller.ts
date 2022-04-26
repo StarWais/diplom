@@ -11,12 +11,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { User, Role } from '@prisma/client';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Role, User } from '@prisma/client';
 
 import { PaginationQuery } from '../common/pagination/pagination-query';
 import { FindOneParams } from '../common/params/find-one-params';
-import { RolesGuard, JwtAuthGuard } from '../auth/guards';
+import { JwtAuthGuard, RolesGuard } from '../auth/guards';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { ArticlesService } from './articles.service';
 import {
