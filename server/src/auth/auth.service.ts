@@ -288,7 +288,7 @@ export class AuthService {
 
   async signup(details: SignupDto, browserInfo: BrowserInfo) {
     const { password, ...restUserDetails } = details;
-    const hashedPassword = await AuthService.hashPassword(password);
+    const hashedPassword = await this.hashPassword(password);
     const user = await this.usersService.create({
       password: hashedPassword,
       ...restUserDetails,
