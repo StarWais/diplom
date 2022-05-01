@@ -29,6 +29,7 @@ model User {
   studentInfo         Student?
   teacherInfo         Teacher?
   articles            Article[]
+  news                News[]
   courseReviews       CourseReview[]
   olympiadReviews     OlympiadReview[]
   passwordResetTokens PasswordResetToken[]
@@ -42,6 +43,36 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("users")
+}
+
+
+model News {
+  id                  Int                  @id @default(autoincrement())
+  title               String               @map("title")
+  description         String               @map("description")
+  content             String               @map("content")
+  author              User                 @relation(fields: [authorId], references: [id])
+  authorId            Int                  @map("author_id")
+  imageLink           String               @map("image_link")
+  slug                String               @unique @map("slug")
+  tags                NewsTag[]
+
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("news")
+}
+
+model NewsTag {
+  id       Int       @id @default(autoincrement())
+  news     News[]
+  name     String    @unique
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("news_tags")
 }
 
 model PasswordResetToken {

@@ -3,22 +3,21 @@ import {
   Article,
   ArticleComment,
   ArticleStatus,
-  ArticleTag,
   Prisma,
   User,
 } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
+import { MailerService } from '@nestjs-modules/mailer';
 import slugify from 'slugify';
 
 import { PaginationQuery } from '../common/pagination/pagination-query';
-import { Paginate, Paginated } from '../common/pagination/pagination';
+import { Paginate } from '../common/pagination/pagination';
 import {
   ArticleCommentCreateDto,
   ArticleCreateDto,
   ArticleUpdateDto,
 } from './dto/request';
 import { ArticlesGetFilter } from './filters';
-import { MailerService } from '@nestjs-modules/mailer';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -100,7 +99,9 @@ export class ArticlesService {
     return article;
   }
 
-  async findOneOrThrowError(details: Prisma.ArticleWhereUniqueInput) {
+  async findOneWithTagsAndLikesDislikesOrThrowError(
+    details: Prisma.ArticleWhereUniqueInput,
+  ) {
     const article = await this.prisma.article.findUnique({
       where: details,
       include: {
@@ -131,8 +132,8 @@ export class ArticlesService {
     return article;
   }
 
-  async publish(details: Prisma.ArticleWhereUniqueInput): Promise<Article> {
-    await this.findOneOrThrowError(details);
+  async publish(details: Prisma.ArticleWhereUniqueInput) {
+    await this.findOneWithTagsAndLikesDislikesOrThrowError(details);
 
     return this.prisma.article.update({
       where: details,
@@ -161,11 +162,11 @@ export class ArticlesService {
     });
   }
 
-  async tags(): Promise<ArticleTag[]> {
+  async tags() {
     return this.prisma.articleTag.findMany();
   }
 
-  async findMany(details: ArticlesGetFilter): Promise<Paginated<Article>> {
+  async findMany(details: ArticlesGetFilter) {
     return Paginate<Article, Prisma.ArticleFindManyArgs>(
       {
         limit: details.limit,
@@ -223,7 +224,7 @@ export class ArticlesService {
     );
   }
 
-  private async generateSlug(title: string): Promise<string> {
+  private async generateSlug(title: string) {
     let slug = slugify(title, {
       replacement: '-',
       lower: true,
@@ -244,7 +245,7 @@ export class ArticlesService {
 
   private async checkCommentExistence(
     details: Prisma.ArticleCommentWhereUniqueInput,
-  ): Promise<void> {
+  ) {
     const comment = await this.prisma.articleComment.findUnique({
       where: details,
     });
@@ -256,19 +257,19 @@ export class ArticlesService {
   async update(
     searchDetails: Prisma.ArticleWhereUniqueInput,
     details: ArticleUpdateDto,
-  ): Promise<Article> {
-    await this.findOneOrThrowError(searchDetails);
-    const { title } = details;
+  ) {
+    await this.findOneWithTagsAndLikesDislikesOrThrowError(searchDetails);
+    const { title, tags, ...rest } = details;
 
     return this.prisma.article.update({
       where: searchDetails,
       data: {
-        ...details,
+        ...rest,
         slug: title ? await this.generateSlug(title) : undefined,
-        tags: details.tags
+        tags: tags
           ? {
               set: [],
-              connectOrCreate: details.tags.map((tag) => ({
+              connectOrCreate: tags.map((tag) => ({
                 where: {
                   name: tag.name,
                 },
@@ -301,8 +302,8 @@ export class ArticlesService {
     });
   }
 
-  async delete(details: Prisma.ArticleWhereUniqueInput): Promise<void> {
-    await this.findOneOrThrowError(details);
+  async delete(details: Prisma.ArticleWhereUniqueInput) {
+    await this.findOneWithTagsAndLikesDislikesOrThrowError(details);
     await this.prisma.article.delete({
       where: details,
     });
@@ -313,7 +314,9 @@ export class ArticlesService {
     details: ArticleCommentCreateDto,
     user: User,
   ) {
-    await this.findOneOrThrowError(searchCommentDetails);
+    await this.findOneWithTagsAndLikesDislikesOrThrowError(
+      searchCommentDetails,
+    );
 
     return this.prisma.articleComment.create({
       data: {
@@ -346,8 +349,8 @@ export class ArticlesService {
   async findComments(
     searchDetails: Prisma.ArticleWhereUniqueInput,
     paginationDetails: PaginationQuery,
-  ): Promise<Paginated<ArticleComment>> {
-    await this.findOneOrThrowError(searchDetails);
+  ) {
+    await this.findOneWithTagsAndLikesDislikesOrThrowError(searchDetails);
     return Paginate<ArticleComment, Prisma.ArticleCommentFindManyArgs>(
       paginationDetails,
       this.prisma,
@@ -374,20 +377,17 @@ export class ArticlesService {
     );
   }
 
-  async deleteComment(
-    details: Prisma.ArticleCommentWhereUniqueInput,
-  ): Promise<void> {
+  async deleteComment(details: Prisma.ArticleCommentWhereUniqueInput) {
     await this.checkCommentExistence(details);
     await this.prisma.articleComment.delete({
       where: details,
     });
   }
 
-  async like(
-    details: Prisma.ArticleWhereUniqueInput,
-    user: User,
-  ): Promise<Article> {
-    const article = await this.findOneOrThrowError(details);
+  async like(details: Prisma.ArticleWhereUniqueInput, user: User) {
+    const article = await this.findOneWithTagsAndLikesDislikesOrThrowError(
+      details,
+    );
     const userLike = article.likes.find((like) => like.userId === user.id);
     const userDislike = article.dislikes.find(
       (dislike) => dislike.userId === user.id,
@@ -442,7 +442,9 @@ export class ArticlesService {
   }
 
   async dislike(details: Prisma.ArticleWhereUniqueInput, user: User) {
-    const article = await this.findOneOrThrowError(details);
+    const article = await this.findOneWithTagsAndLikesDislikesOrThrowError(
+      details,
+    );
     const userLike = article.likes.find((like) => like.userId === user.id);
     const userDislike = article.dislikes.find(
       (dislike) => dislike.userId === user.id,

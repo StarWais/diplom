@@ -8,6 +8,8 @@ import {
 import { PrismaService } from 'nestjs-prisma';
 import { Course, Prisma, Role, Teacher, User } from '@prisma/client';
 import { CreateTeacherDto, UpdateTeacherDto } from './dto/request';
+import { TeachersGetFilter } from './filters';
+import { Paginate } from '../common/pagination/pagination';
 
 @Injectable()
 export class TeachersService {
@@ -24,6 +26,90 @@ export class TeachersService {
       throw new NotFoundException('Учитель не найден');
     }
     return teacher;
+  }
+
+  async findTeacherWithUserInfoOrThrowError(
+    details: Prisma.TeacherWhereUniqueInput,
+  ) {
+    const teacher = await this.prisma.teacher.findUnique({
+      where: details,
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            phone: true,
+            firstName: true,
+            lastName: true,
+            middleName: true,
+            birthDate: true,
+            gender: true,
+          },
+        },
+      },
+    });
+    if (!teacher) {
+      throw new NotFoundException('Учитель не найден');
+    }
+    return teacher;
+  }
+
+  async findAll(details: TeachersGetFilter) {
+    return Paginate<Teacher, Prisma.TeacherFindManyArgs>(
+      {
+        limit: details.limit,
+        page: details.page,
+      },
+      this.prisma,
+      'teacher',
+      {
+        where: {
+          OR: [
+            {
+              specialisations: {
+                hasSome: details.categories,
+              },
+            },
+            {
+              OR: [
+                {
+                  user: {
+                    OR: [
+                      {
+                        firstName: {
+                          contains: details.search,
+                        },
+                      },
+                      {
+                        lastName: {
+                          contains: details.search,
+                        },
+                      },
+                      {
+                        middleName: {
+                          contains: details.search,
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              middleName: true,
+              avatarLink: true,
+            },
+          },
+        },
+      },
+    );
   }
 
   async checkIfTeacherIsCuratingCourseOrThrowError(

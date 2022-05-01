@@ -1,4 +1,4 @@
-import { Prisma, Role, User, Course, Student } from '@prisma/client';
+import { Course, Prisma, Role, Student, User } from '@prisma/client';
 import {
   BadRequestException,
   ForbiddenException,
@@ -15,6 +15,33 @@ export class StudentsService {
   async findStudentOrThrowError(details: Prisma.StudentWhereUniqueInput) {
     const student = await this.prisma.student.findUnique({
       where: details,
+    });
+    if (!student) {
+      throw new NotFoundException('Студент не найден');
+    }
+    return student;
+  }
+
+  async findStudentWithUserInfoOrThrowError(
+    details: Prisma.StudentWhereUniqueInput,
+  ) {
+    const student = await this.prisma.student.findUnique({
+      where: details,
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            phone: true,
+            firstName: true,
+            lastName: true,
+            middleName: true,
+            birthDate: true,
+            gender: true,
+          },
+        },
+      },
     });
     if (!student) {
       throw new NotFoundException('Студент не найден');
@@ -64,6 +91,10 @@ export class StudentsService {
     if (user.id !== student.userId) {
       throw new ForbiddenException();
     }
+  }
+
+  async getStudent(details: Prisma.StudentWhereUniqueInput) {
+    return this.findStudentWithUserInfoOrThrowError(details);
   }
 
   async update(

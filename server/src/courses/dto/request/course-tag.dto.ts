@@ -1,3 +1,3 @@
-import { TagDto } from '../../../common/dto/tag.dto';
+import { TagCreateDto } from '../../../common/dto/tag-create.dto';
 
-export class CourseTagDto extends TagDto {}
+export class CourseTagDto extends TagCreateDto {}

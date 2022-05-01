@@ -42,7 +42,9 @@ export class ArticlesController {
   @ApiOperation({ summary: 'Получить статью по slug' })
   @Get(':slug')
   async findOne(@Param('slug') slug: string) {
-    return this.articlesService.findOneOrThrowError({ slug });
+    return this.articlesService.findOneWithTagsAndLikesDislikesOrThrowError({
+      slug,
+    });
   }
 
   @Get()

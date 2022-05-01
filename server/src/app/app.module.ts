@@ -23,6 +23,7 @@ import { ImagesModule } from '../common/images/images.module';
 import { InfoModule } from '../info/info.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { join } from 'path';
+import { NewsModule } from '../news/news.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { join } from 'path';
     StudentsModule,
     TeachersModule,
     InfoModule,
+    NewsModule,
   ],
   controllers: [],
   providers: [

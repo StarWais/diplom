@@ -110,8 +110,14 @@ export class CoursesController {
   @Roles(Role.TEACHER, Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get(':id/attendance')
-  async getAttendances(@Param() searchParams: FindOneParams) {
-    return this.coursesService.getFullCourseAttendance(searchParams);
+  async getAttendances(
+    @Param() searchParams: FindOneParams,
+    @CurrentUser() currentUser: User,
+  ) {
+    return this.coursesService.getFullCourseAttendance(
+      searchParams,
+      currentUser,
+    );
   }
 
   @ApiOperation({

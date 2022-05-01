@@ -1,3 +1,3 @@
-import { CreateReviewDto } from '../../../common/dto/create-review-dto';
+import { ReviewCreateDto } from '../../../common/dto/review-create.dto';
 
-export class CreateCourseReviewDto extends CreateReviewDto {}
+export class CreateCourseReviewDto extends ReviewCreateDto {}

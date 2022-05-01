@@ -656,8 +656,15 @@ export class CoursesService {
     });
   }
 
-  async getFullCourseAttendance(courseDetails: Prisma.CourseWhereUniqueInput) {
+  async getFullCourseAttendance(
+    courseDetails: Prisma.CourseWhereUniqueInput,
+    currentUser: User,
+  ) {
     const course = await this.findCourseOrThrowError(courseDetails);
+    await this.teachersService.checkIfTeacherIsCuratingCourseOrThrowError(
+      { userId: currentUser.id },
+      course,
+    );
     return this.prisma.courseAttendance.findMany({
       where: {
         courseId: course.id,

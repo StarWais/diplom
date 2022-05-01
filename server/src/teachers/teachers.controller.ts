@@ -1,14 +1,15 @@
-import { JwtAuthGuard } from '../auth/guards';
-import { RolesGuard } from '../auth/guards';
+import { JwtAuthGuard, RolesGuard } from '../auth/guards';
 import { TeachersService } from './teachers.service';
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CreateTeacherDto, UpdateTeacherDto } from './dto/request';
@@ -17,6 +18,7 @@ import { Role } from '@prisma/client';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { FindOneParams } from '../common/params/find-one-params';
+import { TeachersGetFilter } from './filters';
 
 @ApiTags('Учителя')
 @Controller('teachers')
@@ -35,13 +37,31 @@ export class TeachersController {
     await this.teachersService.create(details);
   }
 
+  @ApiOperation({
+    summary: 'Получить данные об учителе',
+  })
+  @Get(':id')
+  async get(@Param() searchDetails: FindOneParams) {
+    return await this.teachersService.findTeacherWithUserInfoOrThrowError(
+      searchDetails,
+    );
+  }
+
+  @ApiOperation({
+    summary: 'Получить список учителей',
+  })
+  @Get()
+  async findMany(@Query() searchDetails: TeachersGetFilter) {
+    return await this.teachersService.findAll(searchDetails);
+  }
+
   @Roles(Role.ADMIN, Role.TEACHER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Обновить данные об учителе',
   })
-  @Patch()
+  @Patch(':id')
   async update(
     @Param() searchParams: FindOneParams,
     @Body() details: UpdateTeacherDto,

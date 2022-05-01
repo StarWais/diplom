@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StudentsService } from './students.service';
 import { FindOneParams } from '../common/params/find-one-params';
@@ -26,5 +26,16 @@ export class StudentsController {
     @CurrentUser() currentUser: User,
   ) {
     return this.studentsService.update(searchDetails, details, currentUser);
+  }
+
+  @Roles(Role.TEACHER, Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Получить данные студента',
+  })
+  @Get(':id')
+  async get(@Param() searchDetails: FindOneParams) {
+    return this.studentsService.getStudent(searchDetails);
   }
 }
