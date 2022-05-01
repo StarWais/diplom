@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
+import slugify from 'slugify';
+
+import { News, Prisma, User } from '@prisma/client';
 import { NewsGetFilter } from './filters/news-get.filter';
 import { Paginate } from '../common/pagination/pagination';
-import { News, Prisma, User } from '@prisma/client';
-import slugify from 'slugify';
-import { NewsCreateDto } from './dto/request/news-create.dto';
+import { NewsCreateDto, NewsUpdateDto } from './dto/request';
 import { ImagesService } from '../common/images/images.service';
-import { NewsUpdateDto } from './dto/request/news-update.dto';
 
 @Injectable()
 export class NewsService {
