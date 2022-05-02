@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
+
 import { UpdateStudentDto } from './dto/request';
 
 @Injectable()
@@ -49,7 +50,7 @@ export class StudentsService {
     return student;
   }
 
-  async findStudentWithCoursesOrThrowError(
+  private async findStudentWithCoursesOrThrowError(
     details: Prisma.StudentWhereUniqueInput,
   ) {
     const student = await this.prisma.student.findUnique({
@@ -91,10 +92,6 @@ export class StudentsService {
     if (user.id !== student.userId) {
       throw new ForbiddenException();
     }
-  }
-
-  async getStudent(details: Prisma.StudentWhereUniqueInput) {
-    return this.findStudentWithUserInfoOrThrowError(details);
   }
 
   async update(

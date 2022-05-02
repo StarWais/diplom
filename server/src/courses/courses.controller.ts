@@ -65,9 +65,20 @@ export class CoursesController {
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Get('my')
-  async findMyCourses(@CurrentUser() currentUser: User) {
+  @Get('attending')
+  async findMyAttendingCourses(@CurrentUser() currentUser: User) {
     return this.coursesService.findMyStudentsCourses(currentUser);
+  }
+
+  @Roles(Role.ADMIN, Role.TEACHER)
+  @ApiOperation({
+    summary: 'Получить мои курсы (учитель)',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get('teaching')
+  async findMyTeachingCourses(@CurrentUser() currentUser: User) {
+    return this.coursesService.findMyTeachersCourses(currentUser);
   }
 
   @ApiOperation({

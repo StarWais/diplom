@@ -35,7 +35,9 @@ export class StudentsController {
     summary: 'Получить данные студента',
   })
   @Get(':id')
-  async get(@Param() searchDetails: FindOneParams) {
-    return this.studentsService.getStudent(searchDetails);
+  async findOne(@Param() searchDetails: FindOneParams) {
+    return this.studentsService.findStudentWithUserInfoOrThrowError(
+      searchDetails,
+    );
   }
 }

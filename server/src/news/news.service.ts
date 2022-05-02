@@ -35,17 +35,20 @@ export class NewsService {
           OR: [
             {
               title: {
-                contains: details.search,
+                contains: details.search || '',
+                mode: 'insensitive',
               },
             },
             {
               description: {
-                contains: details.search,
+                contains: details.search || '',
+                mode: 'insensitive',
               },
             },
             {
               content: {
-                contains: details.search,
+                contains: details.search || '',
+                mode: 'insensitive',
               },
             },
           ],

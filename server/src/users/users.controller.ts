@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -15,7 +17,7 @@ import {
   CurrentBrowserInfo,
 } from '../decorators/browser-info.decorator';
 import { CurrentUser } from '../decorators/current-user.decorator';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import {
   ConfirmEmailChangeDto,
   UpdateUserAvatarDto,
@@ -28,13 +30,26 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { JwtAuthGuard } from '../auth/guards';
+import { JwtAuthGuard, RolesGuard } from '../auth/guards';
 import { FormDataRequest } from 'nestjs-form-data';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UsersGetFilter } from './filters/users-get.filter';
 
 @Controller('users')
 @ApiTags('Пользователи')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Roles(Role.ADMIN)
+  @ApiOperation({
+    summary: 'Получить список пользователей',
+  })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Get()
+  async findMany(@Query() filter: UsersGetFilter) {
+    return this.usersService.findMany(filter);
+  }
 
   @ApiOperation({
     summary: 'Обновить пользователя',
@@ -54,6 +69,27 @@ export class UsersController {
       currentUser,
       browserInfo,
     );
+  }
+
+  @ApiOperation({
+    summary: 'Получить данные о себе',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('me')
+  async me(@CurrentUser() currentUser: User) {
+    return this.usersService.findUniqueOrThrowError({ id: currentUser.id });
+  }
+
+  @Roles(Role.ADMIN)
+  @ApiOperation({
+    summary: 'Получить данные о пользователе',
+  })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Get(':id')
+  async findOne(@Param() searchDetails: FindOneParams) {
+    return this.usersService.findUniqueOrThrowError(searchDetails);
   }
 
   @ApiOperation({
@@ -78,7 +114,6 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('confirm-email-change')
-  @HttpCode(HttpStatus.NO_CONTENT)
   async confirmEmailChangeToken(@Body() details: ConfirmEmailChangeDto) {
     return this.usersService.confirmEmailChange(details);
   }
@@ -94,7 +129,7 @@ export class UsersController {
     @CurrentUser() currentUser: User,
     @CurrentBrowserInfo() browserInfo: BrowserInfo,
   ) {
-    return this.usersService.sendAnotherEmailChangeToken(
+    await this.usersService.sendAnotherEmailChangeToken(
       currentUser,
       browserInfo,
     );

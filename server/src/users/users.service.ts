@@ -7,9 +7,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import {
-  UpdateUserDto,
-  UpdateUserAvatarDto,
   ConfirmEmailChangeDto,
+  UpdateUserAvatarDto,
+  UpdateUserDto,
 } from './dto/request';
 import { ImagesService } from '../common/images/images.service';
 import {
@@ -21,6 +21,8 @@ import { ConfigService } from '@nestjs/config';
 import { BrowserInfo } from '../decorators/browser-info.decorator';
 import { HelpersMethods } from '../common/helpers/helpers.methods';
 import { MailerService } from '@nestjs-modules/mailer';
+import { UsersGetFilter } from './filters/users-get.filter';
+import { Paginate } from '../common/pagination/pagination';
 
 @Injectable()
 export class UsersService {
@@ -31,10 +33,60 @@ export class UsersService {
     private readonly mailerService: MailerService,
   ) {}
 
+  private userIncludeDetails = {
+    include: {
+      teacherInfo: true,
+      studentInfo: true,
+    },
+  };
+
   async findUnique(details: Prisma.UserWhereUniqueInput) {
     return this.prisma.user.findUnique({
       where: details,
+      ...this.userIncludeDetails,
     });
+  }
+
+  async findMany(filter: UsersGetFilter) {
+    return Paginate<User, Prisma.UserFindManyArgs>(
+      {
+        limit: filter.limit,
+        page: filter.page,
+      },
+      this.prisma,
+      'user',
+      {
+        where: {
+          role: {
+            equals: filter.role,
+          },
+          OR: [
+            {
+              firstName: {
+                contains: filter.search || '',
+                mode: 'insensitive',
+              },
+            },
+            {
+              lastName: {
+                contains: filter.search || '',
+                mode: 'insensitive',
+              },
+            },
+            {
+              middleName: {
+                contains: filter.search || '',
+                mode: 'insensitive',
+              },
+            },
+          ],
+        },
+        ...this.userIncludeDetails,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+    );
   }
 
   async findUniqueOrThrowError(details: Prisma.UserWhereUniqueInput) {
@@ -48,7 +100,16 @@ export class UsersService {
   async makeTeacher(user: User) {
     return this.prisma.user.update({
       where: { id: user.id },
-      data: { role: user.role !== Role.ADMIN ? Role.TEACHER : undefined },
+      data: {
+        role: Role.TEACHER,
+        studentInfo: {
+          delete: true,
+        },
+        teacherInfo: {
+          create: true,
+        },
+      },
+      ...this.userIncludeDetails,
     });
   }
 
@@ -70,6 +131,7 @@ export class UsersService {
       data: {
         confirmed: true,
       },
+      ...this.userIncludeDetails,
     });
   }
 
@@ -85,9 +147,10 @@ export class UsersService {
       data: {
         ...details,
         studentInfo: {
-          create: {},
+          create: true,
         },
       },
+      ...this.userIncludeDetails,
     });
   }
 
@@ -228,6 +291,7 @@ export class UsersService {
         newEmail: null,
         newEmailConfirmed: true,
       },
+      ...this.userIncludeDetails,
     });
   }
 
@@ -256,6 +320,7 @@ export class UsersService {
       data: {
         avatarLink,
       },
+      ...this.userIncludeDetails,
     });
     return avatarLink;
   }
@@ -282,6 +347,7 @@ export class UsersService {
         newEmail: email,
         newEmailConfirmed: email ? false : undefined,
       },
+      ...this.userIncludeDetails,
     });
   }
 }

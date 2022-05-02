@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsPositive, MaxLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  Max,
+  MaxLength,
+} from 'class-validator';
 
 export class ReviewCreateDto {
   @ApiProperty({
@@ -15,5 +21,6 @@ export class ReviewCreateDto {
   })
   @IsNumber({ maxDecimalPlaces: 1 })
   @IsPositive()
+  @Max(5)
   readonly rating: number;
 }

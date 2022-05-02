@@ -296,6 +296,20 @@ model CourseReview {
   @@map("course_reviews")
 }
 
+model TeacherRating {
+  id        Int     @id @default(autoincrement())
+  teacherId Int     @map("teacher_id")
+  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  studentId Int     @map("student_id")
+  rating    Float   @map("rating")
+  student   Student @relation(fields: [studentId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("teacher_ratings")
+}
+
 model OlympiadReview {
   id         Int      @id @default(autoincrement())
   olympiadId Int      @map("olympiad_id")
@@ -320,6 +334,7 @@ model Student {
   grade                  Int?
   teachers               String?
   courses                Course[]
+  teacherRatings         TeacherRating[]
   courseApplications     CourseApplication[]
   olympiadApplications   OlympiadApplication[]
   attendances            CourseAttendance[]
@@ -337,6 +352,7 @@ model Teacher {
   courses             Course[]
   rating              Float    @default(0)
   about               String?
+  ratings             TeacherRating[]
   specialisations     String[] @map("specialisation")
   studentsTaughtCount Int      @default(0) @map("students_teached_count")
   telegramLink        String?  @map("telegram_link")

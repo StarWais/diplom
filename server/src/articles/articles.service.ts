@@ -189,11 +189,13 @@ export class ArticlesService {
             {
               title: {
                 contains: details.search || '',
+                mode: 'insensitive',
               },
             },
             {
               content: {
                 contains: details.search || '',
+                mode: 'insensitive',
               },
             },
           ],

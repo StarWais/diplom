@@ -170,6 +170,21 @@ export class CoursesService {
     }));
   }
 
+  async findMyTeachersCourses(currentUser: User) {
+    return this.prisma.course.findMany({
+      where: {
+        teacherId: currentUser.id,
+      },
+      include: {
+        _count: {
+          select: {
+            students: true,
+          },
+        },
+      },
+    });
+  }
+
   async findAll(details: GetCoursesFilter) {
     return Paginate<Course, Prisma.CourseFindManyArgs>(
       {

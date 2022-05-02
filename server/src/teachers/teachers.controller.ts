@@ -12,7 +12,11 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CreateTeacherDto, UpdateTeacherDto } from './dto/request';
+import {
+  CreateTeacherDto,
+  RateTeacherDto,
+  UpdateTeacherDto,
+} from './dto/request';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -53,6 +57,21 @@ export class TeachersController {
   @Get()
   async findMany(@Query() searchDetails: TeachersGetFilter) {
     return await this.teachersService.findAll(searchDetails);
+  }
+
+  @Roles(Role.ADMIN, Role.STUDENT)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Оценить учителя',
+  })
+  @Post(':id/rate')
+  async rate(
+    @Param() searchDetails: FindOneParams,
+    @Body() details: RateTeacherDto,
+    @CurrentUser() user,
+  ) {
+    await this.teachersService.rate(searchDetails, details, user);
   }
 
   @Roles(Role.ADMIN, Role.TEACHER)
