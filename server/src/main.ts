@@ -7,7 +7,11 @@ import { PrismaClientExceptionFilter, PrismaService } from 'nestjs-prisma';
 import helmet from 'helmet';
 
 import { AppModule } from './app/app.module';
-import { SwaggerOptions, ValidationPipeOptions } from './config/configuration';
+import {
+  DomainOptions,
+  SwaggerOptions,
+  ValidationPipeOptions,
+} from './config/configuration';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -37,11 +41,19 @@ async function bootstrap() {
     .setTitle(swaggerConfigOptions.title)
     .setDescription(swaggerConfigOptions.description)
     .setVersion(swaggerConfigOptions.version)
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, SwaggerOptions);
+
   SwaggerModule.setup(swaggerConfigOptions.swaggerPath, app, document);
 
   const port = config.get<number>('port');
+
+  // enable cors
+  app.enableCors({
+    credentials: true,
+    origin: config.get<DomainOptions>('domainOptions').frontend,
+  });
 
   //enable helmet
   app.use(helmet());

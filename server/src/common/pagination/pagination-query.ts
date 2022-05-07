@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsPositive } from 'class-validator';
+
 export class PaginationQuery {
   @IsOptional()
   @IsNumber()
@@ -9,6 +10,7 @@ export class PaginationQuery {
     example: 1,
     default: 1,
     required: false,
+    description: 'Номер страницы',
   })
   page?: number;
 
@@ -20,6 +22,7 @@ export class PaginationQuery {
     example: 20,
     required: false,
     default: 20,
+    description: 'Количество записей на странице',
   })
   limit?: number;
 }

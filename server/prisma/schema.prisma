@@ -45,17 +45,16 @@ model User {
   @@map("users")
 }
 
-
 model News {
-  id                  Int                  @id @default(autoincrement())
-  title               String               @map("title")
-  description         String               @map("description")
-  content             String               @map("content")
-  author              User                 @relation(fields: [authorId], references: [id])
-  authorId            Int                  @map("author_id")
-  imageLink           String               @map("image_link")
-  slug                String               @unique @map("slug")
-  tags                NewsTag[]
+  id          Int       @id @default(autoincrement())
+  title       String    @map("title")
+  description String    @map("description")
+  content     String    @map("content")
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    Int       @map("author_id")
+  imageLink   String    @map("image_link")
+  slug        String    @unique @map("slug")
+  tags        NewsTag[]
 
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -65,9 +64,9 @@ model News {
 }
 
 model NewsTag {
-  id       Int       @id @default(autoincrement())
-  news     News[]
-  name     String    @unique
+  id   Int    @id @default(autoincrement())
+  news News[]
+  name String @unique
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -127,12 +126,13 @@ model Olympiad {
   id                Int                       @id @default(autoincrement())
   name              String
   format            String
-  startDate         DateTime
   participationType OlympiadParticipationType
   grade             Int
   rating            Float                     @default(0)
-  taskExamples      OlympiadExampleTask[]
+  exampleTasksImages String[]                 @map("example_tasks_images")
+  imageLink         String                @map("image_link")
   steps             OlympiadStep[]
+  tags              OlympiadTag[]
   reviews           OlympiadReview[]
   rewards           String[]
   applications      OlympiadApplication[]
@@ -145,21 +145,160 @@ model Olympiad {
   @@map("olympiads")
 }
 
+model OlympiadApplication {
+  id         Int               @id @default(autoincrement())
+  olympiadId Int               @map("course_id")
+  olympiad   Olympiad          @relation(fields: [olympiadId], references: [id], onDelete: Cascade)
+  studentId  Int               @map("student_id")
+  student    Student           @relation(fields: [studentId], references: [id])
+  steps      OlympiadStep[]
+  status     ApplicationStatus @default(CREATED)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("olympiad_applications")
+}
+
+model OlympiadTag {
+  id   Int    @id @default(autoincrement())
+  olympiads Olympiad[]
+  name String @unique
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("olympiad_tags")
+}
+
 model OlympiadStep {
-  id           Int      @id @default(autoincrement())
-  name         String
-  step         Int
-  date         DateTime
-  timeDuration Int      @map("time_duration")
-  description  String
+  id          Int      @id @default(autoincrement())
+  name        String
+  step        Int
+  startDate   DateTime @map("start_date")
+  finishDate  DateTime      @map("finish_date")
+  description String
 
   olympiadId Int      @map("olympiad_id")
   olympiad   Olympiad @relation(fields: [olympiadId], references: [id])
+
+  applications OlympiadApplication[]
+
+  tasks        OlympiadTask[]
+  attempts     OlympiadStepAttempt[]
+  results      OlympiadStepResult[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("olympiad_steps")
+}
+
+model OlympiadStepResult {
+  id                 Int          @id @default(autoincrement())
+  olympiadStepId     Int          @map("olympiad_step_id")
+  olympiadStep       OlympiadStep @relation(fields: [olympiadStepId], references: [id])
+  studentId          Int          @map("student_id")
+  student            Student      @relation(fields: [studentId], references: [id])
+  nextStepAvailiable Boolean      @default(false)
+  place              Int          @default(0)
+
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+
+  @@map("olympiad_step_results")
+}
+
+model OlympiadStepAttempt {
+  id             Int          @id @default(autoincrement())
+  olympiadStepId Int          @map("olympiad_step_id")
+  olympiadStep   OlympiadStep @relation(fields: [olympiadStepId], references: [id])
+
+  studentId Int     @map("student_id")
+  student   Student @relation(fields: [studentId], references: [id])
+
+  attempts OlympiadTaskAnswerAttempt[]
+
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+
+  @@map("olympiad_step_attempts")
+}
+
+model OlympiadTask {
+  id             Int                         @id @default(autoincrement())
+  olympiadStepId Int                         @map("olympiad_step_id")
+  olympiadStep   OlympiadStep                @relation(fields: [olympiadStepId], references: [id])
+  task           String
+  description    String?
+  answerType     OlympiadTaskAnswerType
+  variants       OlympiadTaskAnswerVariant[]
+  attempts       OlympiadTaskAnswerAttempt[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+
+  @@map("olympiad_tasks")
+}
+
+model OlympiadTaskAnswerAttempt {
+  id             Int          @id @default(autoincrement())
+
+  olympiadTaskId Int          @map("olympiad_task_id")
+  olympiadTask   OlympiadTask @relation(fields: [olympiadTaskId], references: [id])
+
+  olympiadStepAttemptId Int?
+  olympiadStepAttempt   OlympiadStepAttempt? @relation(fields: [olympiadStepAttemptId], references: [id])
+
+  studentId Int     @map("student_id")
+  student   Student @relation(fields: [studentId], references: [id])
+
+  answers OlympiadTaskAnswerVariant[]
+  success Boolean                     @default(false)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("olympiad_task_answer_attempts")
+
+}
+
+model OlympiadTaskAnswerVariant {
+  id             Int          @id @default(autoincrement())
+  olympiadTaskId Int          @map("olympiad_task_id")
+  olympiadTask   OlympiadTask @relation(fields: [olympiadTaskId], references: [id])
+
+  taskAttempts OlympiadTaskAnswerAttempt[]
+
+  rightAnswer Boolean
+  points      Int
+  text        String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("olympiad_task_answer_variants")
+}
+
+model OlympiadReview {
+  id         Int      @id @default(autoincrement())
+  olympiadId Int      @map("olympiad_id")
+  olympiad   Olympiad @relation(fields: [olympiadId], references: [id], onDelete: Cascade)
+  authorId   Int      @map("author_id")
+  published  Boolean  @default(false)
+  author     User     @relation(fields: [authorId], references: [id])
+  rating     Float
+  text       String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("olympiad_reviews")
 }
 
 model Course {
@@ -249,35 +388,19 @@ model CourseApplication {
   @@map("course_applications")
 }
 
-
 model CourseAttendance {
-  id              Int               @id @default(autoincrement())
-  courseId        Int               @map("course_id")
-  studentId       Int               @map("student_id")
-  course          Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  student         Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  status          AttendanceStatus
-  date            DateTime
+  id        Int              @id @default(autoincrement())
+  courseId  Int              @map("course_id")
+  studentId Int              @map("student_id")
+  course    Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status    AttendanceStatus
+  date      DateTime
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("course_attendances")
-}
-
-model OlympiadApplication {
-  id         Int               @id @default(autoincrement())
-  olympiadId Int               @map("course_id")
-  olympiad   Olympiad          @relation(fields: [olympiadId], references: [id], onDelete: Cascade)
-  studentId  Int               @map("student_id")
-  student    Student           @relation(fields: [studentId], references: [id])
-  steps      Int[]
-  status     ApplicationStatus @default(CREATED)
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("olympiad_applications")
 }
 
 model CourseReview {
@@ -299,7 +422,7 @@ model CourseReview {
 model TeacherRating {
   id        Int     @id @default(autoincrement())
   teacherId Int     @map("teacher_id")
-  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   studentId Int     @map("student_id")
   rating    Float   @map("rating")
   student   Student @relation(fields: [studentId], references: [id])
@@ -310,34 +433,21 @@ model TeacherRating {
   @@map("teacher_ratings")
 }
 
-model OlympiadReview {
-  id         Int      @id @default(autoincrement())
-  olympiadId Int      @map("olympiad_id")
-  olympiad   Olympiad @relation(fields: [olympiadId], references: [id], onDelete: Cascade)
-  authorId   Int      @map("author_id")
-  published  Boolean  @default(false)
-  author     User     @relation(fields: [authorId], references: [id])
-  rating     Float
-  text       String
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("olympiad_reviews")
-}
-
 model Student {
-  id                     Int                   @id @default(autoincrement())
-  userId                 Int                   @unique @map("user_id")
-  user                   User                  @relation(fields: [userId], references: [id])
-  educationalInstitution String?               @map("educational_institution")
-  grade                  Int?
-  teachers               String?
-  courses                Course[]
-  teacherRatings         TeacherRating[]
-  courseApplications     CourseApplication[]
-  olympiadApplications   OlympiadApplication[]
-  attendances            CourseAttendance[]
+  id                         Int                         @id @default(autoincrement())
+  userId                     Int                         @unique @map("user_id")
+  user                       User                        @relation(fields: [userId], references: [id])
+  educationalInstitution     String?                     @map("educational_institution")
+  grade                      Int?
+  teachers                   String?
+  courses                    Course[]
+  teacherRatings             TeacherRating[]
+  courseApplications         CourseApplication[]
+  olympiadApplications       OlympiadApplication[]
+  olympiadTaskAnswerAttempts OlympiadTaskAnswerAttempt[]
+  attendances                CourseAttendance[]
+  olympiadStepResults  OlympiadStepResult[]
+  olympiadStepAttempts OlympiadStepAttempt[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -346,20 +456,20 @@ model Student {
 }
 
 model Teacher {
-  id                  Int      @id @default(autoincrement())
-  userId              Int      @unique @map("user_id")
-  user                User     @relation(fields: [userId], references: [id])
+  id                  Int             @id @default(autoincrement())
+  userId              Int             @unique @map("user_id")
+  user                User            @relation(fields: [userId], references: [id])
   courses             Course[]
-  rating              Float    @default(0)
+  rating              Float           @default(0)
   about               String?
   ratings             TeacherRating[]
-  specialisations     String[] @map("specialisation")
-  studentsTaughtCount Int      @default(0) @map("students_teached_count")
-  telegramLink        String?  @map("telegram_link")
-  whatsappLink        String?  @map("whatsapp_link")
-  viberLink           String?  @map("viber_link")
-  vkLink              String?  @map("vk_link")
-  skypeLink           String?  @map("skype_link")
+  specialisations     String[]        @map("specialisation")
+  studentsTaughtCount Int             @default(0) @map("students_teached_count")
+  telegramLink        String?         @map("telegram_link")
+  whatsappLink        String?         @map("whatsapp_link")
+  viberLink           String?         @map("viber_link")
+  vkLink              String?         @map("vk_link")
+  skypeLink           String?         @map("skype_link")
 
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -439,19 +549,6 @@ model ArticleTag {
   @@map("article_tags")
 }
 
-model OlympiadExampleTask {
-  id     Int      @id @default(autoincrement())
-  images String[]
-
-  olympiadId Int      @map("olympiad_id")
-  olympiad   Olympiad @relation(fields: [olympiadId], references: [id])
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("olympiad_example_tasks")
-}
-
 enum Role {
   ADMIN
   STUDENT
@@ -489,4 +586,14 @@ enum AttendanceStatus {
   PRESENT
   ABSENT
   ABSENT_WITH_REASON
+}
+
+enum OlympiadTaskAnswerType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+}
+
+enum OlympiadAttemptStatus {
+  PENDING
+  FULFILLED
 }

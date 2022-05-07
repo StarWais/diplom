@@ -13,17 +13,18 @@ import {
   ThrottlerConfigService,
 } from '../config/services';
 import { validationSchema } from '../config/env/env-validation';
-import { AuthModule } from '../auth/auth.module';
-import { UsersModule } from '../users/users.module';
-import { ArticlesModule } from 'src/articles/articles.module';
-import { CoursesModule } from '../courses/courses.module';
-import { StudentsModule } from '../students/students.module';
-import { TeachersModule } from '../teachers/teachers.module';
-import { ImagesModule } from '../common/images/images.module';
-import { InfoModule } from '../info/info.module';
+import { AuthModule } from '../modules/auth/auth.module';
+import { UsersModule } from '../modules/users/users.module';
+import { ArticlesModule } from 'src/modules/articles/articles.module';
+import { CoursesModule } from '../modules/courses/courses.module';
+import { StudentsModule } from '../modules/students/students.module';
+import { TeachersModule } from '../modules/teachers/teachers.module';
+import { ImagesModule } from '../modules/images/images.module';
+import { InfoModule } from '../modules/info/info.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { join } from 'path';
-import { NewsModule } from '../news/news.module';
+import { NewsModule } from '../modules/news/news.module';
+import { OlympicsModule } from '../modules/olympics/olympics.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { NewsModule } from '../news/news.module';
     TeachersModule,
     InfoModule,
     NewsModule,
+    OlympicsModule,
   ],
   controllers: [],
   providers: [
