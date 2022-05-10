@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class FindOneBySlugParams {
   @ApiProperty({
-    example: 1,
+    example: 'this-is-a-slug',
     required: true,
     type: 'string',
     description: 'Slug ресурса',

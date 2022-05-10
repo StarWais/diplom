@@ -6,10 +6,11 @@ import { Prisma, User } from '@prisma/client';
 import { NewsGetFilter } from '../filters/news-get.filter';
 import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
 import { NewsCreateDto, NewsUpdateDto } from '../dto/request';
-import { ImagesService } from '../../images/images.service';
+import { ImagesService } from '../../images/services';
 import { NewsInclude } from '../interfaces';
-import { NewsDto, NewsTagDto } from '../dto/response';
+import { NewsDto, NewsListedDto, NewsTagDto } from '../dto/response';
 import { NewsNotFoundException } from '../exceptions';
+import { FindOneByIDParams } from '../../../common/params';
 
 @Injectable()
 export class NewsService {
@@ -24,8 +25,9 @@ export class NewsService {
     },
   };
 
-  async findMany(details: NewsGetFilter): Promise<PaginatedDto<NewsDto>> {
-    return Paginate<NewsDto, Prisma.NewsFindManyArgs>(
+  async findMany(details: NewsGetFilter): Promise<PaginatedDto<NewsListedDto>> {
+    return Paginate<Prisma.NewsFindManyArgs>(
+      NewsListedDto,
       {
         limit: details.limit,
         page: details.page,
@@ -65,10 +67,16 @@ export class NewsService {
         orderBy: {
           createdAt: 'desc',
         },
-        ...this.newsInclude,
       },
-      (news) => new NewsDto(news),
+      (news) => new NewsListedDto(news),
     );
+  }
+
+  async delete(searchParams: FindOneByIDParams): Promise<void> {
+    await this.findOneOrThrowError(searchParams);
+    await this.prisma.news.delete({
+      where: searchParams,
+    });
   }
 
   private async generateSlug(title: string): Promise<string> {
@@ -91,13 +99,14 @@ export class NewsService {
   }
 
   async tags(): Promise<Array<NewsTagDto>> {
-    return this.prisma.newsTag.findMany();
+    const results = await this.prisma.newsTag.findMany();
+    return results.map((tag) => new NewsTagDto(tag));
   }
 
   async create(details: NewsCreateDto, currentUser: User): Promise<NewsDto> {
     const { image, tags, ...rest } = details;
     const slug = await this.generateSlug(details.title);
-    const imageLink = await this.imageService.saveImage(image);
+    const imageLink = await this.imageService.save(image);
     const result = await this.prisma.news.create({
       data: {
         ...rest,
@@ -128,9 +137,7 @@ export class NewsService {
   ): Promise<NewsDto> {
     await this.findOneOrThrowError(searchDetails);
     const { image, tags, ...rest } = details;
-    const imageLink = image
-      ? await this.imageService.saveImage(image)
-      : undefined;
+    const imageLink = image ? await this.imageService.save(image) : undefined;
     const result = await this.prisma.news.update({
       where: searchDetails,
       data: {

@@ -24,7 +24,12 @@ async function bootstrap() {
     config.get<ValidationPipeOptions>('validatorOptions');
 
   app.useGlobalPipes(new ValidationPipe(validatorOptions));
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(app.get(Reflector), {
+      strategy: 'excludeAll',
+    }),
+  );
+
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   // enable shutdown hook

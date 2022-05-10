@@ -16,15 +16,11 @@ import { validationSchema } from '../config/env/env-validation';
 import { AuthModule } from '../modules/auth/auth.module';
 import { UsersModule } from '../modules/users/users.module';
 import { ArticlesModule } from 'src/modules/articles/articles.module';
-import { CoursesModule } from '../modules/courses/courses.module';
-import { StudentsModule } from '../modules/students/students.module';
-import { TeachersModule } from '../modules/teachers/teachers.module';
-import { ImagesModule } from '../modules/images/images.module';
-import { InfoModule } from '../modules/info/info.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { join } from 'path';
+import { ImagesModule } from '../modules/images/images.module';
 import { NewsModule } from '../modules/news/news.module';
-import { OlympicsModule } from '../modules/olympics/olympics.module';
+import { CoursesModule } from '../modules/courses/courses.module';
 
 @Module({
   imports: [
@@ -54,11 +50,11 @@ import { OlympicsModule } from '../modules/olympics/olympics.module';
     AuthModule,
     ArticlesModule,
     CoursesModule,
-    StudentsModule,
-    TeachersModule,
-    InfoModule,
+    // StudentsModule,
+    // TeachersModule,
+    // InfoModule,
     NewsModule,
-    OlympicsModule,
+    // OlympicsModule,
   ],
   controllers: [],
   providers: [

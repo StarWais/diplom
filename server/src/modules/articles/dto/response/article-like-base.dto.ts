@@ -1,9 +1,11 @@
 import { ArticleLike } from '@prisma/client';
-
-import { BaseAbstractDto } from '../../../../common/dto/response/base-abstract.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
+import { BaseAbstractDto } from '../../../../common/dto/response';
+import { Expose } from 'class-transformer';
+
 export class ArticleLikeBaseDto extends BaseAbstractDto implements ArticleLike {
+  @Expose()
   @ApiProperty({
     description: 'ID статьи',
     example: 1,
@@ -11,6 +13,7 @@ export class ArticleLikeBaseDto extends BaseAbstractDto implements ArticleLike {
   })
   readonly articleId: number;
 
+  @Expose()
   @ApiProperty({
     description: 'ID пользователя',
     example: 1,

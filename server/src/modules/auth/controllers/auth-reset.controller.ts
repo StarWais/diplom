@@ -11,20 +11,20 @@ import { AuthResetService } from '../services';
 import { CurrentBrowserInfo } from '../../../common/decorators';
 import { BrowserInfo } from '../../../common/decorators/browser-info.decorator';
 
-@ApiTags('Авторизация')
+@ApiTags('Сброс пароля')
 @Controller('auth/reset')
 export class AuthResetController {
   constructor(private readonly authResetService: AuthResetService) {}
 
   @Post()
   @ApiOperation({
-    summary: 'Изменить пароль',
+    summary: 'Сбросить пароль',
   })
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiAcceptedResponse({
-    description: 'Письмо смены пароля отправлено',
+    description: 'Письмо сброса пароля отправлено',
   })
-  async resetPassword(
+  async reset(
     @Body() details: PasswordResetDto,
     @CurrentBrowserInfo() browserInfo: BrowserInfo,
   ): Promise<void> {
@@ -33,15 +33,13 @@ export class AuthResetController {
 
   @Post('confirm')
   @ApiOperation({
-    summary: 'Подтвердить изменение пароля',
+    summary: 'Подтвердить сброс пароля',
   })
   @ApiNoContentResponse({
     description: 'Пароль успешно изменен',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  async confirmPasswordReset(
-    @Body() details: ConfirmPasswordResetDto,
-  ): Promise<void> {
+  async confirm(@Body() details: ConfirmPasswordResetDto): Promise<void> {
     await this.authResetService.confirmPasswordReset(details);
   }
 }

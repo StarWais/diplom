@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Prisma, User } from '@prisma/client';
 
-import { ArticleCommentCreateDto } from '../dto/request';
-import { ArticleCommentDto } from '../dto/response';
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
-import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
-import { FindArticleCommentParams, FindByArticleIdParams } from '../params';
-import { CommentNotFoundException } from '../exceptions';
 import { ArticleCommentInclude } from '../interfaces';
 import { ArticlesService } from './articles.service';
+import { FindArticleCommentParams, FindByArticleIdParams } from '../params';
+import { ArticleCommentNotFoundException } from '../exceptions';
+import { PaginationQuery } from '../../../common/pagination/pagination-query';
+import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
+import { ArticleCommentCreateDto } from '../dto/request';
+import { ArticleCommentDto } from '../dto/response';
 
 @Injectable()
 export class ArticlesCommentsService {
@@ -18,21 +18,23 @@ export class ArticlesCommentsService {
     private readonly articlesService: ArticlesService,
   ) {}
 
-  private articleCommentIncludes: ArticleCommentInclude = {
+  private readonly articleCommentIncludes: ArticleCommentInclude = {
     include: {
       author: true,
     },
   };
 
-  private async checkIfCommentExistsOrThrowError(
+  async findOneOrThrowError(
     searchDetails: FindArticleCommentParams,
-  ): Promise<void> {
-    const comment = await this.prisma.articleComment.findFirst({
+  ): Promise<ArticleCommentDto> {
+    const result = await this.prisma.articleComment.findFirst({
       where: searchDetails,
+      ...this.articleCommentIncludes,
     });
-    if (!comment) {
-      throw new CommentNotFoundException(searchDetails.id);
+    if (!result) {
+      throw new ArticleCommentNotFoundException(searchDetails.id);
     }
+    return new ArticleCommentDto(result);
   }
 
   async create(
@@ -73,7 +75,8 @@ export class ArticlesCommentsService {
     await this.articlesService.findOneOrThrowError({
       id: articleId,
     });
-    return Paginate<ArticleCommentDto, Prisma.ArticleCommentFindManyArgs>(
+    return Paginate<Prisma.ArticleCommentFindManyArgs>(
+      ArticleCommentDto,
       paginationDetails,
       this.prisma,
       'articleComment',
@@ -91,7 +94,7 @@ export class ArticlesCommentsService {
   }
 
   async delete(searchDetails: FindArticleCommentParams): Promise<void> {
-    await this.checkIfCommentExistsOrThrowError(searchDetails);
+    await this.findOneOrThrowError(searchDetails);
     await this.prisma.articleComment.delete({
       where: searchDetails,
     });

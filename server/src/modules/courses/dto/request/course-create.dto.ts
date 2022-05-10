@@ -11,10 +11,10 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
+  CourseEducationStepCreateDto,
   CourseModuleCreateDto,
-  CourseStepCreateDto,
   CourseTagCreateDto,
 } from './index';
 import {
@@ -81,7 +81,6 @@ export class CourseCreateDto {
   })
   @IsArray()
   @ArrayMinSize(1)
-  @Type(() => String)
   readonly possibilities: string[];
 
   @ApiProperty({
@@ -116,31 +115,18 @@ export class CourseCreateDto {
 
   @ApiProperty({
     isArray: true,
-    type: () => CourseStepCreateDto,
-    example: [
-      {
-        step: 1,
-        title: 'Начало курса',
-        text: 'Описание начала курса',
-      },
-    ],
+    type: () => CourseEducationStepCreateDto,
   })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CourseStepCreateDto)
+  @Type(() => CourseEducationStepCreateDto)
   @ArrayMaxSize(5)
   @ArrayMinSize(1)
-  readonly steps: CourseStepCreateDto[];
+  readonly steps: CourseEducationStepCreateDto[];
 
   @ApiProperty({
     isArray: true,
     type: () => CourseModuleCreateDto,
-    example: [
-      {
-        name: 'Модуль 1',
-        description: 'Описание модуля 1',
-      },
-    ],
   })
   @IsArray()
   @ValidateNested({ each: true })
@@ -167,6 +153,10 @@ export class CourseCreateDto {
   @MaxLength(100)
   readonly eripNumber: string;
 
+  constructor(partial: Partial<CourseCreateDto>) {
+    Object.assign(this, partial);
+  }
+
   @ApiProperty({
     type: 'file',
   })
@@ -181,4 +171,9 @@ export class CourseCreateDto {
     'image/webp',
   ])
   image: FileSystemStoredFile;
+
+  @Expose()
+  get placesAvailable(): number {
+    return this.capacity;
+  }
 }

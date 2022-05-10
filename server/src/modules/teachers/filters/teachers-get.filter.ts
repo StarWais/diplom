@@ -9,7 +9,7 @@ export class TeachersGetFilter extends PaginationQuery {
   @IsArray()
   @ApiProperty({
     example: 'программирование,математика',
-    isArray: true,
+    description: 'Список категорий через запятую',
     type: 'string',
     required: false,
   })
@@ -18,7 +18,8 @@ export class TeachersGetFilter extends PaginationQuery {
   @IsOptional()
   @ApiProperty({
     type: 'string',
-    example: 'текст поиска',
+    example: 'Иван',
+    description: 'Текст поиска',
     required: false,
   })
   search?: string;

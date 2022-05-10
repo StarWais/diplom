@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { ArticleStatus, Prisma, User } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { MailerService } from '@nestjs-modules/mailer';
-import slugify from 'slugify';
-
-import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
-import { ArticleCreateDto, ArticleUpdateDto } from '../dto/request';
-import { ArticlesGetFilter } from '../filters';
-import { UsersService } from '../../users/users.service';
-import { ArticleInclude } from '../interfaces';
+import { UsersService } from '../../users/services';
 import { ArticleDto, ArticleListedDto, ArticleTagDto } from '../dto/response';
+import { ArticleCreateDto, ArticleUpdateDto } from '../dto/request';
+import { Prisma, PublishingStatus, User } from '@prisma/client';
+import slugify from 'slugify';
+import { ArticleInclude } from '../interfaces';
+import { ArticlesGetFilter } from '../filters';
 import { ArticleNotFoundException } from '../exceptions';
+import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
 
 @Injectable()
 export class ArticlesService {
@@ -20,7 +19,7 @@ export class ArticlesService {
     private readonly usersService: UsersService,
   ) {}
 
-  private articleIncludes: ArticleInclude = {
+  private readonly articleIncludes: ArticleInclude = {
     include: {
       tags: true,
       author: true,
@@ -29,7 +28,7 @@ export class ArticlesService {
     },
   };
 
-  private articleListedIncludes: ArticleInclude = {
+  private readonly articleListedIncludes: ArticleInclude = {
     include: {
       tags: true,
       author: true,
@@ -48,8 +47,8 @@ export class ArticlesService {
         content,
         slug,
         status: currentUser.canPublish
-          ? ArticleStatus.PUBLISHED
-          : ArticleStatus.DRAFT,
+          ? PublishingStatus.PUBLISHED
+          : PublishingStatus.DRAFT,
         tags: {
           connectOrCreate: tags.map((tag) => ({
             where: {
@@ -71,7 +70,7 @@ export class ArticlesService {
 
     const article = new ArticleDto(result);
 
-    if (article.status === ArticleStatus.DRAFT) {
+    if (article.status === PublishingStatus.DRAFT) {
       await this.notifyAdminsOnArticleCreate(article);
     }
     return article;
@@ -115,11 +114,10 @@ export class ArticlesService {
     const result = await this.prisma.article.update({
       where: details,
       data: {
-        status: ArticleStatus.PUBLISHED,
+        status: PublishingStatus.PUBLISHED,
       },
       ...this.articleIncludes,
     });
-
     return new ArticleDto(result);
   }
 
@@ -131,8 +129,9 @@ export class ArticlesService {
   async findMany(
     details: ArticlesGetFilter,
     ignoreDrafts = false,
-  ): Promise<PaginatedDto<ArticleListedDto>> {
-    return Paginate<ArticleListedDto, Prisma.ArticleFindManyArgs>(
+  ): Promise<PaginatedDto<ArticleDto>> {
+    return Paginate<Prisma.ArticleFindManyArgs>(
+      ArticleListedDto,
       {
         limit: details.limit,
         page: details.page,
@@ -141,7 +140,7 @@ export class ArticlesService {
       'article',
       {
         where: {
-          status: ignoreDrafts ? undefined : ArticleStatus.PUBLISHED,
+          status: ignoreDrafts ? undefined : PublishingStatus.PUBLISHED,
           authorId: details.authorId,
           tags: {
             some: {
@@ -184,21 +183,6 @@ export class ArticlesService {
     return !!article;
   }
 
-  private async generateSlug(title: string): Promise<string> {
-    let slug = slugify(title, {
-      replacement: '-',
-      lower: true,
-      locale: 'ru',
-    });
-
-    const slugExists = await this.slugExists(slug);
-
-    if (slugExists) {
-      slug += `-${Date.now()}`;
-    }
-    return slug;
-  }
-
   async update(
     searchDetails: Prisma.ArticleWhereUniqueInput,
     details: ArticleUpdateDto,
@@ -208,6 +192,7 @@ export class ArticlesService {
     const result = await this.prisma.article.update({
       where: searchDetails,
       data: {
+        title,
         ...rest,
         slug: title ? await this.generateSlug(title) : undefined,
         tags: tags
@@ -227,6 +212,22 @@ export class ArticlesService {
       ...this.articleIncludes,
     });
     return new ArticleDto(result);
+  }
+
+  //
+  private async generateSlug(title: string): Promise<string> {
+    let slug = slugify(title, {
+      replacement: '-',
+      lower: true,
+      locale: 'ru',
+    });
+
+    const slugExists = await this.slugExists(slug);
+
+    if (slugExists) {
+      slug += `-${Date.now()}`;
+    }
+    return slug;
   }
 
   async delete(details: Prisma.ArticleWhereUniqueInput): Promise<void> {

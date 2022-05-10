@@ -7,13 +7,13 @@ import {
   ConfirmationTokenOptions,
   DomainOptions,
 } from '../../../config/configuration';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { HelpersMethods } from '../../../common/helpers/helpers.methods';
 import { ConfirmPasswordResetDto, PasswordResetDto } from '../dto/request';
 import { PasswordsMustBeDifferentException } from '../exceptions';
-import { UsersService } from '../../users/users.service';
+import { UsersService } from '../../users/services';
 import { BrowserInfo } from '../../../common/decorators/browser-info.decorator';
 import { AuthService } from './auth.service';
 

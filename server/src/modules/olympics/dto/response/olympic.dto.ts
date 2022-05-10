@@ -57,9 +57,4 @@ export class OlympicDto extends BaseAbstractDto {
     type: () => [OlympicTagDto],
   })
   readonly tags: OlympicTagDto[];
-
-  constructor(partial: Partial<OlympicDto>) {
-    super(partial);
-    Object.assign(this, partial);
-  }
 }

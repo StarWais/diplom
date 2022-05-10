@@ -7,12 +7,12 @@ export class CourseApplicationCreateDto {
   })
   @IsNotEmpty()
   @MaxLength(255)
-  readonly appliciantName: string;
+  readonly applicantName: string;
 
   @ApiProperty({
     example: 'Иванов Иван Иванович',
   })
   @IsNotEmpty()
   @IsPhoneNumber('BY')
-  readonly appliciantPhone: string;
+  readonly applicantPhone: string;
 }

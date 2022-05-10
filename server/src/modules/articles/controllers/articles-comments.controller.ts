@@ -10,30 +10,31 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Role, User } from '@prisma/client';
 
 import { ArticlesCommentsService } from '../services';
-import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiNoContentResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { ArticleCommentDto } from '../dto/response';
 import { ArticleCommentCreateDto } from '../dto/request';
-import { CurrentUser } from '../../../common/decorators';
 import {
   ApiPaginatedResponse,
   PaginatedDto,
 } from '../../../common/pagination/pagination';
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
-import { Roles } from '../../auth/decorators/roles.decorator';
+import { Role, User } from '@prisma/client';
+import { CurrentUser } from '../../../common/decorators';
+import { ArticleCommentDto } from '../dto/response';
+import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
 import { FindArticleCommentParams, FindByArticleIdParams } from '../params';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { PaginationQuery } from '../../../common/pagination/pagination-query';
 
 @Controller('articles/:articleId/comments')
-@ApiTags('Статьи')
+@ApiTags('Комментарии к статьям')
 export class ArticlesCommentsController {
   constructor(
     private readonly articleCommentsService: ArticlesCommentsService,
@@ -49,7 +50,7 @@ export class ArticlesCommentsController {
   })
   @ApiBearerAuth()
   @Post()
-  async createComment(
+  async create(
     @Param() searchDetails: FindByArticleIdParams,
     @Body() details: ArticleCommentCreateDto,
     @CurrentUser() currentUser: User,
@@ -61,10 +62,24 @@ export class ArticlesCommentsController {
     );
   }
 
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Получить коментарий к статье',
+  })
+  @ApiOkResponse({
+    type: ArticleCommentDto,
+    description: 'Коментарий к статье',
+  })
+  async findOne(
+    @Param() searchDetails: FindArticleCommentParams,
+  ): Promise<ArticleCommentDto> {
+    return this.articleCommentsService.findOneOrThrowError(searchDetails);
+  }
+
   @ApiOperation({ summary: 'Получить коментарии к статье' })
   @ApiPaginatedResponse(ArticleCommentDto)
   @Get()
-  async findComments(
+  async findMany(
     @Param() searchDetails: FindByArticleIdParams,
     @Query() paginationDetails: PaginationQuery,
   ): Promise<PaginatedDto<ArticleCommentDto>> {
@@ -79,14 +94,14 @@ export class ArticlesCommentsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth()
   @ApiNoContentResponse({
-    description: 'Коментарий удален',
+    description: 'Коментарий к статье удален',
   })
   @ApiOperation({
     summary: 'Удалить коментарий к статье',
     description: 'Доступно только администратору',
   })
   @Delete(':id')
-  async deleteComment(
+  async delete(
     @Param() searchDetails: FindArticleCommentParams,
   ): Promise<void> {
     await this.articleCommentsService.delete(searchDetails);

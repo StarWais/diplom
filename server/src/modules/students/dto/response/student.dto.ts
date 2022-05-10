@@ -1,16 +1,9 @@
 import { Student } from '@prisma/client';
-
-import { BaseAbstractDto } from '../../../../common/dto/response/base-abstract.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class StudentDto extends BaseAbstractDto implements Student {
-  @ApiProperty({
-    description: 'ID пользователя',
-    example: 1,
-    type: 'integer',
-  })
-  userId: number;
+import { BaseAbstractDto } from '../../../../common/dto/response';
 
+export class StudentDto extends BaseAbstractDto implements Student {
   @ApiProperty({
     description: 'Название учереждения образования пользователя',
     example: 'Гродненская городская Гимназия',
@@ -33,9 +26,4 @@ export class StudentDto extends BaseAbstractDto implements Student {
     nullable: true,
   })
   teachers: string | null;
-
-  constructor(partial: Partial<StudentDto>) {
-    super(partial);
-    Object.assign(this, partial);
-  }
 }

@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -13,14 +16,15 @@ import {
   ApiConsumes,
   ApiCreatedResponse,
   ApiExtraModels,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { FormDataRequest } from 'nestjs-form-data';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 
-import { NewsService } from '../services/news.service';
+import { NewsService } from '../services';
 import { NewsGetFilter } from '../filters/news-get.filter';
 import { CurrentUser } from '../../../common/decorators';
 import { Roles } from '../../auth/decorators/roles.decorator';
@@ -31,10 +35,10 @@ import {
   ApiPaginatedResponse,
   PaginatedDto,
 } from '../../../common/pagination/pagination';
-import { NewsDto, NewsTagDto } from '../dto/response';
+import { NewsDto, NewsListedDto, NewsTagDto } from '../dto/response';
 
 @ApiTags('Новости')
-@ApiExtraModels(PaginatedDto)
+@ApiExtraModels(PaginatedDto, NewsListedDto)
 @Controller('news')
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
@@ -42,11 +46,11 @@ export class NewsController {
   @ApiOperation({
     summary: 'Получить список новостей',
   })
-  @ApiPaginatedResponse(NewsDto)
+  @ApiPaginatedResponse(NewsListedDto)
   @Get()
   async findMany(
     @Query() filter: NewsGetFilter,
-  ): Promise<PaginatedDto<NewsDto>> {
+  ): Promise<PaginatedDto<NewsListedDto>> {
     return this.newsService.findMany(filter);
   }
 
@@ -66,7 +70,7 @@ export class NewsController {
   @Post()
   async create(
     @Body() details: NewsCreateDto,
-    @CurrentUser() currentUser,
+    @CurrentUser() currentUser: User,
   ): Promise<NewsDto> {
     return this.newsService.create(details, currentUser);
   }
@@ -86,17 +90,18 @@ export class NewsController {
   @FormDataRequest()
   @Patch(':id')
   async update(
-    @Param() searchDetails: FindOneByIDParams,
+    @Param() searchParams: FindOneByIDParams,
     @Body() details: NewsUpdateDto,
-  ) {
-    return this.newsService.update(searchDetails, details);
+  ): Promise<NewsDto> {
+    return this.newsService.update(searchParams, details);
   }
 
   @ApiOperation({
     summary: 'Получить теги новостей',
   })
   @ApiOkResponse({
-    type: [NewsTagDto],
+    type: NewsTagDto,
+    isArray: true,
     description: 'Теги новостей',
   })
   @Get('tags')
@@ -110,7 +115,23 @@ export class NewsController {
     description: 'Новость',
   })
   @Get(':slug')
-  async findOne(@Param() searchDetails: FindOneBySlugParams): Promise<NewsDto> {
-    return this.newsService.findOneOrThrowError(searchDetails);
+  async findOne(@Param() searchParams: FindOneBySlugParams): Promise<NewsDto> {
+    return this.newsService.findOneOrThrowError(searchParams);
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Удалить новость',
+    description: 'Доступно только администратору',
+  })
+  @ApiNoContentResponse({
+    description: 'Новость удалена',
+  })
+  @Delete(':id')
+  async delete(@Param() searchParams: FindOneByIDParams): Promise<void> {
+    return this.newsService.delete(searchParams);
   }
 }

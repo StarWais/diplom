@@ -2,8 +2,10 @@ import { News } from '@prisma/client';
 import { BaseAbstractDto } from '../../../../common/dto/response';
 import { ApiProperty } from '@nestjs/swagger';
 import { NewsTagDto } from './news-tag.dto';
+import { Expose, Type } from 'class-transformer';
 
 export class NewsDto extends BaseAbstractDto implements News {
+  @Expose()
   @ApiProperty({
     description: 'Заголовок новости',
     type: 'string',
@@ -11,6 +13,7 @@ export class NewsDto extends BaseAbstractDto implements News {
   })
   readonly title: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Slug новости',
     type: 'string',
@@ -18,6 +21,7 @@ export class NewsDto extends BaseAbstractDto implements News {
   })
   readonly slug: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Описание новости',
     type: 'string',
@@ -25,6 +29,7 @@ export class NewsDto extends BaseAbstractDto implements News {
   })
   readonly description: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Ссылка на картинку новости',
     type: 'string',
@@ -32,6 +37,7 @@ export class NewsDto extends BaseAbstractDto implements News {
   })
   readonly imageLink: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Текст новости',
     type: 'string',
@@ -40,6 +46,7 @@ export class NewsDto extends BaseAbstractDto implements News {
   })
   readonly content: string;
 
+  @Expose()
   @ApiProperty({
     description: 'ID автора новости',
     type: 'number',
@@ -47,10 +54,13 @@ export class NewsDto extends BaseAbstractDto implements News {
   })
   readonly authorId: number;
 
+  @Expose()
   @ApiProperty({
     description: 'Тэги новости',
-    type: () => [NewsTagDto],
+    type: () => NewsTagDto,
+    isArray: true,
   })
+  @Type(() => NewsTagDto)
   readonly tags: Array<NewsTagDto>;
 
   constructor(partial: Partial<NewsDto>) {

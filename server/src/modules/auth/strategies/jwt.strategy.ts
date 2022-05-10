@@ -1,10 +1,10 @@
 import { User } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
 
-import { UsersService } from '../../users/users.service';
+import { UsersService } from '../../users/services';
 import { AuthOptions } from '../../../config/configuration';
 
 export interface JWTPayload {

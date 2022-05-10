@@ -19,8 +19,9 @@ export class CourseAttendanceCreateDto {
   readonly status: AttendanceStatus;
 
   @ApiProperty({
-    example: Date.now(),
+    description: 'Дата посещения',
     type: 'date-time',
+    example: '2020-01-01T00:00:00.000Z',
   })
   @IsNotEmpty()
   @IsDate()

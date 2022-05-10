@@ -1,4 +1,4 @@
-import { Article, ArticleStatus } from '@prisma/client';
+import { PublishingStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { BaseAbstractDto } from '../../../../common/dto/response';
@@ -8,8 +8,10 @@ import {
   ArticleLikeDto,
   ArticleTagDto,
 } from './index';
+import { Expose, Type } from 'class-transformer';
 
-export class ArticleDto extends BaseAbstractDto implements Article {
+export class ArticleDto extends BaseAbstractDto {
+  @Expose()
   @ApiProperty({
     description: 'Заголовок статьи',
     type: 'string',
@@ -17,6 +19,7 @@ export class ArticleDto extends BaseAbstractDto implements Article {
   })
   readonly title: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Slug статьи',
     type: 'string',
@@ -24,6 +27,7 @@ export class ArticleDto extends BaseAbstractDto implements Article {
   })
   readonly slug: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Текст статьи',
     type: 'string',
@@ -32,6 +36,7 @@ export class ArticleDto extends BaseAbstractDto implements Article {
   })
   readonly content: string;
 
+  @Expose()
   @ApiProperty({
     description: 'ID автора статьи',
     type: 'number',
@@ -39,6 +44,7 @@ export class ArticleDto extends BaseAbstractDto implements Article {
   })
   readonly authorId: number;
 
+  @Expose()
   @ApiProperty({
     description: 'Кол-во просмотров статьи',
     type: 'number',
@@ -46,35 +52,47 @@ export class ArticleDto extends BaseAbstractDto implements Article {
   })
   readonly views: number;
 
+  @Expose()
   @ApiProperty({
     description: 'Тэги статьи',
-    type: () => [ArticleTagDto],
+    type: () => ArticleTagDto,
+    isArray: true,
   })
+  @Type(() => ArticleTagDto)
   readonly tags: Array<ArticleTagDto>;
 
+  @Expose()
   @ApiProperty({
     description: 'Лайки статьи',
-    type: () => [ArticleLikeDto],
+    type: () => ArticleLikeDto,
+    isArray: true,
   })
+  @Type(() => ArticleDislikeDto)
   readonly likes: Array<ArticleLikeDto>;
 
+  @Expose()
   @ApiProperty({
     description: 'Дизлайки статьи',
-    type: () => [ArticleDislikeDto],
+    type: () => ArticleDislikeDto,
+    isArray: true,
   })
+  @Type(() => ArticleDislikeDto)
   readonly dislikes: Array<ArticleDislikeDto>;
 
+  @Expose()
   @ApiProperty({
     description: 'Статус статьи',
-    enum: ArticleStatus,
-    example: ArticleStatus.PUBLISHED,
+    enum: PublishingStatus,
+    example: PublishingStatus.PUBLISHED,
   })
-  readonly status: ArticleStatus;
+  readonly status: PublishingStatus;
 
+  @Expose()
   @ApiProperty({
     description: 'Автор статьи',
     type: () => ArticleAuthorDto,
   })
+  @Type(() => ArticleAuthorDto)
   readonly author: ArticleAuthorDto;
 
   constructor(partial: Partial<ArticleDto>) {

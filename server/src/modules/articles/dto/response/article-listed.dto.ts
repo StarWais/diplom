@@ -6,7 +6,8 @@ export class ArticleListedDto extends OmitType(ArticleDto, [
   'dislikes',
   'views',
 ] as const) {
-  constructor(article: Partial<ArticleDto>) {
-    super(article);
+  constructor(partial: Partial<ArticleListedDto>) {
+    super(partial);
+    Object.assign(this, partial);
   }
 }

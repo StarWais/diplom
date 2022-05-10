@@ -3,7 +3,7 @@ import { Prisma, RegistrationToken, TokenStatus, User } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 
 import {
   ConfirmationTokenOptions,
@@ -13,7 +13,7 @@ import { BrowserInfo } from '../../../common/decorators/browser-info.decorator';
 import { UserAlreadyConfirmedException } from '../exceptions';
 import { ConfirmEmailDto } from '../dto/request';
 import { HelpersMethods } from '../../../common/helpers/helpers.methods';
-import { UsersService } from '../../users/users.service';
+import { UsersService } from '../../users/services';
 
 @Injectable()
 export class AuthConfirmService {

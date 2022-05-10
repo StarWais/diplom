@@ -1,4 +1,4 @@
-import { UsersService } from '../users.service';
+import { UsersService } from '../services';
 import {
   registerDecorator,
   ValidationOptions,

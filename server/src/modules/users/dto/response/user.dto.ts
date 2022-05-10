@@ -1,10 +1,11 @@
 import { Gender, Role, User } from '@prisma/client';
-import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 
 import { BaseAbstractDto } from '../../../../common/dto/response';
 
 export class UserDto extends BaseAbstractDto implements User {
+  @Expose()
   @ApiProperty({
     description: 'Email пользователя',
     example: 'example@example.com',
@@ -12,10 +13,10 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly email: string;
 
-  @ApiHideProperty()
   @Exclude()
   readonly password: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Роль пользователя',
     example: Role.TEACHER,
@@ -23,6 +24,7 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly role: Role;
 
+  @Expose()
   @ApiProperty({
     description: 'Имя пользователя',
     example: 'Иван',
@@ -30,6 +32,7 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly firstName: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Фамилия пользователя',
     example: 'Иванов',
@@ -37,6 +40,7 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly lastName: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Отчество пользователя',
     example: 'Иван',
@@ -44,6 +48,7 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly middleName: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Дата рождения пользователя',
     type: 'date-time',
@@ -52,6 +57,7 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly birthDate: Date | null;
 
+  @Expose()
   @ApiProperty({
     description: 'Мобильный телефон пользователя',
     nullable: true,
@@ -60,6 +66,7 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly phone: string | null;
 
+  @Expose()
   @ApiProperty({
     description: 'Может ли пользователь публиковать статьи',
     type: 'boolean',
@@ -67,6 +74,7 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly canPublish: boolean;
 
+  @Expose()
   @ApiProperty({
     description: 'Пол пользователя',
     example: Gender.MALE,
@@ -74,6 +82,7 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly gender: Gender;
 
+  @Expose()
   @ApiProperty({
     description: 'Подтвержден ли пользователь',
     type: 'boolean',
@@ -81,6 +90,7 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly confirmed: boolean;
 
+  @Expose()
   @ApiProperty({
     description: 'Ссылка на аватар пользователя',
     type: 'string',
@@ -89,6 +99,7 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly avatarLink: string | null;
 
+  @Expose()
   @ApiProperty({
     description: 'Новый email пользователя',
     example: 'example@example.com',
@@ -97,6 +108,7 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly newEmail: string | null;
 
+  @Expose()
   @ApiProperty({
     description: 'Подтвержден ли новый email пользователя',
     example: false,
@@ -104,12 +116,12 @@ export class UserDto extends BaseAbstractDto implements User {
   })
   readonly newEmailConfirmed: boolean;
 
+  @Expose()
   @ApiProperty({
     description: 'Полное ФИО пользователя',
     example: 'Иванов Иван Иванович',
     type: 'string',
   })
-  @Expose()
   get fullName(): string {
     return `${this.firstName} ${this.middleName} ${this.lastName}`;
   }

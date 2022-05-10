@@ -6,7 +6,7 @@ import { OlympicsBaseIncludes } from '../interfaces';
 import { OlympicCreateDto, OlympicUpdateDto } from '../dto/request';
 import { OlympicDto } from '../dto/response';
 import { OlympicNotFoundException } from '../exceptions';
-import { ImagesService } from '../../images/images.service';
+import { ImagesService } from '../../images/services';
 
 @Injectable()
 export class OlympicsService {
@@ -24,7 +24,7 @@ export class OlympicsService {
 
   async create(details: OlympicCreateDto): Promise<OlympicDto> {
     const { steps, tags, image, ...rest } = details;
-    const imageLink = await this.imageService.saveImage(image);
+    const imageLink = await this.imageService.save(image);
     const result = await this.prisma.olympiad.create({
       data: {
         ...rest,
@@ -43,7 +43,7 @@ export class OlympicsService {
       },
       ...this.olympicsBaseIncludes,
     });
-    return new OlympicDto(result);
+    return result as unknown as OlympicDto;
   }
 
   async update(
@@ -51,10 +51,8 @@ export class OlympicsService {
     details: OlympicUpdateDto,
   ): Promise<OlympicDto> {
     const { steps, tags, image, ...rest } = details;
-    const imageLink = image
-      ? await this.imageService.saveImage(image)
-      : undefined;
     await this.findOneOrThrowError(searchDetails);
+    const imageLink = image ? await this.imageService.save(image) : undefined;
     const result = await this.prisma.olympiad.update({
       where: searchDetails,
       data: {
@@ -79,7 +77,7 @@ export class OlympicsService {
       },
       ...this.olympicsBaseIncludes,
     });
-    return new OlympicDto(result);
+    return result as unknown as OlympicDto;
   }
 
   async findOneOrThrowError(
@@ -92,7 +90,7 @@ export class OlympicsService {
     if (!result) {
       throw new OlympicNotFoundException(searchDetails.id);
     }
-    return new OlympicDto(result);
+    return result as unknown as OlympicDto;
   }
 
   async delete(searchDetails: Prisma.OlympiadWhereUniqueInput): Promise<void> {

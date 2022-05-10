@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 import { BrowserInfo } from '../../../common/decorators/browser-info.decorator';
-import { UsersService } from '../../users/users.service';
+import { UsersService } from '../../users/services';
 import { JWTPayload } from '../strategies/jwt.strategy';
 import { SignupDto } from '../dto/request';
 import { AccessTokenDto } from '../dto/response';
@@ -36,9 +36,9 @@ export class AuthService {
       sub: user.id,
       email: user.email,
     };
-    return {
+    return new AccessTokenDto({
       accessToken: this.jwtService.sign(payload),
-    };
+    });
   }
 
   async onUserSignedUp(user: User, browserInfo: BrowserInfo): Promise<void> {

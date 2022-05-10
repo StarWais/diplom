@@ -28,7 +28,7 @@ export class ArticleCreateDto {
   @ArrayMaxSize(10)
   @Type(() => ArticleTagCreateDto)
   @ApiProperty({
-    type: () => [ArticleTagCreateDto],
+    type: () => ArticleTagCreateDto,
     isArray: true,
     description: 'Теги статьи',
   })

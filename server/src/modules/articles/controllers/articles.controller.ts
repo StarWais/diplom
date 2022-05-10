@@ -20,15 +20,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { Role, User } from '@prisma/client';
-
-import { FindOneByIDParams, FindOneBySlugParams } from '../../../common/params';
-import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
-import { CurrentUser } from '../../../common/decorators';
 import { ArticlesService } from '../services';
-import { ArticleCreateDto, ArticleUpdateDto } from '../dto/request';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import { ArticlesGetFilter } from '../filters';
 import {
   ArticleCommentDto,
   ArticleDto,
@@ -39,6 +31,13 @@ import {
   ApiPaginatedResponse,
   PaginatedDto,
 } from '../../../common/pagination/pagination';
+import { ArticleCreateDto, ArticleUpdateDto } from '../dto/request';
+import { Role, User } from '@prisma/client';
+import { CurrentUser } from '../../../common/decorators';
+import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
+import { ArticlesGetFilter } from '../filters';
+import { FindOneByIDParams, FindOneBySlugParams } from '../../../common/params';
+import { Roles } from '../../auth/decorators/roles.decorator';
 
 @ApiTags('Статьи')
 @Controller('articles')
@@ -48,8 +47,9 @@ export class ArticlesController {
 
   @ApiOperation({ summary: 'Получить список тегов статей' })
   @ApiOkResponse({
-    type: [ArticleTagDto],
+    type: ArticleTagDto,
     description: 'Список тегов статей',
+    isArray: true,
   })
   @Get('tags')
   async tags(): Promise<Array<ArticleTagDto>> {
@@ -59,7 +59,9 @@ export class ArticlesController {
   @Get('published')
   @ApiPaginatedResponse(ArticleListedDto)
   @ApiOperation({ summary: 'Получить список опубликованных статей' })
-  async findPublished(@Query() filter: ArticlesGetFilter) {
+  async findPublished(
+    @Query() filter: ArticlesGetFilter,
+  ): Promise<PaginatedDto<ArticleListedDto>> {
     return this.articlesService.findMany(filter);
   }
 
@@ -72,7 +74,9 @@ export class ArticlesController {
     summary: 'Получить список всех статей',
     description: 'Доступно только администратору',
   })
-  async findMany(@Query() filter: ArticlesGetFilter) {
+  async findAll(
+    @Query() filter: ArticlesGetFilter,
+  ): Promise<PaginatedDto<ArticleListedDto>> {
     return this.articlesService.findMany(filter, true);
   }
 
@@ -145,7 +149,7 @@ export class ArticlesController {
   @ApiNoContentResponse({
     description: 'Статья удалена',
   })
-  @ApiBearerAuth('Токен')
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Удалить статью',
     description: 'Досутпно только администратору',
@@ -157,6 +161,7 @@ export class ArticlesController {
 
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Добавить лайк к статье' })
+  @ApiBearerAuth()
   @ApiCreatedResponse({
     type: ArticleDto,
     description: 'Лайк добавлен/удален',

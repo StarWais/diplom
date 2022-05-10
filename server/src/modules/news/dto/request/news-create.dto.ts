@@ -26,7 +26,7 @@ export class NewsCreateDto {
   @IsString()
   @IsNotEmpty()
   @Length(1, 255)
-  title: string;
+  readonly title: string;
 
   @IsString()
   @IsNotEmpty()
@@ -35,7 +35,7 @@ export class NewsCreateDto {
     example: 'Новая новость о новом курсе...',
     required: true,
   })
-  content: string;
+  readonly content: string;
 
   @IsString()
   @IsNotEmpty()
@@ -44,26 +44,23 @@ export class NewsCreateDto {
     example: 'Описание новости о новом курсе...',
     required: true,
   })
-  description: string;
+  readonly description: string;
 
   @ApiProperty({
     isArray: true,
-    type: () => CourseTagCreateDto,
-    example: [
-      {
-        name: 'математика',
-      },
-    ],
+    type: CourseTagCreateDto,
+    required: true,
   })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => NewsTagCreateDto)
-  @ArrayMaxSize(10)
   @ArrayMinSize(1)
-  readonly tags: NewsTagCreateDto[];
+  @ArrayMaxSize(10)
+  @Type(() => NewsTagCreateDto)
+  readonly tags: Array<NewsTagCreateDto>;
 
   @ApiProperty({
     type: 'file',
+    required: true,
   })
   @IsFile()
   @MaxFileSize(1e6)
@@ -75,5 +72,5 @@ export class NewsCreateDto {
     'image/svg+xml',
     'image/webp',
   ])
-  image: FileSystemStoredFile;
+  readonly image: FileSystemStoredFile;
 }

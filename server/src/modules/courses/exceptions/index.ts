@@ -1,0 +1,13 @@
+export { CourseNotFoundException } from './course-not-found.exception';
+export { CourseAttendanceNotFoundException } from './course-attendance-not-found.exception';
+export { CourseAttendanceExistsOnDayException } from './course-attendance-exists-on-day.exception';
+export { CourseNotCuratingException } from './course-not-curating.exception';
+export { CourseAttendanceDateOutOfRangeException } from './course-attendance-date-out-of-range.exception';
+export { StudentAlreadyAttendingCourseException } from './student-already-attending-course.exception';
+export { StudentAlreadyAttachedException } from './student-already-attached.exception';
+export { CourseFullException } from './course-full.exception';
+export { CourseFinishedException } from './course-finished.exception';
+export { CourseApplicationNotFoundException } from './course-application-not-found.exception';
+export { CourseAlreadyReviewedException } from './course-already-reviewed.exception';
+export { CourseNotFinishedException } from './course-not-finished.exception';
+export { CourseReviewNotFoundException } from './course-review-not-found.exception';

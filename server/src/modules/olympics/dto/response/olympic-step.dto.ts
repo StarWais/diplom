@@ -37,9 +37,4 @@ export class OlympicStepDto extends BaseAbstractDto {
     example: 1,
   })
   readonly step: number;
-
-  constructor(partial: Partial<OlympicStepDto>) {
-    super(partial);
-    Object.assign(this, partial);
-  }
 }

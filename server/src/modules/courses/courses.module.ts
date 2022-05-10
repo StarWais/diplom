@@ -1,12 +1,23 @@
+import { Module } from '@nestjs/common';
+import { NestjsFormDataModule } from 'nestjs-form-data';
+
 import { StudentsModule } from '../students/students.module';
 import { FormdataConfigService } from '../../config/services';
-import { Module } from '@nestjs/common';
-import { CoursesController } from './courses.controller';
-import { CoursesService } from './courses.service';
+import {
+  CoursesApplicationsController,
+  CoursesAttendancesController,
+  CoursesController,
+  CoursesReviewsController,
+} from './controllers';
+import {
+  CoursesApplicationsService,
+  CoursesAttendancesService,
+  CoursesReviewsService,
+  CoursesService,
+} from './services';
 import { TeachersModule } from '../teachers/teachers.module';
-import { NestjsFormDataModule } from 'nestjs-form-data';
 import { UsersModule } from '../users/users.module';
-import { CoursesJobs } from './courses.jobs';
+import { CoursesJobs } from './jobs';
 
 @Module({
   imports: [
@@ -17,7 +28,18 @@ import { CoursesJobs } from './courses.jobs';
       useClass: FormdataConfigService,
     }),
   ],
-  controllers: [CoursesController],
-  providers: [CoursesService, CoursesJobs],
+  controllers: [
+    CoursesController,
+    CoursesReviewsController,
+    CoursesAttendancesController,
+    CoursesApplicationsController,
+  ],
+  providers: [
+    CoursesService,
+    CoursesJobs,
+    CoursesApplicationsService,
+    CoursesReviewsService,
+    CoursesAttendancesService,
+  ],
 })
 export class CoursesModule {}

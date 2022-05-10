@@ -21,7 +21,7 @@ import { JwtAuthGuard } from '../guards';
 import { CurrentBrowserInfo, CurrentUser } from '../../../common/decorators';
 import { BrowserInfo } from '../../../common/decorators/browser-info.decorator';
 
-@ApiTags('Авторизация')
+@ApiTags('Подтверждение регистрации')
 @Controller('auth/confirm')
 export class AuthConfirmController {
   constructor(private readonly authConfirmService: AuthConfirmService) {}
@@ -48,7 +48,7 @@ export class AuthConfirmController {
     description: 'Письмо подтверждения регистрации отправлено',
   })
   @HttpCode(HttpStatus.ACCEPTED)
-  async resendRegistrationConfirmation(
+  async resend(
     @CurrentUser() user: User,
     @CurrentBrowserInfo() browserInfo: BrowserInfo,
   ): Promise<void> {
