@@ -6,13 +6,13 @@ import { ArticleDto, ArticleListedDto, ArticleTagDto } from '../dto/response';
 import { ArticleCreateDto, ArticleUpdateDto } from '../dto/request';
 import { Prisma, PublishingStatus, User } from '@prisma/client';
 import slugify from 'slugify';
-import { ArticleInclude } from '../interfaces';
+import { ArticleInclude, IArticlesService } from '../interfaces';
 import { ArticlesGetFilter } from '../filters';
 import { ArticleNotFoundException } from '../exceptions';
 import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
 
 @Injectable()
-export class ArticlesService {
+export class ArticlesService implements IArticlesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailerService: MailerService,
@@ -76,9 +76,7 @@ export class ArticlesService {
     return article;
   }
 
-  private async notifyAdminsOnArticleCreate(
-    article: ArticleDto,
-  ): Promise<void> {
+  async notifyAdminsOnArticleCreate(article: ArticleDto): Promise<void> {
     const adminMails = await this.usersService.getAdminConfirmedMails();
     if (adminMails.length > 0) {
       const { author, title, tags } = article;
@@ -173,7 +171,7 @@ export class ArticlesService {
     );
   }
 
-  private async slugExists(slug: string): Promise<boolean> {
+  async slugExists(slug: string): Promise<boolean> {
     const article = await this.prisma.article.findUnique({
       where: {
         slug,
@@ -215,7 +213,7 @@ export class ArticlesService {
   }
 
   //
-  private async generateSlug(title: string): Promise<string> {
+  async generateSlug(title: string): Promise<string> {
     let slug = slugify(title, {
       replacement: '-',
       lower: true,

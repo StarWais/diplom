@@ -4,11 +4,12 @@ import {
 } from 'nestjs-form-data/dist/interfaces';
 import { FileSystemStoredFile } from 'nestjs-form-data';
 import { ConfigService } from '@nestjs/config';
-import { FormDataOptions } from '../configuration';
 import { Injectable } from '@nestjs/common';
 
+import { FormDataOptions } from '../configuration';
+
 @Injectable()
-export class FormdataConfigService implements NestjsFormDataConfigFactory {
+export class FormDataConfigService implements NestjsFormDataConfigFactory {
   constructor(private readonly config: ConfigService) {}
 
   configAsync():

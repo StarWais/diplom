@@ -14,19 +14,12 @@ import {
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
-  ApiExtraModels,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { ArticlesService } from '../services';
-import {
-  ArticleCommentDto,
-  ArticleDto,
-  ArticleListedDto,
-  ArticleTagDto,
-} from '../dto/response';
+import { ArticleDto, ArticleListedDto, ArticleTagDto } from '../dto/response';
 import {
   ApiPaginatedResponse,
   PaginatedDto,
@@ -38,12 +31,12 @@ import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
 import { ArticlesGetFilter } from '../filters';
 import { FindOneByIDParams, FindOneBySlugParams } from '../../../common/params';
 import { Roles } from '../../auth/decorators/roles.decorator';
+import { IArticlesController, IArticlesService } from '../interfaces';
 
 @ApiTags('Статьи')
 @Controller('articles')
-@ApiExtraModels(PaginatedDto, ArticleListedDto, ArticleCommentDto)
-export class ArticlesController {
-  constructor(private readonly articlesService: ArticlesService) {}
+export class ArticlesController implements IArticlesController {
+  constructor(private readonly articlesService: IArticlesService) {}
 
   @ApiOperation({ summary: 'Получить список тегов статей' })
   @ApiOkResponse({
@@ -62,7 +55,7 @@ export class ArticlesController {
   async findPublished(
     @Query() filter: ArticlesGetFilter,
   ): Promise<PaginatedDto<ArticleListedDto>> {
-    return this.articlesService.findMany(filter);
+    return this.articlesService.findMany(filter, false);
   }
 
   @Roles(Role.ADMIN)

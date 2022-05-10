@@ -10,8 +10,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-
-import { ArticlesCommentsService } from '../services';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -32,12 +30,16 @@ import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
 import { FindArticleCommentParams, FindByArticleIdParams } from '../params';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { PaginationQuery } from '../../../common/pagination/pagination-query';
+import {
+  IArticlesCommentsController,
+  IArticlesCommentsService,
+} from '../interfaces';
 
 @Controller('articles/:articleId/comments')
 @ApiTags('Комментарии к статьям')
-export class ArticlesCommentsController {
+export class ArticlesCommentsController implements IArticlesCommentsController {
   constructor(
-    private readonly articleCommentsService: ArticlesCommentsService,
+    private readonly articleCommentsService: IArticlesCommentsService,
   ) {}
 
   @UseGuards(JwtAuthGuard)

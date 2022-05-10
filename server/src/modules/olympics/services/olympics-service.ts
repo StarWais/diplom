@@ -43,7 +43,7 @@ export class OlympicsService {
       },
       ...this.olympicsBaseIncludes,
     });
-    return result as unknown as OlympicDto;
+    return new OlympicDto(result);
   }
 
   async update(
@@ -77,7 +77,7 @@ export class OlympicsService {
       },
       ...this.olympicsBaseIncludes,
     });
-    return result as unknown as OlympicDto;
+    return new OlympicDto(result);
   }
 
   async findOneOrThrowError(
@@ -90,7 +90,7 @@ export class OlympicsService {
     if (!result) {
       throw new OlympicNotFoundException(searchDetails.id);
     }
-    return result as unknown as OlympicDto;
+    return new OlympicDto(result);
   }
 
   async delete(searchDetails: Prisma.OlympiadWhereUniqueInput): Promise<void> {

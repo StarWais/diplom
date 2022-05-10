@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 
 import { StudentsModule } from '../students/students.module';
-import { FormdataConfigService } from '../../config/services';
+import { FormDataConfigService } from '../../config/services';
 import {
   CoursesApplicationsController,
   CoursesAttendancesController,
@@ -25,7 +25,7 @@ import { CoursesJobs } from './jobs';
     StudentsModule,
     UsersModule,
     NestjsFormDataModule.configAsync({
-      useClass: FormdataConfigService,
+      useClass: FormDataConfigService,
     }),
   ],
   controllers: [

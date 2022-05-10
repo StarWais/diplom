@@ -18,7 +18,6 @@ import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
-  ApiExtraModels,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -38,7 +37,6 @@ import {
 } from '../../../common/pagination/pagination';
 
 @ApiTags('Заявки на курсы')
-@ApiExtraModels(PaginatedDto)
 @Controller('courses/:courseId/applications')
 export class CoursesApplicationsController {
   constructor(

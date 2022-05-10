@@ -15,7 +15,6 @@ import {
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
-  ApiExtraModels,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -36,7 +35,6 @@ import {
 } from '../../../common/pagination/pagination';
 
 @ApiTags('Отзывы к курсам')
-@ApiExtraModels(PaginatedDto)
 @Controller('courses/:courseId/reviews')
 export class CoursesReviewsController {
   constructor(private readonly coursesReviewsService: CoursesReviewsService) {}

@@ -15,7 +15,6 @@ import {
   ApiBearerAuth,
   ApiConsumes,
   ApiCreatedResponse,
-  ApiExtraModels,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -38,7 +37,6 @@ import {
 import { NewsDto, NewsListedDto, NewsTagDto } from '../dto/response';
 
 @ApiTags('Новости')
-@ApiExtraModels(PaginatedDto, NewsListedDto)
 @Controller('news')
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}

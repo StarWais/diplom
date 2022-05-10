@@ -1,6 +1,11 @@
 import { PrismaService } from 'nestjs-prisma';
 import { applyDecorators, Type as NType } from '@nestjs/common';
-import { ApiOkResponse, ApiProperty, getSchemaPath } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiOkResponse,
+  ApiProperty,
+  getSchemaPath,
+} from '@nestjs/swagger';
 
 import { PaginationQuery } from './pagination-query';
 import { Expose, Type } from 'class-transformer';
@@ -52,6 +57,7 @@ export class PaginatedDto<T> {
 
 export const ApiPaginatedResponse = <TModel extends NType>(model: TModel) => {
   return applyDecorators(
+    ApiExtraModels(PaginatedDto, model),
     ApiOkResponse({
       description: 'Данные пагинации',
       schema: {

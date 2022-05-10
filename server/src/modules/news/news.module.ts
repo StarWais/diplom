@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 
-import { FormdataConfigService } from '../../config/services';
+import { FormDataConfigService } from '../../config/services';
 import { NewsController } from './controllers';
 import { NewsService } from './services';
 
@@ -10,7 +10,7 @@ import { NewsService } from './services';
   providers: [NewsService],
   imports: [
     NestjsFormDataModule.configAsync({
-      useClass: FormdataConfigService,
+      useClass: FormDataConfigService,
     }),
   ],
 })

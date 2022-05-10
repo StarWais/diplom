@@ -16,7 +16,6 @@ import {
   ApiBearerAuth,
   ApiConsumes,
   ApiCreatedResponse,
-  ApiExtraModels,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -46,12 +45,6 @@ import { GetPersonalCoursesFilter } from '../filters';
 import { BasicUserNameDto } from '../../users/dto/response';
 
 @ApiTags('Курсы')
-@ApiExtraModels(
-  PaginatedDto,
-  CourseListedDto,
-  CourseListedPersonalTeacherDto,
-  CourseListedPersonalStudentDto,
-)
 @Controller('courses')
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}

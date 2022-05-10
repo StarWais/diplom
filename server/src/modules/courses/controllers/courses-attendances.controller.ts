@@ -14,7 +14,6 @@ import {
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
-  ApiExtraModels,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -39,7 +38,6 @@ import { FindByCourseIdParams, FindCourseAttendanceParams } from '../params';
 import { GetCoursesAttendancesFilter } from '../filters';
 
 @ApiTags('Посещаемость курсов')
-@ApiExtraModels(PaginatedDto)
 @Controller('courses/:courseId/attendances')
 export class CoursesAttendancesController {
   constructor(

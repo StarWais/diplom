@@ -3,7 +3,7 @@ import { NestjsFormDataModule } from 'nestjs-form-data';
 
 import { OlympicsController } from './controllers';
 import { OlympicsService } from './services';
-import { FormdataConfigService } from '../../config/services';
+import { FormDataConfigService } from '../../config/services';
 
 @Module({
   controllers: [OlympicsController],
@@ -11,7 +11,7 @@ import { FormdataConfigService } from '../../config/services';
   exports: [],
   imports: [
     NestjsFormDataModule.configAsync({
-      useClass: FormdataConfigService,
+      useClass: FormDataConfigService,
     }),
   ],
 })

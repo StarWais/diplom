@@ -12,7 +12,6 @@ import {
 import { Role } from '@prisma/client';
 import {
   ApiBearerAuth,
-  ApiExtraModels,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -33,7 +32,6 @@ import {
 import { TeacherUserDto, TeacherUserListedDto } from '../dto/response';
 
 @ApiTags('Учителя')
-@ApiExtraModels(PaginatedDto, TeacherUserListedDto)
 @Controller('teachers')
 export class TeachersController {
   constructor(private readonly teachersService: TeachersService) {}

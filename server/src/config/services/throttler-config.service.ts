@@ -4,6 +4,7 @@ import {
   ThrottlerModuleOptions,
   ThrottlerOptionsFactory,
 } from '@nestjs/throttler';
+
 import { ThrottlerOptions } from '../configuration';
 
 @Injectable()
