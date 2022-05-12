@@ -1,15 +1,13 @@
-import { PublishingStatus, Student, User } from '@prisma/client';
+import { PublishingStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Type } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 
 import { BaseAbstractDto } from './base-abstract.dto';
 import { BasicUserDto } from '../../../modules/users/dto/response';
+import { StudentIncludesUser } from '../../../modules/students/interfaces';
 
-interface StudentIncludesUser extends Student {
-  user: User;
-}
-
-export abstract class BaseAbstractReviewDto extends BaseAbstractDto {
+export class BaseAbstractReviewDto extends BaseAbstractDto {
+  @Expose()
   @ApiProperty({
     description: 'Рейтинг',
     type: 'integer',
@@ -17,6 +15,7 @@ export abstract class BaseAbstractReviewDto extends BaseAbstractDto {
   })
   readonly rating: number;
 
+  @Expose()
   @ApiProperty({
     description: 'Статус публикации отзыва',
     enum: PublishingStatus,
@@ -24,6 +23,7 @@ export abstract class BaseAbstractReviewDto extends BaseAbstractDto {
   })
   readonly status: PublishingStatus;
 
+  @Expose()
   @ApiProperty({
     description: 'Текст отзыва',
     type: 'string',
@@ -31,6 +31,7 @@ export abstract class BaseAbstractReviewDto extends BaseAbstractDto {
   })
   readonly text: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Автор отзыва',
     type: () => BasicUserDto,
@@ -40,4 +41,9 @@ export abstract class BaseAbstractReviewDto extends BaseAbstractDto {
 
   @Exclude()
   readonly student: StudentIncludesUser;
+
+  constructor(partial: Partial<BaseAbstractReviewDto>) {
+    super(partial);
+    Object.assign(this, partial);
+  }
 }

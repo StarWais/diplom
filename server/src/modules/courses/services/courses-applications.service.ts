@@ -104,9 +104,7 @@ export class CoursesApplicationsService {
       'courseApplication',
       {
         where: {
-          course: {
-            id: courseId,
-          },
+          courseId,
         },
         orderBy: {
           createdAt: 'desc',

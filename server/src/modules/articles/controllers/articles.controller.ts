@@ -31,12 +31,12 @@ import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
 import { ArticlesGetFilter } from '../filters';
 import { FindOneByIDParams, FindOneBySlugParams } from '../../../common/params';
 import { Roles } from '../../auth/decorators/roles.decorator';
-import { IArticlesController, IArticlesService } from '../interfaces';
+import { ArticlesService } from '../services';
 
 @ApiTags('Статьи')
 @Controller('articles')
-export class ArticlesController implements IArticlesController {
-  constructor(private readonly articlesService: IArticlesService) {}
+export class ArticlesController {
+  constructor(private readonly articlesService: ArticlesService) {}
 
   @ApiOperation({ summary: 'Получить список тегов статей' })
   @ApiOkResponse({

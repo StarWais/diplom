@@ -18,6 +18,7 @@ import {
 import {
   ApiBearerAuth,
   ApiConsumes,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -34,6 +35,11 @@ import { CurrentUser } from '../../../common/decorators';
 import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { UsersGetFilter } from '../filters/users-get.filter';
+import {
+  ApiPaginatedResponse,
+  PaginatedDto,
+} from '../../../common/pagination/pagination';
+import { UserDto, UserListedDto } from '../dto/response';
 
 @Controller('users')
 @ApiTags('Пользователи')
@@ -43,11 +49,15 @@ export class UsersController {
   @Roles(Role.ADMIN)
   @ApiOperation({
     summary: 'Получить список пользователей',
+    description: 'Доступно только администратору',
   })
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiPaginatedResponse(UserListedDto)
   @ApiBearerAuth()
   @Get()
-  async findMany(@Query() filter: UsersGetFilter) {
+  async findMany(
+    @Query() filter: UsersGetFilter,
+  ): Promise<PaginatedDto<UserListedDto>> {
     return this.usersService.findMany(filter);
   }
 
@@ -55,6 +65,7 @@ export class UsersController {
     summary: 'Обновить пользователя',
   })
   @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: UserDto, description: 'Обновленный пользователь' })
   @ApiBearerAuth()
   @Patch(':id')
   async update(
@@ -62,7 +73,7 @@ export class UsersController {
     @CurrentBrowserInfo() browserInfo: BrowserInfo,
     @CurrentUser() currentUser: User,
     @Body() details: UpdateUserDto,
-  ) {
+  ): Promise<UserDto> {
     return this.usersService.update(
       searchParams,
       details,
@@ -74,22 +85,25 @@ export class UsersController {
   @ApiOperation({
     summary: 'Получить данные о себе',
   })
+  @ApiOkResponse({ type: UserDto, description: 'Данные о себе' })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get('me')
-  async me(@CurrentUser() currentUser: User) {
+  async me(@CurrentUser() currentUser: User): Promise<UserDto> {
     return this.usersService.findUniqueOrThrowError({ id: currentUser.id });
   }
 
   @Roles(Role.ADMIN)
   @ApiOperation({
     summary: 'Получить данные о пользователе',
+    description: 'Доступно только администратору',
   })
+  @ApiOkResponse({ type: UserDto, description: 'Данные о пользователе' })
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Get(':id')
-  async findOne(@Param() searchDetails: FindOneByIDParams) {
-    return this.usersService.findUniqueOrThrowError(searchDetails);
+  async findOne(@Param() searchParams: FindOneByIDParams): Promise<UserDto> {
+    return this.usersService.findUniqueOrThrowError(searchParams);
   }
 
   @ApiOperation({
@@ -99,12 +113,16 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
+  @ApiOkResponse({
+    type: 'string',
+    description: 'Ссылка на обновленный аватар',
+  })
   @Patch(':id/avatar')
   async updateAvatar(
     @Param() searchDetails: FindOneByIDParams,
     @Body() details: UpdateUserAvatarDto,
     @CurrentUser() currentUser: User,
-  ) {
+  ): Promise<string> {
     return this.usersService.updateAvatar(searchDetails, currentUser, details);
   }
 

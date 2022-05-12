@@ -2,23 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Prisma, User } from '@prisma/client';
 
-import {
-  ArticleCommentInclude,
-  IArticlesCommentsService,
-  IArticlesService,
-} from '../interfaces';
+import { ArticleCommentInclude } from '../interfaces';
 import { FindArticleCommentParams, FindByArticleIdParams } from '../params';
 import { ArticleCommentNotFoundException } from '../exceptions';
 import { PaginationQuery } from '../../../common/pagination/pagination-query';
 import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
 import { ArticleCommentCreateDto } from '../dto/request';
 import { ArticleCommentDto } from '../dto/response';
+import { ArticlesService } from './articles.service';
 
 @Injectable()
-export class ArticlesCommentsService implements IArticlesCommentsService {
+export class ArticlesCommentsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly articlesService: IArticlesService,
+    private readonly articlesService: ArticlesService,
   ) {}
 
   private readonly articleCommentIncludes: ArticleCommentInclude = {

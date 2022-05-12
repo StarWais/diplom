@@ -1,10 +1,12 @@
-import { OlympiadParticipationType } from '@prisma/client';
+import { Olympiad, OlympiadParticipationType } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
 import { BaseAbstractDto } from '../../../../common/dto/response';
 import { OlympicTagDto } from './olympic-tag.dto';
 
-export class OlympicDto extends BaseAbstractDto {
+export class OlympicDto extends BaseAbstractDto implements Olympiad {
+  @Expose()
   @ApiProperty({
     description: 'Название олимпиады',
     example: 'Олимпиада по информатике',
@@ -12,6 +14,7 @@ export class OlympicDto extends BaseAbstractDto {
   })
   readonly name: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Формат олимпиады',
     example: 'Дистанционно',
@@ -19,6 +22,7 @@ export class OlympicDto extends BaseAbstractDto {
   })
   readonly format: string;
 
+  @Expose()
   @ApiProperty({
     description: 'Тип олимпиады',
     example: OlympiadParticipationType.FREE,
@@ -26,6 +30,7 @@ export class OlympicDto extends BaseAbstractDto {
   })
   readonly participationType: OlympiadParticipationType;
 
+  @Expose()
   @ApiProperty({
     description: 'Класс олимпиады',
     example: 10,
@@ -33,6 +38,7 @@ export class OlympicDto extends BaseAbstractDto {
   })
   readonly grade: number;
 
+  @Expose()
   @ApiProperty({
     description: 'Массив картинок предыдущих этапов олимпиады',
     example: [
@@ -44,6 +50,7 @@ export class OlympicDto extends BaseAbstractDto {
   })
   readonly exampleTasksImages: string[];
 
+  @Expose()
   @ApiProperty({
     description: 'Награды олимпиады',
     isArray: true,
@@ -52,9 +59,32 @@ export class OlympicDto extends BaseAbstractDto {
   })
   readonly rewards: string[];
 
+  @Expose()
   @ApiProperty({
+    description: 'Рейтинг олимпиады',
+    example: 4.5,
+    type: 'integer',
+  })
+  readonly rating: number;
+
+  @Expose()
+  @ApiProperty({
+    description: 'Ссылка на картинку олимпиады',
+    example: 'https://example.com/image.jpg',
+    type: 'string',
+  })
+  readonly imageLink: string;
+
+  @Expose()
+  @ApiProperty({
+    type: () => OlympicTagDto,
     isArray: true,
-    type: () => [OlympicTagDto],
+    description: 'Теги олимпиады',
   })
   readonly tags: OlympicTagDto[];
+
+  constructor(partial: Partial<OlympicDto>) {
+    super(partial);
+    Object.assign(this, partial);
+  }
 }

@@ -2,13 +2,19 @@ import { ApiProperty, PickType } from '@nestjs/swagger';
 import { UserDto } from './user.dto';
 import { Expose } from 'class-transformer';
 
-export class BasicUserDto extends PickType(UserDto, [
+export class UserListedDto extends PickType(UserDto, [
   'id',
+  'email',
   'firstName',
   'lastName',
   'middleName',
-  'avatarLink',
+  'role',
 ] as const) {
+  constructor(partial: Partial<UserListedDto>) {
+    super(partial);
+    Object.assign(this, partial);
+  }
+
   @Expose()
   @ApiProperty({
     description: 'Полное ФИО пользователя',
@@ -17,9 +23,5 @@ export class BasicUserDto extends PickType(UserDto, [
   })
   get fullName(): string {
     return `${this.firstName} ${this.middleName} ${this.lastName}`;
-  }
-  constructor(partial: Partial<BasicUserDto>) {
-    super(partial);
-    Object.assign(this, partial);
   }
 }

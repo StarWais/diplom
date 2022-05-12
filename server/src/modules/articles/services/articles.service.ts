@@ -6,13 +6,13 @@ import { ArticleDto, ArticleListedDto, ArticleTagDto } from '../dto/response';
 import { ArticleCreateDto, ArticleUpdateDto } from '../dto/request';
 import { Prisma, PublishingStatus, User } from '@prisma/client';
 import slugify from 'slugify';
-import { ArticleInclude, IArticlesService } from '../interfaces';
+import { ArticleInclude } from '../interfaces';
 import { ArticlesGetFilter } from '../filters';
 import { ArticleNotFoundException } from '../exceptions';
 import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
 
 @Injectable()
-export class ArticlesService implements IArticlesService {
+export class ArticlesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailerService: MailerService,

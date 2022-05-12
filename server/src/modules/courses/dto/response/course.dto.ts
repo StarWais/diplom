@@ -157,7 +157,7 @@ export class CourseDto extends BaseAbstractDto implements Course {
   readonly teacher: TeacherIncludesUser;
   @Expose()
   @ApiProperty({
-    type: BasicUserNameDto,
+    type: () => BasicUserNameDto,
     description: 'Информация о преподавателе',
   })
   @Type(() => BasicUserNameDto)

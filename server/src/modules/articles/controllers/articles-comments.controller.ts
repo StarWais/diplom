@@ -30,16 +30,13 @@ import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
 import { FindArticleCommentParams, FindByArticleIdParams } from '../params';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { PaginationQuery } from '../../../common/pagination/pagination-query';
-import {
-  IArticlesCommentsController,
-  IArticlesCommentsService,
-} from '../interfaces';
+import { ArticlesCommentsService } from '../services';
 
 @Controller('articles/:articleId/comments')
 @ApiTags('Комментарии к статьям')
-export class ArticlesCommentsController implements IArticlesCommentsController {
+export class ArticlesCommentsController {
   constructor(
-    private readonly articleCommentsService: IArticlesCommentsService,
+    private readonly articleCommentsService: ArticlesCommentsService,
   ) {}
 
   @UseGuards(JwtAuthGuard)

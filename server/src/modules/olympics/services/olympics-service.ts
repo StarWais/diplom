@@ -7,6 +7,9 @@ import { OlympicCreateDto, OlympicUpdateDto } from '../dto/request';
 import { OlympicDto } from '../dto/response';
 import { OlympicNotFoundException } from '../exceptions';
 import { ImagesService } from '../../images/services';
+import { GetOlympicsFilter } from '../filters';
+import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
+import { OlympicListedBaseDto } from '../dto/response/olympic-listed-base.dto';
 
 @Injectable()
 export class OlympicsService {
@@ -19,6 +22,12 @@ export class OlympicsService {
     include: {
       steps: true,
       tags: true,
+    },
+  };
+
+  private olympicWithStepsInclude: OlympicsBaseIncludes = {
+    include: {
+      steps: true,
     },
   };
 
@@ -44,6 +53,39 @@ export class OlympicsService {
       ...this.olympicsBaseIncludes,
     });
     return new OlympicDto(result);
+  }
+
+  async findMany(
+    filter: GetOlympicsFilter,
+  ): Promise<PaginatedDto<OlympicListedBaseDto>> {
+    return Paginate<Prisma.OlympiadFindManyArgs>(
+      OlympicListedBaseDto,
+      {
+        page: filter.page,
+        limit: filter.limit,
+      },
+      this.prisma,
+      'olympiad',
+      {
+        where: {
+          tags: {
+            some: {
+              name: {
+                in: filter.tags,
+              },
+            },
+          },
+          grade: {
+            equals: filter.grade,
+          },
+        },
+        orderBy: {
+          rating: 'desc',
+        },
+        ...this.olympicWithStepsInclude,
+      },
+      (olympic) => new OlympicListedBaseDto(olympic),
+    );
   }
 
   async update(
