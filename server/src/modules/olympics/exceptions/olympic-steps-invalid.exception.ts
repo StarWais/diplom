@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 
-export class OlympicsStepsInvalidException extends BadRequestException {
+export class OlympicStepsInvalidException extends BadRequestException {
   constructor() {
     super('Несуществующие шаги в олимпиаде');
   }

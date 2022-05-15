@@ -1,10 +1,8 @@
 import { PublishingStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Expose } from 'class-transformer';
 
 import { BaseAbstractDto } from './base-abstract.dto';
-import { BasicUserDto } from '../../../modules/users/dto/response';
-import { StudentIncludesUser } from '../../../modules/students/interfaces';
 
 export class BaseAbstractReviewDto extends BaseAbstractDto {
   @Expose()
@@ -30,17 +28,6 @@ export class BaseAbstractReviewDto extends BaseAbstractDto {
     example: 'Отличный сервис!',
   })
   readonly text: string;
-
-  @Expose()
-  @ApiProperty({
-    description: 'Автор отзыва',
-    type: () => BasicUserDto,
-  })
-  @Type(() => BasicUserDto)
-  readonly author: BasicUserDto;
-
-  @Exclude()
-  readonly student: StudentIncludesUser;
 
   constructor(partial: Partial<BaseAbstractReviewDto>) {
     super(partial);

@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { OlympicsService } from './olympics-service';
+import { OlympicsService } from './olympics.service';
 import { OlympicApplicationCreateDto } from '../dto/request';
 import { User } from '@prisma/client';
 import {
   FindByOlympicsIdParams,
-  FindOlympicsApplicationParams,
+  FindOlympicApplicationParams,
 } from '../params';
 import { OlympicsStepsService } from './olympics-steps.service';
 import {
   OlympicApplicationNotFoundException,
-  OlympicsStepsInvalidException,
+  OlympicStepsInvalidException,
   StudentAlreadyAppliedException,
 } from '../exceptions';
 import { OlympicsApplicationInclude } from '../interfaces';
@@ -34,7 +34,7 @@ export class OlympicsApplicationsService {
   ) {}
 
   async findOneOrThrowError(
-    searchParams: FindOlympicsApplicationParams,
+    searchParams: FindOlympicApplicationParams,
   ): Promise<OlympicApplicationDto> {
     const result = await this.prisma.olympiadApplication.findFirst({
       where: {
@@ -110,7 +110,7 @@ export class OlympicsApplicationsService {
       stepIds,
     );
     if (!idsInRange) {
-      throw new OlympicsStepsInvalidException();
+      throw new OlympicStepsInvalidException();
     }
     const studentAlreadyApplied = await this.studentAlreadyApplied(
       currentUser.id,
@@ -128,7 +128,7 @@ export class OlympicsApplicationsService {
     });
   }
 
-  async delete(searchParams: FindOlympicsApplicationParams): Promise<void> {
+  async delete(searchParams: FindOlympicApplicationParams): Promise<void> {
     await this.findOneOrThrowError(searchParams);
     await this.prisma.olympiadApplication.delete({
       where: searchParams,

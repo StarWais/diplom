@@ -320,8 +320,10 @@ model OlympiadTask {
   olympiadStepId Int          @map("olympiad_step_id")
   olympiadStep   OlympiadStep @relation(fields: [olympiadStepId], references: [id], onDelete: Cascade)
 
+
   task        String
   description String?
+  points      Int
 
   answerType OlympiadTaskAnswerType
   variants   OlympiadTaskAnswerVariant[]
@@ -339,7 +341,7 @@ model OlympiadTaskAnswerAttempt {
   olympiadTaskId Int          @map("olympiad_task_id")
   olympiadTask   OlympiadTask @relation(fields: [olympiadTaskId], references: [id], onDelete: Cascade)
 
-  olympiadStepAttemptId Int?
+  olympiadStepAttemptId Int? @map("olympiad_step_attempt_id")
   olympiadStepAttempt   OlympiadStepAttempt? @relation(fields: [olympiadStepAttemptId], references: [id], onDelete: Cascade)
 
   studentId Int     @map("student_id")
@@ -362,7 +364,6 @@ model OlympiadTaskAnswerVariant {
   olympiadTask   OlympiadTask @relation(fields: [olympiadTaskId], references: [id], onDelete: Cascade)
 
   rightAnswer Boolean
-  points      Int
   text        String?
 
   taskAttempts OlympiadTaskAnswerAttempt[]

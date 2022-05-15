@@ -139,4 +139,18 @@ export class OlympicsService {
     await this.findOneOrThrowError(searchDetails);
     await this.prisma.olympiad.delete({ where: searchDetails });
   }
+
+  async userAttended(olympicsId: number, userId: number): Promise<boolean> {
+    const olympic = await this.prisma.olympiad.findFirst({
+      where: {
+        id: olympicsId,
+        studentsAttended: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
+    return !!olympic;
+  }
 }
