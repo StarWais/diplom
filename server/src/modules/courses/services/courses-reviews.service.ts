@@ -64,7 +64,7 @@ export class CoursesReviewsService {
       },
       data: details,
     });
-    await this.coursesService.updateCourseRating(courseId);
+    await this.coursesService.updateRating(courseId);
     return new CourseReviewDto(result);
   }
 
@@ -119,7 +119,7 @@ export class CoursesReviewsService {
         id,
       },
     });
-    await this.coursesService.updateCourseRating(review.courseId);
+    await this.coursesService.updateRating(review.courseId);
   }
 
   async create(

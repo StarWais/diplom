@@ -367,7 +367,7 @@ export class CoursesService {
     );
   }
 
-  async updateCourseRating(courseId: number): Promise<void> {
+  async updateRating(courseId: number): Promise<void> {
     const reviews = await this.prisma.courseReview.findMany({
       where: {
         courseId,

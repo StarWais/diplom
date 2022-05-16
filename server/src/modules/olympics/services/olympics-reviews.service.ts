@@ -133,6 +133,7 @@ export class OlympicsReviewsService {
       },
       data: details,
     });
+    await this.olympicsService.updateRating(searchParams.olympicsId);
     return new OlympicReviewDto(result);
   }
 
