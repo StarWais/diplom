@@ -10,6 +10,10 @@ datasource db {
   url      = env("DATABASE_CONNECTION_URL")
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
 model User {
   id                Int       @id @default(autoincrement())
   email             String    @unique
@@ -20,12 +24,12 @@ model User {
   middleName        String    @map("middle_name")
   birthDate         DateTime? @map("birth_date")
   phone             String?
-  canPublish        Boolean   @default(false)
+  canPublish        Boolean   @default(false) @map("can_publish")
   gender            Gender
   confirmed         Boolean   @default(false)
   avatarLink        String?   @map("avatar_link")
   newEmail          String?   @map("new_email")
-  newEmailConfirmed Boolean   @default(true)
+  newEmailConfirmed Boolean   @default(true) @map("new_email_confirmed")
 
   studentInfo         Student?
   teacherInfo         Teacher?
@@ -79,7 +83,7 @@ model Teacher {
 
   rating              Float    @default(0)
   about               String?
-  specialisations     String[] @map("specialisation")
+  specialisations     String[] @map("specialisations")
   telegramLink        String?  @map("telegram_link")
   whatsappLink        String?  @map("whatsapp_link")
   viberLink           String?  @map("viber_link")
@@ -205,18 +209,18 @@ model Olympiad {
 
   name               String
   format             String
-  participationType  OlympiadParticipationType
+  participationType  OlympiadParticipationType @map("participation_type")
   grade              Int
   rating             Float                     @default(0)
   exampleTasksImages String[]                  @map("example_tasks_images")
   imageLink          String                    @map("image_link")
   rewards            String[]
-  studentsAttended   Student[]
 
-  steps        OlympiadStep[]
-  tags         OlympiadTag[]
-  reviews      OlympiadReview[]
-  applications OlympiadApplication[]
+  studentsAttended   Student[]
+  steps              OlympiadStep[]
+  tags               OlympiadTag[]
+  reviews            OlympiadReview[]
+  applications       OlympiadApplication[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -286,7 +290,7 @@ model OlympiadStepResult {
   studentId Int     @map("student_id")
   student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
-  nextStepAvailiable Boolean @default(false)
+  nextStepAvailiable Boolean @default(false) @map("next_step_availiable")
   place              Int     @default(0)
 
 
@@ -324,10 +328,10 @@ model OlympiadTask {
   task        String
   description String?
   points      Int
-  answerType  OlympiadTaskAnswerType
+  answerType  OlympiadTaskAnswerType @map("answer_type")
 
-  variants   OlympiadTaskAnswerVariant[]
-  attempts   OlympiadTaskAnswerAttempt[]
+  variants    OlympiadTaskAnswerVariant[]
+  attempts    OlympiadTaskAnswerAttempt[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -363,7 +367,7 @@ model OlympiadTaskAnswerVariant {
   olympiadTaskId Int          @map("olympiad_task_id")
   olympiadTask   OlympiadTask @relation(fields: [olympiadTaskId], references: [id], onDelete: Cascade)
 
-  rightAnswer Boolean
+  rightAnswer Boolean @map("right_answer")
   text        String?
 
   taskAttempts OlympiadTaskAnswerAttempt[]
