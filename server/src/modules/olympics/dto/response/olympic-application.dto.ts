@@ -38,6 +38,7 @@ export class OlympicApplicationDto
 
   @Exclude()
   readonly student: StudentIncludesUser | null;
+
   @Expose()
   @ApiProperty({
     type: () => BasicUserDto,

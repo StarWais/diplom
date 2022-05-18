@@ -10,6 +10,7 @@ export class OlympicReviewDto
   extends BaseAbstractReviewDto
   implements OlympiadReview
 {
+  @Expose()
   @ApiProperty({
     type: 'integer',
     description: 'ID олимпиады',
@@ -17,19 +18,16 @@ export class OlympicReviewDto
   })
   readonly olympiadId: number;
 
+  @Expose()
   @ApiProperty({
     type: 'string',
     description: 'ID студента',
     example: 1,
   })
   readonly studentId: number;
+
   @Exclude()
   readonly student: StudentIncludesUser;
-
-  constructor(partial: Partial<OlympicReviewDto>) {
-    super(partial);
-    Object.assign(this, partial);
-  }
 
   @Expose()
   @ApiProperty({
@@ -39,5 +37,10 @@ export class OlympicReviewDto
   @Type(() => BasicUserDto)
   get author(): BasicUserDto {
     return new BasicUserDto(this.student.user);
+  }
+
+  constructor(partial: Partial<OlympicReviewDto>) {
+    super(partial);
+    Object.assign(this, partial);
   }
 }

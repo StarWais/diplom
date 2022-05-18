@@ -324,8 +324,8 @@ model OlympiadTask {
   task        String
   description String?
   points      Int
+  answerType  OlympiadTaskAnswerType
 
-  answerType OlympiadTaskAnswerType
   variants   OlympiadTaskAnswerVariant[]
   attempts   OlympiadTaskAnswerAttempt[]
 
@@ -612,6 +612,18 @@ model ArticleTag {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("article_tags")
+}
+
+model FAQQuestion {
+  id Int @id @default(autoincrement())
+
+  question String
+  answer   String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("faq_questions")
 }
 
 enum Role {

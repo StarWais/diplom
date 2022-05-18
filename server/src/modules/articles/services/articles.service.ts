@@ -8,8 +8,8 @@ import { Prisma, PublishingStatus, User } from '@prisma/client';
 import slugify from 'slugify';
 import { ArticleInclude } from '../interfaces';
 import { ArticlesGetFilter } from '../filters';
-import { ArticleNotFoundException } from '../exceptions';
 import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
+import { ArticleNotFoundException } from '../exceptions';
 
 @Injectable()
 export class ArticlesService {
@@ -99,6 +99,7 @@ export class ArticlesService {
     const article = await this.prisma.article.findUnique({
       where: details,
       ...this.articleIncludes,
+      rejectOnNotFound: true,
     });
 
     if (!article) {

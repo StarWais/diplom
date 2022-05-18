@@ -12,11 +12,6 @@ export class OlympicListedBaseDto extends PickType(OlympicDto, [
   @Exclude()
   readonly steps: OlympiadStep[];
 
-  constructor(partial: Partial<OlympicListedBaseDto>) {
-    super(partial);
-    Object.assign(this, partial);
-  }
-
   @Expose()
   @ApiProperty({
     type: 'date-time',
@@ -35,5 +30,10 @@ export class OlympicListedBaseDto extends PickType(OlympicDto, [
   })
   get finishDate(): Date {
     return this.steps.pop().finishDate;
+  }
+
+  constructor(partial: Partial<OlympicListedBaseDto>) {
+    super(partial);
+    Object.assign(this, partial);
   }
 }
