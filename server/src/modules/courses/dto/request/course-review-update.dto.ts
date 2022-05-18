@@ -1,14 +1,3 @@
-import { PublishingStatus } from '@prisma/client';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { ReviewUpdateDto } from '../../../../common/dto/request';
 
-export class CourseReviewUpdateDto {
-  @IsNotEmpty()
-  @IsEnum(PublishingStatus)
-  @ApiProperty({
-    enum: PublishingStatus,
-    example: PublishingStatus.PUBLISHED,
-    description: 'Статус публикации отзыва',
-  })
-  readonly status: PublishingStatus;
-}
+export class CourseReviewUpdateDto extends ReviewUpdateDto {}

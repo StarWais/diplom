@@ -64,7 +64,7 @@ export class CoursesReviewsService {
       },
       data: details,
     });
-    await this.coursesService.updateCourseRating(courseId);
+    await this.coursesService.updateRating(courseId);
     return new CourseReviewDto(result);
   }
 
@@ -101,10 +101,7 @@ export class CoursesReviewsService {
     );
   }
 
-  async checkIfUserReviewedCourse(
-    userId: number,
-    courseId: number,
-  ): Promise<boolean> {
+  async userReviewed(userId: number, courseId: number): Promise<boolean> {
     const review = await this.prisma.courseReview.findFirst({
       where: {
         studentId: userId,
@@ -122,7 +119,7 @@ export class CoursesReviewsService {
         id,
       },
     });
-    await this.coursesService.updateCourseRating(review.courseId);
+    await this.coursesService.updateRating(review.courseId);
   }
 
   async create(
@@ -137,7 +134,7 @@ export class CoursesReviewsService {
     if (!course.finished) {
       throw new CourseNotFinishedException(courseId);
     }
-    const userReviewedCourse = await this.checkIfUserReviewedCourse(
+    const userReviewedCourse = await this.userReviewed(
       currentUser.id,
       courseId,
     );
@@ -178,7 +175,7 @@ export class CoursesReviewsService {
       template: 'new-course-review',
       context: {
         reviewText: review.text,
-        authorFullName: review.author.fullName,
+        authorFullName: `${review.student.user.lastName} ${review.student.user.firstName} ${review.student.user.lastName} `,
         courseName: course.name,
         courseGrade: course.grade,
       },

@@ -1,12 +1,15 @@
 import { PrismaService } from 'nestjs-prisma';
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, PublishingStatus } from '@prisma/client';
 
 import { OlympicsBaseIncludes } from '../interfaces';
 import { OlympicCreateDto, OlympicUpdateDto } from '../dto/request';
 import { OlympicDto } from '../dto/response';
 import { OlympicNotFoundException } from '../exceptions';
 import { ImagesService } from '../../images/services';
+import { GetOlympicsFilter } from '../filters';
+import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
+import { OlympicListedBaseDto } from '../dto/response/olympic-listed-base.dto';
 
 @Injectable()
 export class OlympicsService {
@@ -19,6 +22,12 @@ export class OlympicsService {
     include: {
       steps: true,
       tags: true,
+    },
+  };
+
+  private olympicWithStepsInclude: OlympicsBaseIncludes = {
+    include: {
+      steps: true,
     },
   };
 
@@ -44,6 +53,39 @@ export class OlympicsService {
       ...this.olympicsBaseIncludes,
     });
     return new OlympicDto(result);
+  }
+
+  async findMany(
+    filter: GetOlympicsFilter,
+  ): Promise<PaginatedDto<OlympicListedBaseDto>> {
+    return Paginate<Prisma.OlympiadFindManyArgs>(
+      OlympicListedBaseDto,
+      {
+        page: filter.page,
+        limit: filter.limit,
+      },
+      this.prisma,
+      'olympiad',
+      {
+        where: {
+          tags: {
+            some: {
+              name: {
+                in: filter.tags,
+              },
+            },
+          },
+          grade: {
+            equals: filter.grade,
+          },
+        },
+        orderBy: {
+          rating: 'desc',
+        },
+        ...this.olympicWithStepsInclude,
+      },
+      (olympic) => new OlympicListedBaseDto(olympic),
+    );
   }
 
   async update(
@@ -96,5 +138,40 @@ export class OlympicsService {
   async delete(searchDetails: Prisma.OlympiadWhereUniqueInput): Promise<void> {
     await this.findOneOrThrowError(searchDetails);
     await this.prisma.olympiad.delete({ where: searchDetails });
+  }
+
+  async userAttended(olympicsId: number, userId: number): Promise<boolean> {
+    const olympic = await this.prisma.olympiad.findFirst({
+      where: {
+        id: olympicsId,
+        studentsAttended: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
+    return !!olympic;
+  }
+
+  async updateRating(olympicId: number): Promise<void> {
+    const reviews = await this.prisma.olympiadReview.findMany({
+      where: {
+        olympiadId: olympicId,
+        status: PublishingStatus.PUBLISHED,
+      },
+    });
+    if (reviews.length === 0) {
+      return;
+    }
+    const rating = reviews.reduce((acc, review) => acc + review.rating, 0);
+    await this.prisma.olympiad.update({
+      where: {
+        id: olympicId,
+      },
+      data: {
+        rating: rating / reviews.length,
+      },
+    });
   }
 }

@@ -55,12 +55,13 @@ model Student {
 
   courses                    Course[]
   teacherRatings             TeacherRating[]
+  olympiadsAttended          Olympiad[]
   myTeachers                 Teacher[]
   courseApplications         CourseApplication[]
-  olympiadApplications       OlympiadApplication[]
-  olympiadTaskAnswerAttempts OlympiadTaskAnswerAttempt[]
   attendances                CourseAttendance[]
   courseReviews              CourseReview[]
+  olympiadApplications       OlympiadApplication[]
+  olympiadTaskAnswerAttempts OlympiadTaskAnswerAttempt[]
   olympiadReviews            OlympiadReview[]
   olympiadStepResults        OlympiadStepResult[]
   olympiadStepAttempts       OlympiadStepAttempt[]
@@ -210,6 +211,7 @@ model Olympiad {
   exampleTasksImages String[]                  @map("example_tasks_images")
   imageLink          String                    @map("image_link")
   rewards            String[]
+  studentsAttended   Student[]
 
   steps        OlympiadStep[]
   tags         OlympiadTag[]
@@ -230,8 +232,6 @@ model OlympiadApplication {
 
   studentId Int     @map("student_id")
   student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
-
-  status ApplicationStatus @default(CREATED)
 
   steps OlympiadStep[]
 
@@ -320,8 +320,10 @@ model OlympiadTask {
   olympiadStepId Int          @map("olympiad_step_id")
   olympiadStep   OlympiadStep @relation(fields: [olympiadStepId], references: [id], onDelete: Cascade)
 
+
   task        String
   description String?
+  points      Int
 
   answerType OlympiadTaskAnswerType
   variants   OlympiadTaskAnswerVariant[]
@@ -339,7 +341,7 @@ model OlympiadTaskAnswerAttempt {
   olympiadTaskId Int          @map("olympiad_task_id")
   olympiadTask   OlympiadTask @relation(fields: [olympiadTaskId], references: [id], onDelete: Cascade)
 
-  olympiadStepAttemptId Int?
+  olympiadStepAttemptId Int? @map("olympiad_step_attempt_id")
   olympiadStepAttempt   OlympiadStepAttempt? @relation(fields: [olympiadStepAttemptId], references: [id], onDelete: Cascade)
 
   studentId Int     @map("student_id")
@@ -362,7 +364,6 @@ model OlympiadTaskAnswerVariant {
   olympiadTask   OlympiadTask @relation(fields: [olympiadTaskId], references: [id], onDelete: Cascade)
 
   rightAnswer Boolean
-  points      Int
   text        String?
 
   taskAttempts OlympiadTaskAnswerAttempt[]
@@ -441,6 +442,7 @@ model CourseModule {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  @@map("courses_modules")
 }
 
 model CourseTag {

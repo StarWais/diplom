@@ -37,6 +37,11 @@ export class OlympicStepCreateDto {
   @IsDate()
   readonly finishDate: Date;
 
+  @ApiProperty({
+    description: 'Номер этапа',
+    type: 'number',
+    example: 1,
+  })
   readonly step: number;
 
   constructor(partial: Partial<OlympicStepCreateDto>) {

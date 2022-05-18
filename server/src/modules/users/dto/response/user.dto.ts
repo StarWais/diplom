@@ -1,8 +1,10 @@
 import { Gender, Role, User } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 
 import { BaseAbstractDto } from '../../../../common/dto/response';
+import { StudentDto } from '../../../students/dto/response';
+import { TeacherDto } from '../../../teachers/dto/response';
 
 export class UserDto extends BaseAbstractDto implements User {
   @Expose()
@@ -115,6 +117,24 @@ export class UserDto extends BaseAbstractDto implements User {
     type: 'boolean',
   })
   readonly newEmailConfirmed: boolean;
+
+  @Expose()
+  @ApiProperty({
+    description: 'Информация об учителе',
+    type: () => TeacherDto,
+    nullable: true,
+  })
+  @Type(() => TeacherDto)
+  readonly teacherInfo: TeacherDto | null;
+
+  @Expose()
+  @ApiProperty({
+    description: 'Информация об ученике',
+    type: () => StudentDto,
+    nullable: true,
+  })
+  @Type(() => StudentDto)
+  readonly studentInfo: StudentDto | null;
 
   @Expose()
   @ApiProperty({

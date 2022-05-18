@@ -1,3 +1,3 @@
-import { ReviewCreateDto } from '../../../../common/dto/request/review-create.dto';
+import { ReviewCreateDto } from '../../../../common/dto/request';
 
 export class CourseReviewCreateDto extends ReviewCreateDto {}

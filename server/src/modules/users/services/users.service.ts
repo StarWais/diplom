@@ -1,11 +1,12 @@
 import { PrismaService } from 'nestjs-prisma';
-import { Prisma, Role, TokenStatus, User } from '@prisma/client';
 import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+  EmailChangeToken,
+  Prisma,
+  Role,
+  TokenStatus,
+  User,
+} from '@prisma/client';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import {
   ConfirmEmailChangeDto,
   UpdateUserAvatarDto,
@@ -24,7 +25,13 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { UsersGetFilter } from '../filters/users-get.filter';
 import { Paginate } from '../../../common/pagination/pagination';
 import { UserInclude } from '../interfaces';
-import { UserDto } from '../dto/response';
+import { UserDto, UserListedDto } from '../dto/response';
+import {
+  EmailAlreadyConfirmedException,
+  EmailUserExistsException,
+  SameEmailInputException,
+  UserNotFoundException,
+} from '../exceptions';
 
 @Injectable()
 export class UsersService {
@@ -42,17 +49,15 @@ export class UsersService {
     },
   };
 
-  async findUnique(details: Prisma.UserWhereUniqueInput) {
-    const result = await this.prisma.user.findUnique({
+  async findUnique(details: Prisma.UserWhereUniqueInput): Promise<User> {
+    return this.prisma.user.findUnique({
       where: details,
-      ...this.userIncludeDetails,
     });
-    return result;
   }
 
   async findMany(filter: UsersGetFilter) {
     return Paginate<Prisma.UserFindManyArgs>(
-      UserDto,
+      UserListedDto,
       {
         limit: filter.limit,
         page: filter.page,
@@ -90,19 +95,23 @@ export class UsersService {
           createdAt: 'desc',
         },
       },
+      (user) => new UserListedDto(user),
     );
   }
 
   async findUniqueOrThrowError(details: Prisma.UserWhereUniqueInput) {
-    const user = await this.findUnique(details);
-    if (!user) {
-      throw new NotFoundException('Пользователь не найден');
+    const result = await this.prisma.user.findUnique({
+      where: details,
+      ...this.userIncludeDetails,
+    });
+    if (!result) {
+      throw new UserNotFoundException(details.id || details.email);
     }
-    return user;
+    return new UserDto(result);
   }
 
-  async makeTeacher(user: User) {
-    return this.prisma.user.update({
+  async makeTeacher(user: User): Promise<void> {
+    await this.prisma.user.update({
       where: { id: user.id },
       data: {
         role: Role.TEACHER,
@@ -120,8 +129,8 @@ export class UsersService {
   async updatePassword(
     searchDetails: Prisma.UserWhereUniqueInput,
     newPassword: string,
-  ) {
-    return this.prisma.user.update({
+  ): Promise<void> {
+    await this.prisma.user.update({
       where: searchDetails,
       data: {
         password: newPassword,
@@ -129,7 +138,7 @@ export class UsersService {
     });
   }
 
-  async confirmUser(details: Prisma.UserWhereUniqueInput) {
+  async confirmUser(details: Prisma.UserWhereUniqueInput): Promise<User> {
     return this.prisma.user.update({
       where: details,
       data: {
@@ -178,105 +187,18 @@ export class UsersService {
     });
   }
 
-  private async validateEmailChange(user: User, updateUserDto: UpdateUserDto) {
-    const userWithEmail = await this.findUnique({ email: updateUserDto.email });
-    if (userWithEmail && userWithEmail.id === user.id) {
-      throw new BadRequestException(
-        'Вы не можете изменить свой email на тот же',
-      );
-    }
-    if (userWithEmail && userWithEmail.id !== user.id) {
-      throw new BadRequestException(
-        'Пользователь с таким email уже существует',
-      );
-    }
-  }
-
-  private async checkUpdatePermission(
-    currentUser: User,
-    searchDetails: Prisma.UserWhereUniqueInput,
-  ) {
-    if (currentUser.role === Role.ADMIN) {
-      return;
-    }
-    if (currentUser.id !== searchDetails.id) {
-      throw new ForbiddenException();
-    }
-  }
-
-  private async createEmailChangeToken(
-    details: Omit<Prisma.EmailChangeTokenCreateInput, 'token' | 'expiresIn'>,
-  ) {
-    const { length: tokenLength, expiresIn: tokenExpiresIn } =
-      this.config.get<ConfirmationTokenOptions>(
-        'authOptions.emailChangeTokenOptions',
-      );
-    const tokenValue = crypto.randomBytes(tokenLength).toString('hex');
-    return this.prisma.emailChangeToken.create({
-      data: {
-        token: tokenValue,
-        expiresIn: new Date(tokenExpiresIn + Date.now()),
-        ...details,
-      },
-    });
-  }
-
-  async sendAnotherEmailChangeToken(user: User, browserInfo: BrowserInfo) {
+  async sendAnotherEmailChangeToken(
+    user: User,
+    browserInfo: BrowserInfo,
+  ): Promise<void> {
     if (user.newEmailConfirmed) {
-      throw new BadRequestException(
-        'Пользователю не требуется повторная отправка токена',
-      );
+      throw new EmailAlreadyConfirmedException();
     }
     await this.disableOtherEmailChangeTokens(user.id);
     return this.createSendEmailChangeToken(user, browserInfo);
   }
 
-  private async sendEmailChangeTokenEmail(
-    user: User,
-    token: string,
-    newEmail?: string,
-  ) {
-    return this.mailerService.sendMail({
-      to: user.email,
-      subject: 'Изменение email',
-      template: 'email-change',
-      context: {
-        fullName: `${user.lastName} ${user.firstName} ${user.middleName}`,
-        email: newEmail || user.newEmail,
-        title: 'Подтверждение смены email',
-        linkButtonLink: `${
-          this.config.get<DomainOptions>('domainOptions').frontend
-        }/change-email/${token}`,
-        linkButtonText: 'Изменить email',
-      },
-    });
-  }
-
-  private async createSendEmailChangeToken(
-    user: User,
-    browserInfo: BrowserInfo,
-    newEmail?: string,
-  ) {
-    const token = await this.createEmailChangeToken({
-      user: {
-        connect: {
-          id: user.id,
-        },
-      },
-      ...browserInfo,
-    });
-
-    await this.sendEmailChangeTokenEmail(user, token.token, newEmail);
-  }
-
-  private async validateEmailChangeToken(tokenValue: string) {
-    const tokenInfo = await this.prisma.emailChangeToken.findUnique({
-      where: { token: tokenValue },
-    });
-    return HelpersMethods.checkToken(tokenInfo);
-  }
-
-  async confirmEmailChange(details: ConfirmEmailChangeDto) {
+  async confirmEmailChange(details: ConfirmEmailChangeDto): Promise<void> {
     const token = await this.validateEmailChangeToken(details.token);
     await this.prisma.emailChangeToken.update({
       where: { id: token.id },
@@ -298,23 +220,11 @@ export class UsersService {
     });
   }
 
-  private async disableOtherEmailChangeTokens(userId: number) {
-    await this.prisma.emailChangeToken.updateMany({
-      where: {
-        userId,
-        expiresIn: { gt: new Date(Date.now()) },
-      },
-      data: {
-        expiresIn: new Date(Date.now() - 1),
-      },
-    });
-  }
-
   async updateAvatar(
     searchDetails: Prisma.UserWhereUniqueInput,
     currentUser: User,
     details: UpdateUserAvatarDto,
-  ) {
+  ): Promise<string> {
     await this.checkUpdatePermission(currentUser, searchDetails);
     await this.findUniqueOrThrowError(searchDetails);
     const avatarLink = await this.imageService.save(details.avatar);
@@ -333,7 +243,7 @@ export class UsersService {
     details: UpdateUserDto,
     currentUser: User,
     browserInfo: BrowserInfo,
-  ) {
+  ): Promise<UserDto> {
     await this.checkUpdatePermission(currentUser, searchDetails);
     const userToUpdate = await this.findUniqueOrThrowError(searchDetails);
     const { email, studentInfo, teacherInfo, ...rest } = details;
@@ -343,7 +253,7 @@ export class UsersService {
       await this.createSendEmailChangeToken(userToUpdate, browserInfo, email);
     }
 
-    return this.prisma.user.update({
+    const result = await this.prisma.user.update({
       where: searchDetails,
       data: {
         ...rest,
@@ -359,6 +269,109 @@ export class UsersService {
         },
       },
       ...this.userIncludeDetails,
+    });
+
+    return new UserDto(result);
+  }
+
+  private async validateEmailChange(
+    user: User,
+    updateUserDto: UpdateUserDto,
+  ): Promise<void> {
+    const userWithEmail = await this.findUnique({ email: updateUserDto.email });
+    if (userWithEmail && userWithEmail.id === user.id) {
+      throw new SameEmailInputException();
+    }
+    if (userWithEmail && userWithEmail.id !== user.id) {
+      throw new EmailUserExistsException(updateUserDto.email);
+    }
+  }
+
+  private checkUpdatePermission(
+    currentUser: User,
+    searchDetails: Prisma.UserWhereUniqueInput,
+  ): void {
+    if (currentUser.role === Role.ADMIN) {
+      return;
+    }
+    if (currentUser.id !== searchDetails.id) {
+      throw new ForbiddenException();
+    }
+  }
+
+  private async createEmailChangeToken(
+    details: Omit<Prisma.EmailChangeTokenCreateInput, 'token' | 'expiresIn'>,
+  ): Promise<EmailChangeToken> {
+    const { length: tokenLength, expiresIn: tokenExpiresIn } =
+      this.config.get<ConfirmationTokenOptions>(
+        'authOptions.emailChangeTokenOptions',
+      );
+    const tokenValue = crypto.randomBytes(tokenLength).toString('hex');
+    return this.prisma.emailChangeToken.create({
+      data: {
+        token: tokenValue,
+        expiresIn: new Date(tokenExpiresIn + Date.now()),
+        ...details,
+      },
+    });
+  }
+
+  private async sendEmailChangeTokenEmail(
+    user: User,
+    token: string,
+    newEmail?: string,
+  ): Promise<void> {
+    return this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Изменение email',
+      template: 'email-change',
+      context: {
+        fullName: `${user.lastName} ${user.firstName} ${user.middleName}`,
+        email: newEmail || user.newEmail,
+        title: 'Подтверждение смены email',
+        linkButtonLink: `${
+          this.config.get<DomainOptions>('domainOptions').frontend
+        }/change-email/${token}`,
+        linkButtonText: 'Изменить email',
+      },
+    });
+  }
+
+  private async createSendEmailChangeToken(
+    user: User,
+    browserInfo: BrowserInfo,
+    newEmail?: string,
+  ): Promise<void> {
+    const token = await this.createEmailChangeToken({
+      user: {
+        connect: {
+          id: user.id,
+        },
+      },
+      ...browserInfo,
+    });
+
+    await this.sendEmailChangeTokenEmail(user, token.token, newEmail);
+  }
+
+  private async validateEmailChangeToken(
+    tokenValue: string,
+  ): Promise<EmailChangeToken> {
+    const tokenInfo = await this.prisma.emailChangeToken.findUnique({
+      where: { token: tokenValue },
+    });
+    return HelpersMethods.checkToken(tokenInfo);
+  }
+
+  private async disableOtherEmailChangeTokens(userId: number): Promise<void> {
+    await this.prisma.emailChangeToken.updateMany({
+      where: {
+        userId,
+        expiresIn: { gt: new Date(Date.now()) },
+      },
+      data: {
+        expiresIn: new Date(Date.now() - 1),
+      },
     });
   }
 }

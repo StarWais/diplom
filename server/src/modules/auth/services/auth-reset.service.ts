@@ -3,13 +3,14 @@ import { PrismaService } from 'nestjs-prisma';
 import { PasswordResetToken, Prisma, TokenStatus, User } from '@prisma/client';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import * as crypto from 'crypto';
+import { ConfigService } from '@nestjs/config';
+import { MailerService } from '@nestjs-modules/mailer';
+
 import {
   ConfirmationTokenOptions,
   DomainOptions,
 } from '../../../config/configuration';
-import * as crypto from 'crypto';
-import { MailerService } from '@nestjs-modules/mailer';
-import { ConfigService } from '@nestjs/config';
 import { HelpersMethods } from '../../../common/helpers/helpers.methods';
 import { ConfirmPasswordResetDto, PasswordResetDto } from '../dto/request';
 import { PasswordsMustBeDifferentException } from '../exceptions';

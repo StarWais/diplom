@@ -11,6 +11,7 @@ export class GetByTagsAndGradeFilter extends PaginationQuery {
     type: 'number',
     example: 1,
     required: false,
+    description: 'Класс',
   })
   grade?: number;
 
@@ -20,6 +21,7 @@ export class GetByTagsAndGradeFilter extends PaginationQuery {
     example: 'tag1,tag2',
     type: 'string',
     required: false,
+    description: 'Список тегов через запятую',
   })
   tags?: string[];
 }
