@@ -1,7 +1,8 @@
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
+
+import { PaginationQuery } from '@pagination/pagination-query';
 
 export class UsersGetFilter extends PaginationQuery {
   @IsOptional()
@@ -11,7 +12,7 @@ export class UsersGetFilter extends PaginationQuery {
     example: 'Новость',
     required: false,
   })
-  search?: string;
+  readonly search?: string;
 
   @IsOptional()
   @IsEnum(Role)
@@ -20,5 +21,5 @@ export class UsersGetFilter extends PaginationQuery {
     required: false,
     enum: Role,
   })
-  role?: Role;
+  readonly role?: Role;
 }

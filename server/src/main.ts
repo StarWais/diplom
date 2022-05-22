@@ -11,7 +11,7 @@ import {
   DomainOptions,
   SwaggerOptions,
   ValidationPipeOptions,
-} from './config/configuration';
+} from '@config/configuration';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

@@ -2,8 +2,8 @@ import { Student, Teacher } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
 
-import { BaseAbstractDto } from '../../../../common/dto/response';
-import { CourseListedDto } from '../../../courses/dto/response';
+import { BaseAbstractDto } from '@common/dto/response';
+import { CourseListedDto } from '@courses/dto/response';
 
 export class TeacherDto extends BaseAbstractDto implements Teacher {
   @Expose()

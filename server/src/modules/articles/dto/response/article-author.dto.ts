@@ -1,7 +1,7 @@
-import { BasicUserDto } from '../../../users/dto/response';
-
 import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { BasicUserDto } from '@users/dto/response';
 
 export class ArticleAuthorDto extends BasicUserDto {
   @Expose()

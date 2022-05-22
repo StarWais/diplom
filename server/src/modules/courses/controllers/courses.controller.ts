@@ -23,17 +23,14 @@ import {
 } from '@nestjs/swagger';
 import { FormDataRequest } from 'nestjs-form-data';
 
-import { FindOneByIDParams } from '../../../common/params';
+import { FindOneByIDParams } from '@common/params';
 import { CoursesService } from '../services';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
+import { Roles } from '@auth/decorators/roles.decorator';
+import { JwtAuthGuard, RolesGuard } from '@auth/guards';
 import { CourseCreateDto, CourseUpdateDto } from '../dto/request';
-import { CurrentUser } from '../../../common/decorators';
-import { GetByTagsAndGradeFilter } from '../../../common/filters';
-import {
-  ApiPaginatedResponse,
-  PaginatedDto,
-} from '../../../common/pagination/pagination';
+import { CurrentUser } from '@common/decorators';
+import { GetByTagsAndGradeFilter } from '@common/filters';
+import { ApiPaginatedResponse, PaginatedDto } from '@pagination/pagination';
 import {
   CourseDto,
   CourseListedDto,
@@ -42,7 +39,7 @@ import {
   CourseTagDto,
 } from '../dto/response';
 import { GetPersonalCoursesFilter } from '../filters';
-import { BasicUserNameDto } from '../../users/dto/response';
+import { BasicUserNameDto } from '@users/dto/response';
 
 @ApiTags('Курсы')
 @Controller('courses')

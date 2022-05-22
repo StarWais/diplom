@@ -1,14 +1,10 @@
-import { CourseListedPersonalBaseDto } from './course-listed-personal-base.dto';
 import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { differenceInMilliseconds } from 'date-fns';
 
-export class CourseListedPersonalTeacherDto extends CourseListedPersonalBaseDto {
-  constructor(partial: Partial<CourseListedPersonalTeacherDto>) {
-    super(partial);
-    Object.assign(this, partial);
-  }
+import { CourseListedPersonalBaseDto } from './course-listed-personal-base.dto';
 
+export class CourseListedPersonalTeacherDto extends CourseListedPersonalBaseDto {
   @Expose()
   @ApiProperty({
     description: 'Прогресс обучения',
@@ -29,5 +25,10 @@ export class CourseListedPersonalTeacherDto extends CourseListedPersonalBaseDto 
       (betweenTodayAndFinishDate / betweenFinishDateAndStartDate) * 100,
     );
     return `${progress}%`;
+  }
+
+  constructor(partial: Partial<CourseListedPersonalTeacherDto>) {
+    super(partial);
+    Object.assign(this, partial);
   }
 }

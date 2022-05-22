@@ -1,6 +1,7 @@
 import { Prisma, Student } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
+
 import { StudentNotFoundException } from '../exceptions';
 
 @Injectable()

@@ -22,17 +22,14 @@ import {
 } from '@nestjs/swagger';
 import { Role, User } from '@prisma/client';
 
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
+import { PaginationQuery } from '@pagination/pagination-query';
+import { Roles } from '@auth/decorators/roles.decorator';
+import { JwtAuthGuard, RolesGuard } from '@auth/guards';
 import { CourseReviewCreateDto, CourseReviewUpdateDto } from '../dto/request';
-import { CurrentUser } from '../../../common/decorators';
+import { CurrentUser } from '@common/decorators';
 import { FindByCourseIdParams, FindCourseReviewParams } from '../params';
 import { CourseReviewDto } from '../dto/response';
-import {
-  ApiPaginatedResponse,
-  PaginatedDto,
-} from '../../../common/pagination/pagination';
+import { ApiPaginatedResponse, PaginatedDto } from '@pagination/pagination';
 
 @ApiTags('Отзывы к курсам')
 @Controller('courses/:courseId/reviews')

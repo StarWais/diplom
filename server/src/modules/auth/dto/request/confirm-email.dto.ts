@@ -9,5 +9,5 @@ export class ConfirmEmailDto {
   })
   @IsNotEmpty()
   @IsString()
-  token: string;
+  readonly token: string;
 }

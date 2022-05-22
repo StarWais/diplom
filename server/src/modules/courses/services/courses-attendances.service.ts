@@ -13,10 +13,10 @@ import {
   CourseAttendanceNotFoundException,
   CourseNotCuratingException,
 } from '../exceptions';
-import { HelpersMethods } from '../../../common/helpers/helpers.methods';
+import { HelpersMethods } from '@common/helpers/helpers.methods';
 import { CourseAttendanceInclude } from '../interfaces';
 import { CourseAttendanceDto } from '../dto/response';
-import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
+import { Paginate, PaginatedDto } from '@pagination/pagination';
 import { GetCoursesAttendancesFilter } from '../filters';
 
 @Injectable()

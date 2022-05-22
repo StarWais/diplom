@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsPositive,
 } from 'class-validator';
+
 import { CourseApplicationCreateDto } from './course-application-create.dto';
 
 export class CourseApplicationUpdateDto extends PartialType(
@@ -16,6 +17,7 @@ export class CourseApplicationUpdateDto extends PartialType(
     enum: ApplicationStatus,
     example: ApplicationStatus.PENDING,
     required: false,
+    description: 'Статус заявки',
   })
   @IsOptional()
   @IsNotEmpty()
@@ -29,6 +31,7 @@ export class CourseApplicationUpdateDto extends PartialType(
     example: 1,
     type: 'integer',
     required: false,
+    description: 'Идентификатор студента',
   })
   readonly studentId?: number;
 }

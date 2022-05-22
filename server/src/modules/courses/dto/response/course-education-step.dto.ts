@@ -2,7 +2,7 @@ import { CourseEducationStep } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
-import { BaseAbstractDto } from '../../../../common/dto/response';
+import { BaseAbstractDto } from '@common/dto/response';
 
 export class CourseEducationStepDto
   extends BaseAbstractDto

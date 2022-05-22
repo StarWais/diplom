@@ -15,8 +15,8 @@ import {
 } from '../exceptions';
 import { OlympicsApplicationInclude } from '../interfaces';
 import { OlympicApplicationDto } from '../dto/response';
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
-import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
+import { PaginationQuery } from '@pagination/pagination-query';
+import { Paginate, PaginatedDto } from '@pagination/pagination';
 
 @Injectable()
 export class OlympicsApplicationsService {

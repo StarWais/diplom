@@ -26,19 +26,16 @@ import { FormDataRequest } from 'nestjs-form-data';
 import { Role, User } from '@prisma/client';
 
 import { UsersService } from '../services';
-import { FindOneByIDParams } from '../../../common/params';
+import { FindOneByIDParams } from '@common/params';
 import {
   BrowserInfo,
   CurrentBrowserInfo,
-} from '../../../common/decorators/browser-info.decorator';
-import { CurrentUser } from '../../../common/decorators';
-import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
-import { Roles } from '../../auth/decorators/roles.decorator';
+} from '@common/decorators/browser-info.decorator';
+import { CurrentUser } from '@common/decorators';
+import { JwtAuthGuard, RolesGuard } from '@auth/guards';
+import { Roles } from '@auth/decorators/roles.decorator';
 import { UsersGetFilter } from '../filters/users-get.filter';
-import {
-  ApiPaginatedResponse,
-  PaginatedDto,
-} from '../../../common/pagination/pagination';
+import { ApiPaginatedResponse, PaginatedDto } from '@pagination/pagination';
 import { UserDto, UserListedDto } from '../dto/response';
 
 @Controller('users')

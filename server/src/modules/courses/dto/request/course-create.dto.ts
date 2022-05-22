@@ -7,16 +7,12 @@ import {
   IsInt,
   IsNotEmpty,
   IsPositive,
+  IsString,
   Length,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { Expose, Type } from 'class-transformer';
-import {
-  CourseEducationStepCreateDto,
-  CourseModuleCreateDto,
-  CourseTagCreateDto,
-} from './index';
+import { Type } from 'class-transformer';
 import {
   FileSystemStoredFile,
   HasMimeType,
@@ -24,17 +20,26 @@ import {
   MaxFileSize,
 } from 'nestjs-form-data';
 
+import {
+  CourseEducationStepCreateDto,
+  CourseModuleCreateDto,
+  CourseTagCreateDto,
+} from './index';
+
 export class CourseCreateDto {
   @ApiProperty({
-    example: 'Название курса',
+    example: 'Курс по программированию',
+    description: 'Название курса',
   })
   @IsNotEmpty()
+  @IsString()
   @MaxLength(100)
   readonly name: string;
 
   @ApiProperty({
     example: 5,
     type: 'integer',
+    description: 'Вместимость курса',
   })
   @IsInt()
   @IsPositive()
@@ -43,6 +48,7 @@ export class CourseCreateDto {
   @ApiProperty({
     example: 5,
     type: 'integer',
+    description: 'Идентификатор преподавателя',
   })
   @IsInt()
   @IsPositive()
@@ -51,6 +57,7 @@ export class CourseCreateDto {
   @ApiProperty({
     example: 11,
     type: 'integer',
+    description: 'Класс курса',
   })
   @IsInt()
   @IsPositive()
@@ -59,6 +66,7 @@ export class CourseCreateDto {
   @ApiProperty({
     example: 11,
     type: 'integer',
+    description: 'Стоимость курса',
   })
   @IsInt()
   @IsPositive()
@@ -68,6 +76,7 @@ export class CourseCreateDto {
     isArray: true,
     type: 'string',
     example: ['Cтудентам', 'Преподавателям'],
+    description: 'Кому этот курс подходит',
   })
   @IsArray()
   @ArrayMinSize(1)
@@ -78,6 +87,7 @@ export class CourseCreateDto {
     isArray: true,
     type: 'string',
     example: ['Возможность 1', 'Возможность 2'],
+    description: 'Возможности курса',
   })
   @IsArray()
   @ArrayMinSize(1)
@@ -85,13 +95,18 @@ export class CourseCreateDto {
 
   @ApiProperty({
     example: 'https://example.com/materials.zip',
+    type: 'string',
+    description: 'Ссылка на материалы',
   })
   @IsNotEmpty()
+  @IsString()
   @Length(1, 255)
   readonly materialsLink: string;
 
   @ApiProperty({
     example: 12,
+    type: 'integer',
+    description: 'Кол-во материалов курса',
   })
   @IsInt()
   @IsPositive()
@@ -100,14 +115,16 @@ export class CourseCreateDto {
   @ApiProperty({
     type: 'date-time',
     example: '2020-01-01T00:00:00.000Z',
+    description: 'Дата начала курса',
   })
   @IsNotEmpty()
   @IsDate()
   readonly startDate: Date;
 
   @ApiProperty({
-    example: Date.now(),
     type: 'date-time',
+    example: '2020-01-01T00:00:00.000Z',
+    description: 'Дата окончания курса',
   })
   @IsNotEmpty()
   @IsDate()
@@ -116,6 +133,7 @@ export class CourseCreateDto {
   @ApiProperty({
     isArray: true,
     type: () => CourseEducationStepCreateDto,
+    description: 'Этапы обучения',
   })
   @IsArray()
   @ValidateNested({ each: true })
@@ -127,6 +145,7 @@ export class CourseCreateDto {
   @ApiProperty({
     isArray: true,
     type: () => CourseModuleCreateDto,
+    description: 'Модули курса',
   })
   @IsArray()
   @ValidateNested({ each: true })
@@ -138,6 +157,7 @@ export class CourseCreateDto {
   @ApiProperty({
     isArray: true,
     type: () => CourseTagCreateDto,
+    description: 'Теги курса',
   })
   @IsArray()
   @ValidateNested({ each: true })
@@ -148,17 +168,16 @@ export class CourseCreateDto {
 
   @ApiProperty({
     example: '12367yfhu23njn',
+    description: 'Номер ЕРИП',
   })
   @IsNotEmpty()
+  @IsString()
   @MaxLength(100)
   readonly eripNumber: string;
 
-  constructor(partial: Partial<CourseCreateDto>) {
-    Object.assign(this, partial);
-  }
-
   @ApiProperty({
     type: 'file',
+    description: 'Картинка курса',
   })
   @IsFile()
   @MaxFileSize(1e6)
@@ -170,10 +189,9 @@ export class CourseCreateDto {
     'image/svg+xml',
     'image/webp',
   ])
-  image: FileSystemStoredFile;
+  readonly image: FileSystemStoredFile;
 
-  @Expose()
-  get placesAvailable(): number {
-    return this.capacity;
+  constructor(partial: Partial<CourseCreateDto>) {
+    Object.assign(this, partial);
   }
 }

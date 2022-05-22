@@ -7,15 +7,12 @@ import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
 
-import {
-  ConfirmationTokenOptions,
-  DomainOptions,
-} from '../../../config/configuration';
-import { HelpersMethods } from '../../../common/helpers/helpers.methods';
+import { ConfirmationTokenOptions, DomainOptions } from '@config/configuration';
+import { HelpersMethods } from '@common/helpers/helpers.methods';
 import { ConfirmPasswordResetDto, PasswordResetDto } from '../dto/request';
 import { PasswordsMustBeDifferentException } from '../exceptions';
-import { UsersService } from '../../users/services';
-import { BrowserInfo } from '../../../common/decorators/browser-info.decorator';
+import { UsersService } from '@users/services';
+import { BrowserInfo } from '@common/decorators/browser-info.decorator';
 import { AuthService } from './auth.service';
 
 @Injectable()

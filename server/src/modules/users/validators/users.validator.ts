@@ -1,4 +1,3 @@
-import { UsersService } from '../services';
 import {
   registerDecorator,
   ValidationOptions,
@@ -6,6 +5,8 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
+
+import { UsersService } from '../services';
 
 @ValidatorConstraint({ name: 'isEmailUserAlreadyExist', async: true })
 @Injectable()

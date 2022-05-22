@@ -18,8 +18,8 @@ import { User } from '@prisma/client';
 import { ConfirmEmailDto } from '../dto/request';
 import { AuthConfirmService } from '../services';
 import { JwtAuthGuard } from '../guards';
-import { CurrentBrowserInfo, CurrentUser } from '../../../common/decorators';
-import { BrowserInfo } from '../../../common/decorators/browser-info.decorator';
+import { CurrentBrowserInfo, CurrentUser } from '@common/decorators';
+import { BrowserInfo } from '@common/decorators/browser-info.decorator';
 
 @ApiTags('Подтверждение регистрации')
 @Controller('auth/confirm')

@@ -14,7 +14,7 @@ import {
   PasswordValidationRequirement,
 } from 'class-validator-password-check';
 
-import { IsEmailUserAlreadyExist } from '../../../users/validators/users.validator';
+import { IsEmailUserAlreadyExist } from '@users/validators';
 
 export const passwordRequirement: PasswordValidationRequirement = {
   mustContainLowerLetter: true,

@@ -14,16 +14,15 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-
-import { OlympicStepCreateDto } from './olympic-step-create.dto';
-import { CourseTagCreateDto } from '../../../courses/dto/request';
-import { OlympicTagCreateDto } from './olympic-tag-create.dto';
 import {
   FileSystemStoredFile,
   HasMimeType,
   IsFile,
   MaxFileSize,
 } from 'nestjs-form-data';
+
+import { OlympicStepCreateDto } from './olympic-step-create.dto';
+import { OlympicTagCreateDto } from './olympic-tag-create.dto';
 
 export class OlympicCreateDto {
   @ApiProperty({
@@ -93,7 +92,7 @@ export class OlympicCreateDto {
 
   @ApiProperty({
     isArray: true,
-    type: () => [CourseTagCreateDto],
+    type: () => [OlympicTagCreateDto],
   })
   @IsArray()
   @ValidateNested({ each: true })

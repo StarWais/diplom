@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { MailerService } from '@nestjs-modules/mailer';
-import { UsersService } from '../../users/services';
+import slugify from 'slugify';
+import { Prisma, PublishingStatus, User } from '@prisma/client';
+
+import { UsersService } from '@users/services';
 import { ArticleDto, ArticleListedDto, ArticleTagDto } from '../dto/response';
 import { ArticleCreateDto, ArticleUpdateDto } from '../dto/request';
-import { Prisma, PublishingStatus, User } from '@prisma/client';
-import slugify from 'slugify';
 import { ArticleInclude } from '../interfaces';
 import { ArticlesGetFilter } from '../filters';
-import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
+import { Paginate, PaginatedDto } from '@pagination/pagination';
 import { ArticleNotFoundException } from '../exceptions';
 
 @Injectable()

@@ -8,8 +8,8 @@ import {
 
 import { ConfirmPasswordResetDto, PasswordResetDto } from '../dto/request';
 import { AuthResetService } from '../services';
-import { CurrentBrowserInfo } from '../../../common/decorators';
-import { BrowserInfo } from '../../../common/decorators/browser-info.decorator';
+import { CurrentBrowserInfo } from '@common/decorators';
+import { BrowserInfo } from '@common/decorators/browser-info.decorator';
 
 @ApiTags('Сброс пароля')
 @Controller('auth/reset')

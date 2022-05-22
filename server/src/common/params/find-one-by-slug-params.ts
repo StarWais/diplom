@@ -9,5 +9,5 @@ export class FindOneBySlugParams {
     description: 'Slug ресурса',
   })
   @IsString()
-  slug: string;
+  readonly slug: string;
 }

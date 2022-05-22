@@ -1,8 +1,9 @@
 import { News } from '@prisma/client';
-import { BaseAbstractDto } from '../../../../common/dto/response';
 import { ApiProperty } from '@nestjs/swagger';
-import { NewsTagDto } from './news-tag.dto';
 import { Expose, Type } from 'class-transformer';
+
+import { BaseAbstractDto } from '@common/dto/response';
+import { NewsTagDto } from './news-tag.dto';
 
 export class NewsDto extends BaseAbstractDto implements News {
   @Expose()

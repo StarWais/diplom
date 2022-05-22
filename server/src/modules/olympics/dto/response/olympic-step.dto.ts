@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { OlympiadStep } from '@prisma/client';
 import { Expose } from 'class-transformer';
 
-import { BaseAbstractDto } from '../../../../common/dto/response';
+import { BaseAbstractDto } from '@common/dto/response';
 
 export class OlympicStepDto extends BaseAbstractDto implements OlympiadStep {
   @Expose()

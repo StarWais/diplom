@@ -2,9 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { CourseReview } from '@prisma/client';
 import { Exclude, Expose, Type } from 'class-transformer';
 
-import { BaseAbstractReviewDto } from '../../../../common/dto/response/base-abstract-review.dto';
-import { BasicUserDto } from '../../../users/dto/response';
-import { StudentIncludesUser } from '../../../students/interfaces';
+import { BaseAbstractReviewDto } from '@common/dto/response/base-abstract-review.dto';
+import { BasicUserDto } from '@users/dto/response';
+import { StudentIncludesUser } from '@students/interfaces';
 
 export class CourseReviewDto
   extends BaseAbstractReviewDto

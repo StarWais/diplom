@@ -4,7 +4,7 @@ import { FileSystemStoredFile } from 'nestjs-form-data';
 import { v4 } from 'uuid';
 import * as Sharp from 'sharp';
 
-import { DomainOptions, FormDataOptions } from '../../../config/configuration';
+import { DomainOptions, FormDataOptions } from '@config/configuration';
 
 @Injectable()
 export class ImagesService {

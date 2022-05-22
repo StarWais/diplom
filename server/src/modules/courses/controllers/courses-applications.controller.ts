@@ -11,10 +11,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CoursesApplicationsService } from '../services';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import { Role } from '@prisma/client';
-import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -23,18 +19,20 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
+import { CoursesApplicationsService } from '../services';
+import { Roles } from '@auth/decorators/roles.decorator';
+import { JwtAuthGuard, RolesGuard } from '@auth/guards';
+
+import { PaginationQuery } from '@pagination/pagination-query';
 import {
   CourseApplicationCreateDto,
   CourseApplicationUpdateDto,
 } from '../dto/request';
 import { FindByCourseIdParams, FindCourseApplicationParams } from '../params';
 import { CourseApplicationDto } from '../dto/response';
-import {
-  ApiPaginatedResponse,
-  PaginatedDto,
-} from '../../../common/pagination/pagination';
+import { ApiPaginatedResponse, PaginatedDto } from '@pagination/pagination';
 
 @ApiTags('Заявки на курсы')
 @Controller('courses/:courseId/applications')

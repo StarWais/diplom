@@ -1,8 +1,9 @@
 import { ApiProperty, PartialType, PickType } from '@nestjs/swagger';
-import { SignupDto } from '../../../auth/dto/request';
 import { IsDate, IsOptional, IsPhoneNumber } from 'class-validator';
-import { UpdateStudentDto } from './update-student.dto';
 import { Type } from 'class-transformer';
+
+import { SignupDto } from '@auth/dto/request';
+import { UpdateStudentDto } from './update-student.dto';
 import { UpdateTeacherDto } from './update-teacher.dto';
 
 export class UpdateUserDto extends PartialType(

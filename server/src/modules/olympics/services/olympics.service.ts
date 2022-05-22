@@ -6,9 +6,9 @@ import { OlympicsBaseIncludes } from '../interfaces';
 import { OlympicCreateDto, OlympicUpdateDto } from '../dto/request';
 import { OlympicDto } from '../dto/response';
 import { OlympicNotFoundException } from '../exceptions';
-import { ImagesService } from '../../images/services';
+import { ImagesService } from '@images/services';
 import { GetOlympicsFilter } from '../filters';
-import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
+import { Paginate, PaginatedDto } from '@pagination/pagination';
 import { OlympicListedBaseDto } from '../dto/response/olympic-listed-base.dto';
 
 @Injectable()

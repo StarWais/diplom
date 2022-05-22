@@ -14,9 +14,9 @@ import { FindByOlympicsIdParams, FindOlympicReviewParams } from '../params';
 import { OlympicReviewInclude } from '../interfaces';
 import { OlympicReviewCreateDto } from '../dto/request/olympic-review-create.dto';
 import { OlympicReviewUpdateDto } from '../dto/request/olympic-review-update.dto';
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
-import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
-import { UsersService } from '../../users/services';
+import { PaginationQuery } from '@pagination/pagination-query';
+import { Paginate, PaginatedDto } from '@pagination/pagination';
+import { UsersService } from '@users/services';
 
 @Injectable()
 export class OlympicsReviewsService {

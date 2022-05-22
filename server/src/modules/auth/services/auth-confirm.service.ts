@@ -5,15 +5,12 @@ import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
 import * as crypto from 'crypto';
 
-import {
-  ConfirmationTokenOptions,
-  DomainOptions,
-} from '../../../config/configuration';
-import { BrowserInfo } from '../../../common/decorators/browser-info.decorator';
+import { ConfirmationTokenOptions, DomainOptions } from '@config/configuration';
+import { BrowserInfo } from '@common/decorators/browser-info.decorator';
 import { UserAlreadyConfirmedException } from '../exceptions';
 import { ConfirmEmailDto } from '../dto/request';
-import { HelpersMethods } from '../../../common/helpers/helpers.methods';
-import { UsersService } from '../../users/services';
+import { HelpersMethods } from '@common/helpers/helpers.methods';
+import { UsersService } from '@users/services';
 
 @Injectable()
 export class AuthConfirmService {

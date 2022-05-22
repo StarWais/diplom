@@ -1,3 +1,3 @@
-import { GetByTagsAndGradeFilter } from '../../../common/filters';
+import { GetByTagsAndGradeFilter } from '@common/filters';
 
 export class GetCoursesFilter extends GetByTagsAndGradeFilter {}

@@ -19,17 +19,14 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ArticleCommentCreateDto } from '../dto/request';
-import {
-  ApiPaginatedResponse,
-  PaginatedDto,
-} from '../../../common/pagination/pagination';
+import { ApiPaginatedResponse, PaginatedDto } from '@pagination/pagination';
 import { Role, User } from '@prisma/client';
-import { CurrentUser } from '../../../common/decorators';
+import { CurrentUser } from '@common/decorators';
 import { ArticleCommentDto } from '../dto/response';
-import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
+import { JwtAuthGuard, RolesGuard } from '@auth/guards';
 import { FindArticleCommentParams, FindByArticleIdParams } from '../params';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
+import { Roles } from '@auth/decorators/roles.decorator';
+import { PaginationQuery } from '@pagination/pagination-query';
 import { ArticlesCommentsService } from '../services';
 
 @Controller('articles/:articleId/comments')

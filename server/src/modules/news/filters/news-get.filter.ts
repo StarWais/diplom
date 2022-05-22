@@ -1,7 +1,8 @@
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { PaginationQuery } from '@pagination/pagination-query';
 
 export class NewsGetFilter extends PaginationQuery {
   @IsOptional()
@@ -11,7 +12,7 @@ export class NewsGetFilter extends PaginationQuery {
     example: 'Новость',
     required: false,
   })
-  search?: string;
+  readonly search?: string;
 
   @IsOptional()
   @Transform(({ value }) => value.split(','))
@@ -20,5 +21,5 @@ export class NewsGetFilter extends PaginationQuery {
     type: 'string',
     required: false,
   })
-  tags?: string[];
+  readonly tags?: string[];
 }

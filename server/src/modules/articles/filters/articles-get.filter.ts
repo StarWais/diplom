@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsInt, IsOptional, IsPositive, IsString } from 'class-validator';
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
+
+import { PaginationQuery } from '@pagination/pagination-query';
 
 export class ArticlesGetFilter extends PaginationQuery {
   @IsOptional()
@@ -13,7 +14,7 @@ export class ArticlesGetFilter extends PaginationQuery {
     required: false,
     description: 'ID автора статьи',
   })
-  authorId?: number;
+  readonly authorId?: number;
 
   @IsOptional()
   @Transform(({ value }) => value.split(','))
@@ -23,7 +24,7 @@ export class ArticlesGetFilter extends PaginationQuery {
     required: false,
     description: 'Список тегов через запятую',
   })
-  tags?: string[];
+  readonly tags?: string[];
 
   @IsOptional()
   @IsString()
@@ -33,5 +34,5 @@ export class ArticlesGetFilter extends PaginationQuery {
     required: false,
     description: 'Текст поиска',
   })
-  search?: string;
+  readonly search?: string;
 }

@@ -4,13 +4,13 @@ import slugify from 'slugify';
 import { Prisma, User } from '@prisma/client';
 
 import { NewsGetFilter } from '../filters/news-get.filter';
-import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
+import { Paginate, PaginatedDto } from '@pagination/pagination';
 import { NewsCreateDto, NewsUpdateDto } from '../dto/request';
-import { ImagesService } from '../../images/services';
+import { ImagesService } from '@images/services';
 import { NewsInclude } from '../interfaces';
 import { NewsDto, NewsListedDto, NewsTagDto } from '../dto/response';
 import { NewsNotFoundException } from '../exceptions';
-import { FindOneByIDParams } from '../../../common/params';
+import { FindOneByIDParams } from '@common/params';
 
 @Injectable()
 export class NewsService {

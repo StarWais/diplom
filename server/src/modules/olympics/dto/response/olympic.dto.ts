@@ -2,7 +2,7 @@ import { Olympiad, OlympiadParticipationType } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
-import { BaseAbstractDto } from '../../../../common/dto/response';
+import { BaseAbstractDto } from '@common/dto/response';
 import { OlympicTagDto } from './olympic-tag.dto';
 
 export class OlympicDto extends BaseAbstractDto implements Olympiad {

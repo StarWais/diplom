@@ -2,9 +2,9 @@ import { AttendanceStatus, CourseAttendance } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
 
-import { BaseAbstractDto } from '../../../../common/dto/response';
-import { BasicUserDto } from '../../../users/dto/response';
-import { StudentIncludesUser } from '../../../students/interfaces';
+import { BaseAbstractDto } from '@common/dto/response';
+import { BasicUserDto } from '@users/dto/response';
+import { StudentIncludesUser } from '@students/interfaces';
 
 export class CourseAttendanceDto
   extends BaseAbstractDto
@@ -28,6 +28,7 @@ export class CourseAttendanceDto
 
   @Exclude()
   readonly student: StudentIncludesUser | null;
+
   @Expose()
   @ApiProperty({
     type: 'string',
@@ -36,6 +37,7 @@ export class CourseAttendanceDto
     nullable: true,
   })
   readonly reason: string | null;
+
   @Expose()
   @ApiProperty({
     enum: AttendanceStatus,
@@ -43,6 +45,7 @@ export class CourseAttendanceDto
     example: AttendanceStatus.PRESENT,
   })
   readonly status: AttendanceStatus;
+
   @Expose()
   @ApiProperty({
     description: 'Дата посещения',
@@ -50,11 +53,6 @@ export class CourseAttendanceDto
     example: '2020-01-01T00:00:00.000Z',
   })
   readonly date: Date;
-
-  constructor(partial: Partial<CourseAttendanceDto>) {
-    super(partial);
-    Object.assign(this, partial);
-  }
 
   @Expose()
   @ApiProperty({
@@ -65,5 +63,10 @@ export class CourseAttendanceDto
   @Type(() => BasicUserDto)
   get user(): BasicUserDto | null {
     return (this.student?.user as unknown as BasicUserDto) || null;
+  }
+
+  constructor(partial: Partial<CourseAttendanceDto>) {
+    super(partial);
+    Object.assign(this, partial);
   }
 }

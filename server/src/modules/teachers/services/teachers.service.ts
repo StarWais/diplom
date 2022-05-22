@@ -4,9 +4,9 @@ import { Prisma, Role, Student, User } from '@prisma/client';
 
 import { CreateTeacherDto, RateTeacherDto } from '../dto/request';
 import { TeachersGetFilter } from '../filters';
-import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
-import { UsersService } from '../../users/services';
-import { FindOneByIDParams } from '../../../common/params';
+import { Paginate, PaginatedDto } from '@pagination/pagination';
+import { UsersService } from '@users/services';
+import { FindOneByIDParams } from '@common/params';
 import {
   StudentNotTaughtException,
   TeacherAlreadyRatedException,

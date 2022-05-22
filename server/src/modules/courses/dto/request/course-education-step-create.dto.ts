@@ -6,6 +6,7 @@ export class CourseEducationStepCreateDto {
   @MaxLength(100)
   @ApiProperty({
     example: 'Название шага',
+    description: 'Название шага',
   })
   readonly title: string;
 
@@ -13,6 +14,7 @@ export class CourseEducationStepCreateDto {
   @MaxLength(100)
   @ApiProperty({
     example: 'Текст шага',
+    description: 'Описание шага',
   })
   readonly description: string;
 
@@ -21,6 +23,7 @@ export class CourseEducationStepCreateDto {
   @ApiProperty({
     example: 1,
     type: 'integer',
+    description: 'Порядковый номер шага',
   })
   readonly step: number;
 }

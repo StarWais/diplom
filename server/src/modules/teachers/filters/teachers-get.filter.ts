@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsArray, IsOptional } from 'class-validator';
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
+
+import { PaginationQuery } from '@pagination/pagination-query';
 
 export class TeachersGetFilter extends PaginationQuery {
   @IsOptional()
@@ -13,7 +14,7 @@ export class TeachersGetFilter extends PaginationQuery {
     type: 'string',
     required: false,
   })
-  categories?: string[];
+  readonly categories?: string[];
 
   @IsOptional()
   @ApiProperty({
@@ -22,5 +23,5 @@ export class TeachersGetFilter extends PaginationQuery {
     description: 'Текст поиска',
     required: false,
   })
-  search?: string;
+  readonly search?: string;
 }

@@ -19,16 +19,13 @@ import {
 } from '@nestjs/swagger';
 
 import { CreateTeacherDto, RateTeacherDto } from '../dto/request';
-import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
+import { JwtAuthGuard, RolesGuard } from '@auth/guards';
 import { TeachersService } from '../services';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import { CurrentUser } from '../../../common/decorators';
-import { FindOneByIDParams } from '../../../common/params';
+import { Roles } from '@auth/decorators/roles.decorator';
+import { CurrentUser } from '@common/decorators';
+import { FindOneByIDParams } from '@common/params';
 import { TeachersGetFilter } from '../filters';
-import {
-  ApiPaginatedResponse,
-  PaginatedDto,
-} from '../../../common/pagination/pagination';
+import { ApiPaginatedResponse, PaginatedDto } from '@pagination/pagination';
 import { TeacherUserDto, TeacherUserListedDto } from '../dto/response';
 
 @ApiTags('Учителя')

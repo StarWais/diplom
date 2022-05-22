@@ -5,13 +5,12 @@ import { isBefore } from 'date-fns';
 import { Prisma, PublishingStatus, Role, User } from '@prisma/client';
 
 import { CourseCreateDto, CourseUpdateDto } from '../dto/request';
-
-import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
-import { TeachersService } from '../../teachers/services';
-import { StudentsService } from '../../students/services';
-import { UsersService } from '../../users/services';
-import { ImagesService } from '../../images/services';
-import { HelpersMethods } from '../../../common/helpers/helpers.methods';
+import { Paginate, PaginatedDto } from '@pagination/pagination';
+import { TeachersService } from '@teachers/services';
+import { StudentsService } from '@students/services';
+import { UsersService } from '@users/services';
+import { ImagesService } from '@images/services';
+import { HelpersMethods } from '@common/helpers/helpers.methods';
 import {
   CourseDto,
   CourseListedDto,
@@ -19,14 +18,14 @@ import {
   CourseListedPersonalTeacherDto,
   CourseTagDto,
 } from '../dto/response';
-import { FindOneByIDParams } from '../../../common/params';
+import { FindOneByIDParams } from '@common/params';
 import { CourseInclude, CourseWithStudents } from '../interfaces';
 import {
   CourseNotCuratingException,
   CourseNotFoundException,
 } from '../exceptions';
 import { GetCoursesFilter, GetPersonalCoursesFilter } from '../filters';
-import { BasicUserNameDto } from '../../users/dto/response';
+import { BasicUserNameDto } from '@users/dto/response';
 
 @Injectable()
 export class CoursesService {
@@ -140,12 +139,11 @@ export class CoursesService {
     await this.teachersService.findOneOrThrowError({
       id: details.teacherId,
     });
-    const { teacherId, modules, steps, tags, image, placesAvailable, ...rest } =
-      details;
+    const { teacherId, modules, steps, tags, image, ...rest } = details;
     const imageLink = await this.imageService.save(image);
     const result = await this.prisma.course.create({
       data: {
-        placesAvailable,
+        placesAvailable: details.capacity,
         ...rest,
         imageLink,
         teacher: {

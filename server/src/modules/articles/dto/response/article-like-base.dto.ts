@@ -1,8 +1,8 @@
 import { ArticleLike } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-
-import { BaseAbstractDto } from '../../../../common/dto/response';
 import { Expose } from 'class-transformer';
+
+import { BaseAbstractDto } from '@common/dto/response';
 
 export class ArticleLikeBaseDto extends BaseAbstractDto implements ArticleLike {
   @Expose()

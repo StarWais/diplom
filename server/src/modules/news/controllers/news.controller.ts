@@ -25,15 +25,12 @@ import { Role, User } from '@prisma/client';
 
 import { NewsService } from '../services';
 import { NewsGetFilter } from '../filters/news-get.filter';
-import { CurrentUser } from '../../../common/decorators';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
+import { CurrentUser } from '@common/decorators';
+import { Roles } from '@auth/decorators/roles.decorator';
+import { JwtAuthGuard, RolesGuard } from '@auth/guards';
 import { NewsCreateDto, NewsUpdateDto } from '../dto/request';
-import { FindOneByIDParams, FindOneBySlugParams } from '../../../common/params';
-import {
-  ApiPaginatedResponse,
-  PaginatedDto,
-} from '../../../common/pagination/pagination';
+import { FindOneByIDParams, FindOneBySlugParams } from '@common/params';
+import { ApiPaginatedResponse, PaginatedDto } from '@pagination/pagination';
 import { NewsDto, NewsListedDto, NewsTagDto } from '../dto/response';
 
 @ApiTags('Новости')

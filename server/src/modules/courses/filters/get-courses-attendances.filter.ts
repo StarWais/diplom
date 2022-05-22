@@ -1,3 +1,3 @@
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
+import { PaginationQuery } from '@pagination/pagination-query';
 
 export class GetCoursesAttendancesFilter extends PaginationQuery {}

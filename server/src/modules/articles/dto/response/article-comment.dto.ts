@@ -2,7 +2,7 @@ import { ArticleComment } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 
-import { BaseAbstractDto } from '../../../../common/dto/response';
+import { BaseAbstractDto } from '@common/dto/response';
 import { ArticleCommentAuthorDto } from './article-comment-author.dto';
 
 export class ArticleCommentDto

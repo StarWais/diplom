@@ -22,11 +22,11 @@ import { AuthService } from '../services';
 import {
   BrowserInfo,
   CurrentBrowserInfo,
-} from '../../../common/decorators/browser-info.decorator';
+} from '@common/decorators/browser-info.decorator';
 import { ChangePasswordDto, SigninDto, SignupDto } from '../dto/request';
 import { JwtAuthGuard, LocalAuthGuard } from '../guards';
 import { AccessTokenDto } from '../dto/response';
-import { CurrentUser } from '../../../common/decorators';
+import { CurrentUser } from '@common/decorators';
 
 @ApiTags('Авторизация')
 @Controller('auth')

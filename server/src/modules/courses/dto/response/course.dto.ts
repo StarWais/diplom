@@ -1,15 +1,12 @@
-import { Course, Teacher, User } from '@prisma/client';
+import { Course } from '@prisma/client';
 import { Exclude, Expose, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { BaseAbstractDto } from '../../../../common/dto/response';
-import { BasicUserNameDto } from '../../../users/dto/response';
+import { BaseAbstractDto } from '@common/dto/response';
+import { BasicUserNameDto } from '@users/dto/response';
 import { CourseModuleDto } from './course-module.dto';
 import { CourseEducationStepDto } from './course-education-step.dto';
-
-interface TeacherIncludesUser extends Teacher {
-  user: User;
-}
+import { TeacherIncludesUser } from '@teachers/interfaces';
 
 export class CourseDto extends BaseAbstractDto implements Course {
   @Expose()
@@ -111,6 +108,7 @@ export class CourseDto extends BaseAbstractDto implements Course {
   })
   @Type(() => CourseModuleDto)
   readonly steps: Array<CourseEducationStepDto>;
+
   @Expose()
   @ApiProperty({
     description: 'Цена курса',
@@ -118,6 +116,7 @@ export class CourseDto extends BaseAbstractDto implements Course {
     example: 150,
   })
   readonly price: number;
+
   @Expose()
   @ApiProperty({
     description: 'Ссылка на картинку курса',
@@ -125,6 +124,7 @@ export class CourseDto extends BaseAbstractDto implements Course {
     example: 'https://example.com/course-image.jpg',
   })
   readonly imageLink: string;
+
   @Expose()
   @ApiProperty({
     description: 'Номер ерип',
@@ -132,6 +132,7 @@ export class CourseDto extends BaseAbstractDto implements Course {
     example: '7589098349AEJK8U89',
   })
   readonly eripNumber: string;
+
   @Expose()
   @ApiProperty({
     description: 'Дата окончания курса',
@@ -139,6 +140,7 @@ export class CourseDto extends BaseAbstractDto implements Course {
     example: '2020-01-01T00:00:00.000Z',
   })
   readonly finishDate: Date;
+
   @Expose()
   @ApiProperty({
     description: 'Завершен ли курс',
@@ -146,6 +148,7 @@ export class CourseDto extends BaseAbstractDto implements Course {
     example: false,
   })
   readonly finished: boolean;
+
   @Expose()
   @ApiProperty({
     description: 'Доступно мест',
@@ -153,8 +156,10 @@ export class CourseDto extends BaseAbstractDto implements Course {
     example: 10,
   })
   readonly placesAvailable: number;
+
   @Exclude()
   readonly teacher: TeacherIncludesUser;
+
   @Expose()
   @ApiProperty({
     type: () => BasicUserNameDto,
@@ -162,11 +167,6 @@ export class CourseDto extends BaseAbstractDto implements Course {
   })
   @Type(() => BasicUserNameDto)
   readonly teacherInfo: BasicUserNameDto;
-
-  constructor(partial: Partial<CourseDto>) {
-    super(partial);
-    Object.assign(this, partial);
-  }
 
   @Expose()
   @ApiProperty({
@@ -176,5 +176,10 @@ export class CourseDto extends BaseAbstractDto implements Course {
   })
   get modulesCount(): number {
     return this.modules.length;
+  }
+
+  constructor(partial: Partial<CourseDto>) {
+    super(partial);
+    Object.assign(this, partial);
   }
 }

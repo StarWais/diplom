@@ -2,9 +2,9 @@ import { Gender, Role, User } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
 
-import { BaseAbstractDto } from '../../../../common/dto/response';
-import { StudentDto } from '../../../students/dto/response';
-import { TeacherDto } from '../../../teachers/dto/response';
+import { BaseAbstractDto } from '@common/dto/response';
+import { StudentDto } from '@students/dto/response';
+import { TeacherDto } from '@teachers/dto/response';
 
 export class UserDto extends BaseAbstractDto implements User {
   @Expose()

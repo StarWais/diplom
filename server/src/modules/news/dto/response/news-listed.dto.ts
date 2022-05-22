@@ -1,5 +1,6 @@
-import { NewsDto } from './news.dto';
 import { OmitType } from '@nestjs/swagger';
+
+import { NewsDto } from './news.dto';
 
 export class NewsListedDto extends OmitType(NewsDto, [
   'content',

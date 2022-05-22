@@ -7,23 +7,21 @@ import {
   User,
 } from '@prisma/client';
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import * as crypto from 'crypto';
+import { ConfigService } from '@nestjs/config';
+import { MailerService } from '@nestjs-modules/mailer';
+
 import {
   ConfirmEmailChangeDto,
   UpdateUserAvatarDto,
   UpdateUserDto,
 } from '../dto/request';
-import { ImagesService } from '../../images/services';
-import {
-  ConfirmationTokenOptions,
-  DomainOptions,
-} from '../../../config/configuration';
-import * as crypto from 'crypto';
-import { ConfigService } from '@nestjs/config';
-import { BrowserInfo } from '../../../common/decorators/browser-info.decorator';
-import { HelpersMethods } from '../../../common/helpers/helpers.methods';
-import { MailerService } from '@nestjs-modules/mailer';
+import { ImagesService } from '@images/services';
+import { ConfirmationTokenOptions, DomainOptions } from '@config/configuration';
+import { BrowserInfo } from '@common/decorators/browser-info.decorator';
+import { HelpersMethods } from '@common/helpers/helpers.methods';
 import { UsersGetFilter } from '../filters/users-get.filter';
-import { Paginate } from '../../../common/pagination/pagination';
+import { Paginate } from '@pagination/pagination';
 import { UserInclude } from '../interfaces';
 import { UserDto, UserListedDto } from '../dto/response';
 import {

@@ -16,6 +16,50 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@articles/*": [
+        "./src/modules/articles/*"
+      ],
+      "@auth/*": [
+        "./src/modules/auth/*"
+      ],
+      "@courses/*": [
+        "./src/modules/courses/*"
+      ],
+      "@faq/*": [
+        "./src/modules/faq/*"
+      ],
+      "@images/*": [
+        "./src/modules/images/*"
+      ],
+      "@info/*": [
+        "./src/modules/info/*"
+      ],
+      "@news/*": [
+        "./src/modules/news/*"
+      ],
+      "@olympics/*": [
+        "./src/modules/olympics/*"
+      ],
+      "@students/*": [
+        "./src/modules/students/*"
+      ],
+      "@teachers/*": [
+        "./src/modules/teachers/*"
+      ],
+      "@users/*": [
+        "./src/modules/users/*"
+      ],
+      "@config/*": [
+        "./src/config/*"
+      ],
+      "@common/*": [
+        "./src/common/*"
+      ],
+      "@pagination/*": [
+        "./src/common/pagination/*"
+      ],
+    }
   }
 }

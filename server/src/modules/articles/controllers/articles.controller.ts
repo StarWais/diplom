@@ -20,18 +20,15 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ArticleDto, ArticleListedDto, ArticleTagDto } from '../dto/response';
-import {
-  ApiPaginatedResponse,
-  PaginatedDto,
-} from '../../../common/pagination/pagination';
+import { ApiPaginatedResponse, PaginatedDto } from '@pagination/pagination';
 import { ArticleCreateDto, ArticleUpdateDto } from '../dto/request';
 import { Role, User } from '@prisma/client';
-import { CurrentUser } from '../../../common/decorators';
-import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
+import { CurrentUser } from '@common/decorators';
+import { JwtAuthGuard, RolesGuard } from '@auth/guards';
 import { ArticlesGetFilter } from '../filters';
-import { FindOneByIDParams, FindOneBySlugParams } from '../../../common/params';
-import { Roles } from '../../auth/decorators/roles.decorator';
+import { FindOneByIDParams, FindOneBySlugParams } from '@common/params';
 import { ArticlesService } from '../services';
+import { Roles } from '@auth/decorators/roles.decorator';
 
 @ApiTags('Статьи')
 @Controller('articles')

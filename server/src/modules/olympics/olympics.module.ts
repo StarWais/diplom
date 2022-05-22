@@ -7,7 +7,7 @@ import {
   OlympicsService,
   OlympicsStepsService,
 } from './services';
-import { FormDataConfigService } from '../../config/services';
+import { FormDataConfigService } from '@config/services';
 import { OlympicsReviewsService } from './services/olympics-reviews.service';
 
 @Module({

@@ -5,22 +5,25 @@ import { PrismaClientExceptionFilter, PrismaModule } from 'nestjs-prisma';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { join } from 'path';
 
 import configuration from '../config/configuration';
 import {
   MailerConfigService,
   PrismaConfigService,
   ThrottlerConfigService,
-} from '../config/services';
-import { validationSchema } from '../config/env/env-validation';
-import { AuthModule } from '../modules/auth/auth.module';
-import { UsersModule } from '../modules/users/users.module';
-import { ArticlesModule } from 'src/modules/articles/articles.module';
+} from '@config/services';
+import { validationSchema } from '@config/env/env-validation';
+import { AuthModule } from '@auth/auth.module';
+import { UsersModule } from '@users/users.module';
+import { ArticlesModule } from '@articles/articles.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { join } from 'path';
-import { ImagesModule } from '../modules/images/images.module';
-import { NewsModule } from '../modules/news/news.module';
-import { CoursesModule } from '../modules/courses/courses.module';
+import { ImagesModule } from '@images/images.module';
+import { NewsModule } from '@news/news.module';
+import { CoursesModule } from '@courses/courses.module';
+import { StudentsModule } from '@students/students.module';
+import { TeachersModule } from '@teachers/teachers.module';
+import { InfoModule } from '@info/info.module';
 
 @Module({
   imports: [
@@ -50,9 +53,9 @@ import { CoursesModule } from '../modules/courses/courses.module';
     AuthModule,
     ArticlesModule,
     CoursesModule,
-    // StudentsModule,
-    // TeachersModule,
-    // InfoModule,
+    StudentsModule,
+    TeachersModule,
+    InfoModule,
     NewsModule,
     // OlympicsModule,
   ],

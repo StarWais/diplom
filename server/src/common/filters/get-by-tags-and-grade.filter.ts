@@ -1,7 +1,8 @@
 import { IsInt, IsOptional, IsPositive } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { PaginationQuery } from '../pagination/pagination-query';
+
+import { PaginationQuery } from '@pagination/pagination-query';
 
 export class GetByTagsAndGradeFilter extends PaginationQuery {
   @IsOptional()
@@ -13,7 +14,7 @@ export class GetByTagsAndGradeFilter extends PaginationQuery {
     required: false,
     description: 'Класс',
   })
-  grade?: number;
+  readonly grade?: number;
 
   @IsOptional()
   @Transform(({ value }) => value.split(','))
@@ -23,5 +24,5 @@ export class GetByTagsAndGradeFilter extends PaginationQuery {
     required: false,
     description: 'Список тегов через запятую',
   })
-  tags?: string[];
+  readonly tags?: string[];
 }

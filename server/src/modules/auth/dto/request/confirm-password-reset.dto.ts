@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, Length, Validate } from 'class-validator';
 import { PasswordValidation } from 'class-validator-password-check/lib';
+
 import { passwordRequirement } from './signup.dto';
 
 export class ConfirmPasswordResetDto {

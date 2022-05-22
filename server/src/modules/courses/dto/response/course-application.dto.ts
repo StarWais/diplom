@@ -2,10 +2,10 @@ import { ApplicationStatus, CourseApplication } from '@prisma/client';
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
 
-import { BaseAbstractDto } from '../../../../common/dto/response';
+import { BaseAbstractDto } from '@common/dto/response';
 import { CourseDto } from './course.dto';
-import { BasicUserDto } from '../../../users/dto/response';
-import { StudentIncludesUser } from '../../../students/interfaces';
+import { BasicUserDto } from '@users/dto/response';
+import { StudentIncludesUser } from '@students/interfaces';
 
 export class CourseApplicationDto
   extends BaseAbstractDto
@@ -51,6 +51,7 @@ export class CourseApplicationDto
   })
   @Type(() => PickType(CourseDto, ['id', 'name'] as const))
   readonly course: Pick<CourseDto, 'name' | 'id'>;
+
   @Expose()
   @ApiProperty({
     description: 'Статус заявки',
@@ -59,13 +60,9 @@ export class CourseApplicationDto
     example: ApplicationStatus.CREATED,
   })
   readonly status: ApplicationStatus;
+
   @Exclude()
   private readonly student: StudentIncludesUser | null;
-
-  constructor(partial: Partial<CourseApplicationDto>) {
-    super(partial);
-    Object.assign(this, partial);
-  }
 
   @Expose()
   @ApiProperty({
@@ -76,5 +73,10 @@ export class CourseApplicationDto
   @Type(() => BasicUserDto)
   get user(): BasicUserDto | null {
     return (this.student?.user as unknown as BasicUserDto) || null;
+  }
+
+  constructor(partial: Partial<CourseApplicationDto>) {
+    super(partial);
+    Object.assign(this, partial);
   }
 }

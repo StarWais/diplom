@@ -3,8 +3,8 @@ import { PrismaService } from 'nestjs-prisma';
 import { Course, Prisma, PublishingStatus, User } from '@prisma/client';
 import { MailerService } from '@nestjs-modules/mailer';
 
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
-import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
+import { PaginationQuery } from '@pagination/pagination-query';
+import { Paginate, PaginatedDto } from '@pagination/pagination';
 import { CourseReviewCreateDto, CourseReviewUpdateDto } from '../dto/request';
 import { CoursesService } from './courses.service';
 import { FindByCourseIdParams, FindCourseReviewParams } from '../params';
@@ -15,7 +15,7 @@ import {
   CourseNotFinishedException,
   CourseReviewNotFoundException,
 } from '../exceptions';
-import { UsersService } from '../../users/services';
+import { UsersService } from '@users/services';
 
 @Injectable()
 export class CoursesReviewsService {

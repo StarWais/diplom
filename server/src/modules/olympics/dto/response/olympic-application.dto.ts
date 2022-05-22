@@ -2,10 +2,10 @@ import { OlympiadApplication } from '@prisma/client';
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
 
-import { BaseAbstractDto } from '../../../../common/dto/response';
-import { StudentIncludesUser } from '../../../students/interfaces';
-import { BasicUserDto } from '../../../users/dto/response';
-import { CourseDto } from '../../../courses/dto/response';
+import { BaseAbstractDto } from '@common/dto/response';
+import { StudentIncludesUser } from '@students/interfaces';
+import { BasicUserDto } from '@users/dto/response';
+import { CourseDto } from '@courses/dto/response';
 import { OlympicDto } from './olympic.dto';
 
 export class OlympicApplicationDto

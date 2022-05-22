@@ -7,8 +7,8 @@ import {
   CourseApplicationCreateDto,
   CourseApplicationUpdateDto,
 } from '../dto/request';
-import { PaginationQuery } from '../../../common/pagination/pagination-query';
-import { Paginate, PaginatedDto } from '../../../common/pagination/pagination';
+import { PaginationQuery } from '@pagination/pagination-query';
+import { Paginate, PaginatedDto } from '@pagination/pagination';
 import { CourseApplicationInclude } from '../interfaces';
 import { FindByCourseIdParams, FindCourseApplicationParams } from '../params';
 import {
@@ -20,7 +20,7 @@ import {
 } from '../exceptions';
 import { CourseApplicationDto } from '../dto/response';
 import { CoursesService } from './courses.service';
-import { UsersService } from '../../users/services';
+import { UsersService } from '@users/services';
 
 @Injectable()
 export class CoursesApplicationsService {

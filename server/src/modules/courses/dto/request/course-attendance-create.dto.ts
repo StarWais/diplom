@@ -6,6 +6,7 @@ export class CourseAttendanceCreateDto {
   @ApiProperty({
     type: 'integer',
     example: 1,
+    description: 'Идентификатор студента',
   })
   @IsInt()
   @IsPositive()
@@ -15,6 +16,7 @@ export class CourseAttendanceCreateDto {
   @ApiProperty({
     enum: AttendanceStatus,
     example: AttendanceStatus.PRESENT,
+    description: 'Статус посещения',
   })
   readonly status: AttendanceStatus;
 

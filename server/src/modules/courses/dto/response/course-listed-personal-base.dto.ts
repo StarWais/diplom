@@ -1,5 +1,6 @@
-import { CourseDto } from './course.dto';
 import { PickType } from '@nestjs/swagger';
+
+import { CourseDto } from './course.dto';
 
 export class CourseListedPersonalBaseDto extends PickType(CourseDto, [
   'id',

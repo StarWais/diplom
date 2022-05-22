@@ -5,11 +5,6 @@ import { differenceInMilliseconds } from 'date-fns';
 import { CourseListedPersonalBaseDto } from './course-listed-personal-base.dto';
 
 export class CourseListedPersonalStudentDto extends CourseListedPersonalBaseDto {
-  constructor(partial: Partial<CourseListedPersonalStudentDto>) {
-    super(partial);
-    Object.assign(this, partial);
-  }
-
   @Expose()
   @ApiProperty({
     description: 'Прогресс обучения',
@@ -30,5 +25,10 @@ export class CourseListedPersonalStudentDto extends CourseListedPersonalBaseDto 
       (betweenTodayAndFinishDate / betweenFinishDateAndStartDate) * 100,
     );
     return `${progress}%`;
+  }
+
+  constructor(partial: Partial<CourseListedPersonalStudentDto>) {
+    super(partial);
+    Object.assign(this, partial);
   }
 }

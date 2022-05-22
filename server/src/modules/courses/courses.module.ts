@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 
-import { StudentsModule } from '../students/students.module';
-import { FormDataConfigService } from '../../config/services';
+import { StudentsModule } from '@students/students.module';
+import { FormDataConfigService } from '@config/services';
 import {
   CoursesApplicationsController,
   CoursesAttendancesController,
@@ -15,8 +15,8 @@ import {
   CoursesReviewsService,
   CoursesService,
 } from './services';
-import { TeachersModule } from '../teachers/teachers.module';
-import { UsersModule } from '../users/users.module';
+import { TeachersModule } from '@teachers/teachers.module';
+import { UsersModule } from '@users/users.module';
 import { CoursesJobs } from './jobs';
 
 @Module({

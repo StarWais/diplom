@@ -1,7 +1,7 @@
 import { PublishingStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { BaseAbstractDto } from '../../../../common/dto/response';
+import { BaseAbstractDto } from '@common/dto/response';
 import {
   ArticleAuthorDto,
   ArticleDislikeDto,

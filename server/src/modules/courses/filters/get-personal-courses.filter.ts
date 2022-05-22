@@ -1,5 +1,6 @@
-import { GetCoursesFilter } from './get-courses.filter';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { GetCoursesFilter } from './get-courses.filter';
 
 export class GetPersonalCoursesFilter extends GetCoursesFilter {
   @ApiProperty({

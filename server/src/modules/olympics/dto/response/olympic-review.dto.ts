@@ -2,9 +2,9 @@ import { OlympiadReview } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
 
-import { BaseAbstractReviewDto } from '../../../../common/dto/response/base-abstract-review.dto';
-import { BasicUserDto } from '../../../users/dto/response';
-import { StudentIncludesUser } from '../../../students/interfaces';
+import { BaseAbstractReviewDto } from '@common/dto/response/base-abstract-review.dto';
+import { BasicUserDto } from '@users/dto/response';
+import { StudentIncludesUser } from '@students/interfaces';
 
 export class OlympicReviewDto
   extends BaseAbstractReviewDto

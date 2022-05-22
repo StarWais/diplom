@@ -1,8 +1,8 @@
 import { Student } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-
-import { BaseAbstractDto } from '../../../../common/dto/response';
 import { Expose } from 'class-transformer';
+
+import { BaseAbstractDto } from '@common/dto/response';
 
 export class StudentDto extends BaseAbstractDto implements Student {
   @Expose()
@@ -12,7 +12,7 @@ export class StudentDto extends BaseAbstractDto implements Student {
     type: 'string',
     nullable: true,
   })
-  educationalInstitution: string | null;
+  readonly educationalInstitution: string | null;
 
   @Expose()
   @ApiProperty({
@@ -21,7 +21,7 @@ export class StudentDto extends BaseAbstractDto implements Student {
     type: 'integer',
     nullable: true,
   })
-  grade: number | null;
+  readonly grade: number | null;
 
   @Expose()
   @ApiProperty({
@@ -29,7 +29,7 @@ export class StudentDto extends BaseAbstractDto implements Student {
     type: 'string',
     nullable: true,
   })
-  teachers: string | null;
+  readonly teachers: string | null;
 
   constructor(partial: Partial<StudentDto>) {
     super(partial);

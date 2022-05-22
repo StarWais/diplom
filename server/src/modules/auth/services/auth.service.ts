@@ -3,8 +3,8 @@ import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { BrowserInfo } from '../../../common/decorators/browser-info.decorator';
-import { UsersService } from '../../users/services';
+import { BrowserInfo } from '@common/decorators/browser-info.decorator';
+import { UsersService } from '@users/services';
 import { JWTPayload } from '../strategies/jwt.strategy';
 import { ChangePasswordDto, SignupDto } from '../dto/request';
 import { AccessTokenDto } from '../dto/response';

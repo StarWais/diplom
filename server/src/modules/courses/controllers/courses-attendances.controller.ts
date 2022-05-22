@@ -22,17 +22,14 @@ import {
 import { Role, User } from '@prisma/client';
 
 import { CoursesAttendancesService } from '../services';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import { JwtAuthGuard, RolesGuard } from '../../auth/guards';
-import { CurrentUser } from '../../../common/decorators';
+import { Roles } from '@auth/decorators/roles.decorator';
+import { JwtAuthGuard, RolesGuard } from '@auth/guards';
+import { CurrentUser } from '@common/decorators';
 import {
   CourseAttendanceCreateDto,
   CourseAttendanceUpdateDto,
 } from '../dto/request';
-import {
-  ApiPaginatedResponse,
-  PaginatedDto,
-} from '../../../common/pagination/pagination';
+import { ApiPaginatedResponse, PaginatedDto } from '@pagination/pagination';
 import { CourseAttendanceDto } from '../dto/response';
 import { FindByCourseIdParams, FindCourseAttendanceParams } from '../params';
 import { GetCoursesAttendancesFilter } from '../filters';

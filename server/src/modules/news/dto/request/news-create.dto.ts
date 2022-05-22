@@ -8,15 +8,16 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { CourseTagCreateDto } from '../../../courses/dto/request';
 import { Type } from 'class-transformer';
-import { NewsTagCreateDto } from './news-tag-create.dto';
 import {
   FileSystemStoredFile,
   HasMimeType,
   IsFile,
   MaxFileSize,
 } from 'nestjs-form-data';
+
+import { CourseTagCreateDto } from '@courses/dto/request';
+import { NewsTagCreateDto } from './news-tag-create.dto';
 
 export class NewsCreateDto {
   @ApiProperty({

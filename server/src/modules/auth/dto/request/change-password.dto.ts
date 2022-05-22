@@ -1,6 +1,7 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { ConfirmPasswordResetDto } from './confirm-password-reset.dto';
 import { IsNotEmpty, IsString } from 'class-validator';
+
+import { ConfirmPasswordResetDto } from './confirm-password-reset.dto';
 
 export class ChangePasswordDto extends PickType(ConfirmPasswordResetDto, [
   'newPassword',

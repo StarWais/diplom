@@ -1,4 +1,5 @@
 import { PickType } from '@nestjs/swagger';
+
 import { TeacherUserDto } from './teacher-user.dto';
 
 export class TeacherUserListedDto extends PickType(TeacherUserDto, [

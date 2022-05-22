@@ -12,7 +12,7 @@ export class PaginationQuery {
     required: false,
     description: 'Номер страницы',
   })
-  page?: number;
+  readonly page?: number;
 
   @IsOptional()
   @IsNumber()
@@ -24,5 +24,5 @@ export class PaginationQuery {
     default: 20,
     description: 'Количество записей на странице',
   })
-  limit?: number;
+  readonly limit?: number;
 }
