@@ -11,16 +11,7 @@ export class ConfirmPasswordResetDto {
   })
   @IsNotEmpty()
   @IsString()
-  token: string;
-
-  @ApiProperty({
-    example: 'oldPassword1!',
-    description: 'Старый пароль',
-    type: 'string',
-  })
-  @IsNotEmpty()
-  @IsString()
-  oldPassword: string;
+  readonly token: string;
 
   @ApiProperty({
     example: 'newPassword1!',

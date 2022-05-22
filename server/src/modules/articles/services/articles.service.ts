@@ -99,7 +99,6 @@ export class ArticlesService {
     const article = await this.prisma.article.findUnique({
       where: details,
       ...this.articleIncludes,
-      rejectOnNotFound: true,
     });
 
     if (!article) {

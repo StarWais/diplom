@@ -8,8 +8,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -21,9 +23,10 @@ import {
   BrowserInfo,
   CurrentBrowserInfo,
 } from '../../../common/decorators/browser-info.decorator';
-import { SigninDto, SignupDto } from '../dto/request';
-import { LocalAuthGuard } from '../guards';
+import { ChangePasswordDto, SigninDto, SignupDto } from '../dto/request';
+import { JwtAuthGuard, LocalAuthGuard } from '../guards';
 import { AccessTokenDto } from '../dto/response';
+import { CurrentUser } from '../../../common/decorators';
 
 @ApiTags('Авторизация')
 @Controller('auth')
@@ -44,6 +47,23 @@ export class AuthController {
     @CurrentBrowserInfo() browserInfo: BrowserInfo,
   ): Promise<AccessTokenDto> {
     return this.authService.signup(details, browserInfo);
+  }
+
+  @Post('password')
+  @ApiOperation({
+    summary: 'Изменить пароль',
+  })
+  @ApiNoContentResponse({
+    description: 'Пароль успешно изменен',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async changePassword(
+    @Body() details: ChangePasswordDto,
+    @CurrentUser() currentUser: User,
+  ): Promise<void> {
+    return this.authService.changePassword(details, currentUser);
   }
 
   @UseGuards(LocalAuthGuard)

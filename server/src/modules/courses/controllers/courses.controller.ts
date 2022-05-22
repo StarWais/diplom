@@ -129,9 +129,9 @@ export class CoursesController {
   async findOne(@Param() searchParams: FindOneByIDParams): Promise<CourseDto> {
     return (await this.coursesService.findOneOrThrowError(
       searchParams,
+      true,
     )) as CourseDto;
   }
-
   @Roles(Role.ADMIN, Role.TEACHER)
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)

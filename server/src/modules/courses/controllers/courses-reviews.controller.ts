@@ -69,7 +69,11 @@ export class CoursesReviewsController {
 
   @ApiOperation({
     summary: 'Получить отзыв к курсу',
+    description: 'Доступно только администратору',
   })
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOkResponse({ type: CourseReviewDto })
   @Get(':id')
   async findOne(

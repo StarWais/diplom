@@ -1,3 +1,4 @@
+export { ChangePasswordDto } from './change-password.dto';
 export { SigninDto } from './signin.dto';
 export { PasswordResetDto } from './reset-password.dto';
 export { ConfirmPasswordResetDto } from './confirm-password-reset.dto';

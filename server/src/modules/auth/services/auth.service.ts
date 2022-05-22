@@ -6,9 +6,13 @@ import * as bcrypt from 'bcrypt';
 import { BrowserInfo } from '../../../common/decorators/browser-info.decorator';
 import { UsersService } from '../../users/services';
 import { JWTPayload } from '../strategies/jwt.strategy';
-import { SignupDto } from '../dto/request';
+import { ChangePasswordDto, SignupDto } from '../dto/request';
 import { AccessTokenDto } from '../dto/response';
 import { AuthConfirmService } from './auth-confirm.service';
+import {
+  InvalidOldPasswordException,
+  PasswordsMustBeDifferentException,
+} from '../exceptions';
 
 @Injectable()
 export class AuthService {
@@ -45,6 +49,30 @@ export class AuthService {
     return this.authConfirmService.createSendRegistrationToken(
       user,
       browserInfo,
+    );
+  }
+
+  async changePassword(
+    details: ChangePasswordDto,
+    currentUser: User,
+  ): Promise<void> {
+    const compareNewPassword = await AuthService.comparePassword(
+      details.newPassword,
+      currentUser.password,
+    );
+    if (compareNewPassword) {
+      throw new PasswordsMustBeDifferentException();
+    }
+    const compareOldPassword = await AuthService.comparePassword(
+      details.newPassword,
+      currentUser.password,
+    );
+    if (compareOldPassword) {
+      throw new InvalidOldPasswordException();
+    }
+    await this.usersService.updatePassword(
+      { id: currentUser.id },
+      details.newPassword,
     );
   }
 
