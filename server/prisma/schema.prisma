@@ -292,6 +292,7 @@ model OlympiadStepResult {
 
   nextStepAvailiable Boolean @default(false) @map("next_step_availiable")
   place              Int     @default(0)
+  points             Int     @default(0)
 
 
   createdAt DateTime @default(now()) @map("created_at")

@@ -1,1 +1,9 @@
-export { OlympicsController } from './olympics-controller';
+export { OlympicsStepsController } from './olympics-steps.controller';
+export { OlympicsStepResultsController } from './olympics-step-results.controller';
+export { OlympicsTasksVariantsController } from './olympics-tasks-variants.controller';
+export { OlympicsTasksAttemptsController } from './olympics-tasks-attempts.controller';
+export { OlympicsStepAttemptsController } from './olympics-step-attempts.controller';
+export { OlympicsReviewsController } from './olympics-reviews.controller';
+export { OlympicsApplicationsController } from './olympics-applications.controller';
+export { OlympicsController } from './olympics.controller';
+export { OlympicsTasksController } from './olympics-tasks.controller';

@@ -56,7 +56,9 @@ export class TeachersController {
     description: 'Данные об учителе',
   })
   @Get(':id')
-  async get(@Param() searchParams: FindOneByIDParams): Promise<TeacherUserDto> {
+  async findOne(
+    @Param() searchParams: FindOneByIDParams,
+  ): Promise<TeacherUserDto> {
     return await this.teachersService.findOneOrThrowError(searchParams);
   }
 

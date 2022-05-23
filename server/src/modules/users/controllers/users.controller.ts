@@ -129,7 +129,7 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('confirm-email-change')
-  async confirmEmailChangeToken(@Body() details: ConfirmEmailChangeDto) {
+  async confirmEmailChange(@Body() details: ConfirmEmailChangeDto) {
     return this.usersService.confirmEmailChange(details);
   }
 

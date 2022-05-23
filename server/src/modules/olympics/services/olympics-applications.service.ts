@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
+import { User } from '@prisma/client';
+
 import { OlympicsService } from './olympics.service';
 import { OlympicApplicationCreateDto } from '../dto/request';
-import { User } from '@prisma/client';
 import {
   FindByOlympicsIdParams,
   FindOlympicApplicationParams,

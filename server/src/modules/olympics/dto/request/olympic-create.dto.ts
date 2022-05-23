@@ -92,7 +92,7 @@ export class OlympicCreateDto {
 
   @ApiProperty({
     isArray: true,
-    type: () => [OlympicTagCreateDto],
+    type: () => OlympicTagCreateDto,
   })
   @IsArray()
   @ValidateNested({ each: true })
@@ -104,7 +104,7 @@ export class OlympicCreateDto {
   @ApiProperty({
     description: 'Массив этапов олимпиады',
     isArray: true,
-    type: () => [OlympicStepCreateDto],
+    type: () => OlympicStepCreateDto,
   })
   @IsArray()
   @ValidateNested({ each: true })
@@ -130,5 +130,5 @@ export class OlympicCreateDto {
     'image/svg+xml',
     'image/webp',
   ])
-  image: FileSystemStoredFile;
+  readonly image: FileSystemStoredFile;
 }
