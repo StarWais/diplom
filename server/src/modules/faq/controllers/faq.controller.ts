@@ -1,12 +1,15 @@
 import { FaqService } from '../services';
 import {
+  Body,
   Controller,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -39,7 +42,7 @@ export class FaqController {
     summary: 'Получить FAQ',
     description: 'Доступно только администратору',
   })
-  async findOne(searchParams: FindOneByIDParams): Promise<FaqDto> {
+  async findOne(@Param() searchParams: FindOneByIDParams): Promise<FaqDto> {
     return this.faqService.findOneOrThrowError(searchParams);
   }
 
@@ -48,7 +51,9 @@ export class FaqController {
   @ApiOperation({
     summary: 'Получить список отвеченных FAQ',
   })
-  async findPublished(query: PaginationQuery): Promise<PaginatedDto<FaqDto>> {
+  async findPublished(
+    @Query() query: PaginationQuery,
+  ): Promise<PaginatedDto<FaqDto>> {
     return this.faqService.findPublished(query);
   }
 
@@ -61,7 +66,9 @@ export class FaqController {
     description: 'Доступно только администратору',
   })
   @Get('/published')
-  async findAll(query: PaginationQuery): Promise<PaginatedDto<FaqDto>> {
+  async findAll(
+    @Query() query: PaginationQuery,
+  ): Promise<PaginatedDto<FaqDto>> {
     return this.faqService.findAll(query);
   }
 
@@ -75,7 +82,7 @@ export class FaqController {
   @ApiOperation({
     summary: 'Создать FAQ',
   })
-  async create(details: CreateFaqDto): Promise<FaqDto> {
+  async create(@Body() details: CreateFaqDto): Promise<FaqDto> {
     return this.faqService.create(details);
   }
 
@@ -89,8 +96,8 @@ export class FaqController {
   @ApiOkResponse({ type: FaqDto, description: 'обновленный вопрос FAQ' })
   @Patch(':id')
   async update(
-    searchParams: FindOneByIDParams,
-    details: UpdateFaqDto,
+    @Param() searchParams: FindOneByIDParams,
+    @Body() details: UpdateFaqDto,
   ): Promise<FaqDto> {
     return this.faqService.update(searchParams, details);
   }
@@ -105,7 +112,7 @@ export class FaqController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({ type: FaqDto, description: 'Вопрос FAQ удален' })
   @Delete(':id')
-  async delete(searchParams: FindOneByIDParams): Promise<void> {
+  async delete(@Param() searchParams: FindOneByIDParams): Promise<void> {
     return this.faqService.delete(searchParams);
   }
 }
