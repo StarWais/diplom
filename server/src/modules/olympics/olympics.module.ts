@@ -24,6 +24,7 @@ import {
   OlympicsTasksVariantsService,
 } from './services';
 import { FormDataConfigService } from '@config/services';
+import { UsersModule } from '@users/users.module';
 
 @Module({
   controllers: [
@@ -53,6 +54,7 @@ import { FormDataConfigService } from '@config/services';
     NestjsFormDataModule.configAsync({
       useClass: FormDataConfigService,
     }),
+    UsersModule,
   ],
 })
 export class OlympicsModule {}

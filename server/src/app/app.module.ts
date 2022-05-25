@@ -24,6 +24,8 @@ import { CoursesModule } from '@courses/courses.module';
 import { StudentsModule } from '@students/students.module';
 import { TeachersModule } from '@teachers/teachers.module';
 import { InfoModule } from '@info/info.module';
+import { FaqModule } from '@faq/faq.module';
+import { OlympicsModule } from '@olympics/olympics.module';
 
 @Module({
   imports: [
@@ -57,7 +59,8 @@ import { InfoModule } from '@info/info.module';
     TeachersModule,
     InfoModule,
     NewsModule,
-    // OlympicsModule,
+    OlympicsModule,
+    FaqModule,
   ],
   controllers: [],
   providers: [
