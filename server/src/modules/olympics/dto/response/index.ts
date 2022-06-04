@@ -1,3 +1,7 @@
+export { OlympicTaskDto } from './olympic-task.dto';
+export { OlympicTaskFullDto } from './olympic-task-full.dto';
+export { OlympicTaskAnswerVariantDto } from './olympic-task-answer-variant.dto';
+export { OlympicTaskAnswerVariantFullDto } from './olympic-task-answer-variant-full.dto';
 export { OlympicReviewDto } from './olympic-review.dto';
 export { OlympicApplicationDto } from './olympic-application.dto';
 export { OlympicStepDto } from './olympic-step.dto';

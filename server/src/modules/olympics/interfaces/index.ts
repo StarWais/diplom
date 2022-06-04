@@ -1,3 +1,4 @@
+export { OlympicTaskInclude } from './olympic-task.include.interface';
 export { OlympicReviewInclude } from './olympic-review-include.interface';
 export { OlympicsApplicationInclude } from './olympic-application-include.interface';
 export { OlympicsBaseIncludes } from './olympic-base-include.interface';

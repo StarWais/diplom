@@ -1,3 +1,8 @@
+export { OlympicTaskNotFoundException } from './olympic-task-not-found.exception';
+export { OlympicStepNotStartedException } from './olympic-step-not-started.exception';
+export { OlympicStepFinishedException } from './olympic-step-finished.exception';
+export { OlympicStepNotAttendedException } from './olympic-step-not-attended.exception';
+export { OlympicStepNotFoundException } from './olympic-step-not-found.exception';
 export { OlympicNotAttendedException } from './olympic-not-attended.exception';
 export { OlympicAlreadyReviewedException } from './olympic-already-reviewed.exception';
 export { OlympicReviewNotFoundException } from './olympic-review-not-found.exception';
