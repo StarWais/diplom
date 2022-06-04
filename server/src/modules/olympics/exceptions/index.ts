@@ -1,3 +1,4 @@
+export { OlympicTaskAnswerVariantNotFoundException } from './olympic-task-answer-variant-not-found.exception';
 export { OlympicTaskNotFoundException } from './olympic-task-not-found.exception';
 export { OlympicStepNotStartedException } from './olympic-step-not-started.exception';
 export { OlympicStepFinishedException } from './olympic-step-finished.exception';

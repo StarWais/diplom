@@ -1,3 +1,5 @@
+export { OlympicTaskAnswerVariantUpdateDto } from './olympic-task-answer-variant-update.dto';
+export { OlympicTaskAnswerVariantCreateDto } from './olympic-task-answer-variant-create.dto';
 export { OlympicTaskUpdateDto } from './olympic-task-update.dto';
 export { OlympicTaskCreateDto } from './olympic-task-create.dto';
 export { OlympicTagCreateDto } from './olympic-tag-create.dto';
