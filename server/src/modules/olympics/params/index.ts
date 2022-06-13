@@ -1,3 +1,4 @@
+export { FindOlympicStepAttemptParams } from './find-olympic-step-attempt.params';
 export { FindOlympicTaskVariantParams } from './find-olympic-task-variant.params';
 export { FindByOlympicsTaskIdParams } from './find-by-olympics-task-id.params';
 export { FindByOlympicsStepIdParams } from './find-by-olympics-step-id.params';

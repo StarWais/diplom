@@ -1,3 +1,5 @@
+export { OlympicStepAttemptCreateDto } from './olympic-step-attempt-create.dto';
+export { OlympicTaskAnswerAttemptCreateDto } from './olympic-task-answer-attempt-create.dto';
 export { OlympicTaskAnswerVariantUpdateDto } from './olympic-task-answer-variant-update.dto';
 export { OlympicTaskAnswerVariantCreateDto } from './olympic-task-answer-variant-create.dto';
 export { OlympicTaskUpdateDto } from './olympic-task-update.dto';

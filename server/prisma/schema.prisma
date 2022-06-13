@@ -346,8 +346,8 @@ model OlympiadTaskAnswerAttempt {
   olympiadTaskId Int          @map("olympiad_task_id")
   olympiadTask   OlympiadTask @relation(fields: [olympiadTaskId], references: [id], onDelete: Cascade)
 
-  olympiadStepAttemptId Int? @map("olympiad_step_attempt_id")
-  olympiadStepAttempt   OlympiadStepAttempt? @relation(fields: [olympiadStepAttemptId], references: [id], onDelete: Cascade)
+  olympiadStepAttemptId Int @map("olympiad_step_attempt_id")
+  olympiadStepAttempt   OlympiadStepAttempt @relation(fields: [olympiadStepAttemptId], references: [id], onDelete: Cascade)
 
   studentId Int     @map("student_id")
   student   Student @relation(fields: [studentId], references: [id])

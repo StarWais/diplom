@@ -5,8 +5,13 @@ import { Prisma, User } from '@prisma/client';
 import { FindOlympicStepParams, FindOlympicTaskParams } from '@olympics/params';
 import { OlympicTaskDto, OlympicTaskFullDto } from '@olympics/dto/response';
 import { OlympicTaskInclude } from '@olympics/interfaces';
-import { OlympicTaskNotFoundException } from '@olympics/exceptions';
 import {
+  OlympicTaskNotFoundException,
+  TasksNotInRangeException,
+  TaskVariantNotInRangeException,
+} from '@olympics/exceptions';
+import {
+  OlympicStepAttemptCreateDto,
   OlympicTaskCreateDto,
   OlympicTaskUpdateDto,
 } from '@olympics/dto/request';
@@ -43,6 +48,52 @@ export class OlympicsTasksService {
     }
 
     return new OlympicTaskFullDto(task);
+  }
+
+  async validateTasks(
+    attempts: OlympicStepAttemptCreateDto,
+    stepId: number,
+  ): Promise<void> {
+    const tasksInStep = await this.prisma.olympiadTask.findMany({
+      where: {
+        olympiadStepId: stepId,
+      },
+    });
+
+    const taskIds = tasksInStep.map((task) => task.id);
+    const dtoTaskIds = attempts.taskAttempts.map((attempt) => attempt.taskId);
+
+    const invalidTaskIds = dtoTaskIds.filter(
+      (taskId) => !taskIds.includes(taskId),
+    );
+
+    if (invalidTaskIds.length) {
+      throw new TasksNotInRangeException(invalidTaskIds, stepId);
+    }
+
+    const answeredTasks = await this.prisma.olympiadTask.findMany({
+      where: {
+        id: {
+          in: taskIds,
+        },
+      },
+      include: {
+        variants: true,
+      },
+    });
+
+    answeredTasks.forEach((task) => {
+      const dtoAttempt = attempts.taskAttempts.find(
+        (attempt) => attempt.taskId === task.id,
+      );
+      const dtoAttemptVariantsIds = dtoAttempt.variants;
+      const taskVariantsIds = task.variants.map((variant) => variant.id);
+      dtoAttemptVariantsIds.forEach((variant) => {
+        if (!taskVariantsIds.includes(variant)) {
+          throw new TaskVariantNotInRangeException(variant, task.id);
+        }
+      });
+    });
   }
 
   async create(

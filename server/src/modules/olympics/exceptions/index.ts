@@ -1,3 +1,8 @@
+export { OlympicStepAttemptNotFoundException } from './olympic-step-attempt-not-found.exception';
+export { TaskVariantNotInRangeException } from './task-variant-not-in-range.exception';
+export { TasksNotInRangeException } from './tasks-not-in-range.exception';
+export { OlympicStepAttemptNotCreatedException } from './olympic-step-attempt-not-created.exception';
+export { OlympicStepAttemptCreatedException } from './olympic-step-attempt-created.exception';
 export { OlympicTaskAnswerVariantNotFoundException } from './olympic-task-answer-variant-not-found.exception';
 export { OlympicTaskNotFoundException } from './olympic-task-not-found.exception';
 export { OlympicStepNotStartedException } from './olympic-step-not-started.exception';
