@@ -1,3 +1,4 @@
+export { OlympicListedMyDto } from './olympic-listed-my.dto';
 export { OlympicTaskAnswerAttemptDto } from './olympic-task-answer-attempt.dto';
 export { OlympicStepAttemptDto } from './olympic-step-attempt.dto';
 export { OlympicTaskDto } from './olympic-task.dto';

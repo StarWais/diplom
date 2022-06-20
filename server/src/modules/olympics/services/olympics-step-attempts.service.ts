@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 
 import {
+  FindByOlympicsStepIdParams,
   FindOlympicStepAttemptParams,
   FindOlympicStepParams,
 } from '@olympics/params';
@@ -54,8 +55,8 @@ export class OlympicsStepAttemptsService {
   }
 
   async findMany(
+    searchParams: FindByOlympicsStepIdParams,
     paginationDetails: PaginationQuery,
-    searchParams: FindOlympicStepAttemptParams,
   ): Promise<PaginatedDto<OlympicStepAttemptDto>> {
     return Paginate<Prisma.OlympiadStepAttemptFindManyArgs>(
       OlympicStepAttemptDto,

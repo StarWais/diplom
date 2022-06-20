@@ -20,7 +20,7 @@ export class OlympicReviewDto
 
   @Expose()
   @ApiProperty({
-    type: 'string',
+    type: 'integer',
     description: 'ID студента',
     example: 1,
   })

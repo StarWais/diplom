@@ -9,7 +9,7 @@ export class OlympicTaskAnswerVariantFullDto
 {
   @Expose()
   @ApiProperty({
-    type: 'string',
+    type: 'integer',
     description: 'Идентификатор задания',
     example: 1,
   })

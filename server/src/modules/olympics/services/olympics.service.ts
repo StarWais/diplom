@@ -1,13 +1,13 @@
 import { PrismaService } from 'nestjs-prisma';
 import { Injectable } from '@nestjs/common';
-import { Prisma, PublishingStatus } from '@prisma/client';
+import { Prisma, PublishingStatus, User } from '@prisma/client';
 
 import { OlympicsBaseIncludes } from '../interfaces';
 import { OlympicCreateDto, OlympicUpdateDto } from '../dto/request';
-import { OlympicDto } from '../dto/response';
+import { OlympicDto, OlympicListedMyDto } from '../dto/response';
 import { OlympicNotFoundException } from '../exceptions';
 import { ImagesService } from '@images/services';
-import { GetOlympicsFilter } from '../filters';
+import { GetOlympicsFilter, GetMyOlympicsFilter } from '../filters';
 import { Paginate, PaginatedDto } from '@pagination/pagination';
 import { OlympicListedBaseDto } from '../dto/response/olympic-listed-base.dto';
 
@@ -85,6 +85,51 @@ export class OlympicsService {
         ...this.olympicWithStepsInclude,
       },
       (olympic) => new OlympicListedBaseDto(olympic),
+    );
+  }
+
+  async findMy(filter: GetMyOlympicsFilter, currentUser: User) {
+    return Paginate<Prisma.OlympiadFindManyArgs>(
+      OlympicListedMyDto,
+      {
+        page: filter.page,
+        limit: filter.limit,
+      },
+      this.prisma,
+      'olympiad',
+      {
+        where: {
+          tags: {
+            some: {
+              name: {
+                in: filter.tags,
+              },
+            },
+          },
+          grade: {
+            equals: filter.grade,
+          },
+          steps: {
+            some: {
+              step: {
+                equals: filter.step,
+              },
+            },
+          },
+          applications: {
+            some: {
+              student: {
+                id: currentUser.id,
+              },
+            },
+          },
+        },
+        orderBy: {
+          name: 'asc',
+        },
+        ...this.olympicWithStepsInclude,
+      },
+      (olympic) => new OlympicListedMyDto(olympic),
     );
   }
 

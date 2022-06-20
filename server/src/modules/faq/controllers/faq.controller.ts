@@ -18,6 +18,7 @@ import {
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
@@ -29,22 +30,10 @@ import { PaginationQuery } from '@pagination/pagination-query';
 import { ApiPaginatedResponse, PaginatedDto } from '@pagination/pagination';
 import { CreateFaqDto, UpdateFaqDto } from '@faq/dto/request';
 
-@Controller()
+@ApiTags('FAQ')
+@Controller('faq')
 export class FaqController {
   constructor(private readonly faqService: FaqService) {}
-
-  @Roles(Role.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @ApiBearerAuth()
-  @ApiOkResponse({ type: FaqDto, description: 'FAQ' })
-  @Get(':id')
-  @ApiOperation({
-    summary: 'Получить FAQ',
-    description: 'Доступно только администратору',
-  })
-  async findOne(@Param() searchParams: FindOneByIDParams): Promise<FaqDto> {
-    return this.faqService.findOneOrThrowError(searchParams);
-  }
 
   @ApiPaginatedResponse(FaqDto)
   @Get('/answered')
@@ -70,6 +59,19 @@ export class FaqController {
     @Query() query: PaginationQuery,
   ): Promise<PaginatedDto<FaqDto>> {
     return this.faqService.findAll(query);
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: FaqDto, description: 'FAQ' })
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Получить FAQ',
+    description: 'Доступно только администратору',
+  })
+  async findOne(@Param() searchParams: FindOneByIDParams): Promise<FaqDto> {
+    return this.faqService.findOneOrThrowError(searchParams);
   }
 
   @UseGuards(JwtAuthGuard)
